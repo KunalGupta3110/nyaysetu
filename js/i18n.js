@@ -340,7 +340,7 @@ async function translateDictionary(lang, dictionary, cacheKey) {
     'Return only valid JSON. Do not add markdown or explanation.'
   ].join(' ');
 
-  const response = await fetch('http://localhost:5000/chat', {
+  const response = await fetch('https://nyaysetu-a5vj.onrender.com/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ system, message: JSON.stringify(dictionary, null, 2) })

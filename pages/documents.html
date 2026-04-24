@@ -445,7 +445,7 @@ async function generateDocument() {
 
   document.getElementById("preview-body").innerText = "Generating document...";
 
-  const res = await fetch("http://localhost:5000/generate-doc", {
+  const res = await fetch("https://nyaysetu-a5vj.onrender.com/generate-doc", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
