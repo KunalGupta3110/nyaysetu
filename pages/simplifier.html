@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Law Simplifier — NyaySetu</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+.page-hero { padding: 52px 0 36px; border-bottom: 1px solid var(--border); }
+
+/* Two-panel layout */
+.simplify-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 32px 0 80px; }
+
+.panel {
+  background: var(--bg1); border: 1px solid var(--border); border-radius: var(--rl);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.panel-head {
+  padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--bg2);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.panel-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--ts); font-family: 'DM Mono', monospace; }
+.panel-badge { padding: 2px 8px; border-radius: 100px; font-size: 10px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; }
+.badge-in  { background: var(--bluedim); border: 1px solid rgba(129,140,248,.2); color: var(--blue); }
+.badge-out { background: var(--greendim); border: 1px solid rgba(74,222,128,.15); color: var(--green); }
+
+.panel-body { flex: 1; padding: 18px 20px; display: flex; flex-direction: column; }
+.panel-foot { padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg2); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+
+/* Input */
+.simplify-ta {
+  flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px; font-size: 13px; color: var(--tp); resize: none; outline: none;
+  line-height: 1.72; min-height: 420px; transition: border-color var(--t) var(--ease);
+}
+.simplify-ta:focus { border-color: var(--border2); }
+.simplify-ta::placeholder { color: var(--tm); }
+
+/* Word count */
+.wc { font-size: 11px; color: var(--tm); font-family: 'DM Mono', monospace; }
+
+/* Output */
+.output-area {
+  flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 14px;
+  background: var(--bg); overflow-y: auto; min-height: 420px;
+}
+.output-area.empty { display: flex; align-items: center; justify-content: center; text-align: center; color: var(--tm); font-size: 13px; flex-direction: column; gap: 12px; }
+.output-area.loading { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; color: var(--ts); font-size: 13px; }
+
+/* Output sections */
+.out-section { margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.out-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.out-sec-title { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.4px; color: var(--accent); margin-bottom: 10px; font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 6px; }
+.out-text { font-size: 13.5px; color: var(--tp); line-height: 1.78; }
+.out-text p { margin-bottom: 5px; }
+.out-text p:last-child { margin-bottom: 0; }
+
+.law-chip { display: inline-flex; align-items: center; padding: 1px 7px; background: var(--adim); border: 1px solid rgba(201,169,110,.2); border-radius: 4px; font-size: 11px; color: var(--accent); font-family: 'DM Mono', monospace; font-weight: 500; margin: 2px 2px; cursor: default; white-space: nowrap; }
+.action-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; font-size: 12.5px; color: var(--ts); margin: 3px 2px; cursor: default; }
+
+/* Sample buttons */
+.samples { display: flex; gap: 8px; flex-wrap: wrap; }
+.sample-btn { padding: 5px 12px; border-radius: 7px; border: 1px solid var(--border); background: transparent; font-size: 12px; color: var(--ts); transition: all var(--t) var(--ease); }
+.sample-btn:hover { border-color: var(--border2); color: var(--tp); background: var(--bg2); }
+
+/* Detail meta */
+.meta-row { display: flex; gap: 14px; font-size: 11px; color: var(--tm); font-family: 'DM Mono', monospace; }
+
+@media (max-width: 860px) {
+  .simplify-layout { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body data-page="simplify">
+<script src="../js/utils.js"></script>
+<script src="../js/i18n.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+function injectNav() {
+  document.body.insertAdjacentHTML('afterbegin', `
+  <nav id="nav">
+    <a href="../index.html" class="nav-logo"><div class="nav-logo-box">N</div><span class="nav-logo-name">NyaySetu</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="../index.html"  data-page="home"><span data-i18n="nav_home">Home</span></a>
+      <a class="nav-tab" href="chat.html"       data-page="chat"><span class="nav-icon">⚖</span> <span data-i18n="nav_chat">AI Chat</span></a>
+      <a class="nav-tab" href="documents.html"  data-page="docs"><span class="nav-icon">📄</span> <span data-i18n="nav_docs">Documents</span></a>
+      <a class="nav-tab" href="simplifier.html" data-page="simplify"><span class="nav-icon">📚</span> <span data-i18n="nav_simplify">Simplifier</span></a>
+      <a class="nav-tab" href="students.html"   data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
+      <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()">☀</button>
+      <a href="chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
+    </div>
+  </nav>
+  <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>`);
+  initTheme(); setActiveNav();
+}
+injectNav();
+</script>
+
+<main style="padding-top:64px">
+
+  <!-- HERO -->
+  <section class="page-hero">
+    <div class="container-md">
+      <div class="eyebrow fi" data-i18n="simplifier_title">Law Simplifier</div>
+      <h1 class="sh2 fi" data-i18n="simplifier_header">Understand any legal text instantly</h1>
+      <p class="sub fi" style="max-width:520px;margin-bottom:22px" data-i18n="simplifier_sub">Paste a court order, legal notice, contract clause, IPC section, or government circular — get a plain-language breakdown with actionable steps in seconds.</p>
+      <div class="samples fi">
+        <span style="font-size:12px;color:var(--ts);align-self:center;margin-right:4px" data-i18n="simplifier_try_sample">Try a sample:</span>
+        <button class="sample-btn" onclick="loadSample('ipc')">📖 IPC Section 420</button>
+        <button class="sample-btn" onclick="loadSample('notice')">📬 Legal Notice</button>
+        <button class="sample-btn" onclick="loadSample('order')">⚖ Court Order</button>
+        <button class="sample-btn" onclick="loadSample('clause')">📋 Contract Clause</button>
+        <button class="sample-btn" onclick="loadSample('rti_reply')">📄 RTI Reply</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANELS -->
+  <div class="container-md">
+    <div class="simplify-layout">
+
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">📥 <span data-i18n="simplify_input_label">Legal Text Input</span> <span class="panel-badge badge-in" data-i18n="simplify_input_badge">Paste Here</span></div>
+          <button class="btn-ghost btn-sm" onclick="clearAll()" data-i18n="simplify_clear">Clear</button>
+        </div>
+        <div class="panel-body">
+          <textarea class="simplify-ta" id="simplify-in"
+            placeholder="Paste any legal text here — court order, legal notice, contract clause, IPC / CrPC section, government circular, FIR content...
+
+Example:
+'Whoever cheats and thereby dishonestly induces the person deceived to deliver any property to any person, or to make, alter or destroy the whole or any part of a valuable security... shall be punished with imprisonment of either description for a term which may extend to seven years, and shall also be liable to fine.' (Section 420 IPC)"
+            oninput="updateWC()"></textarea>
+        </div>
+        <div class="panel-foot">
+          <span class="wc" id="wc">0 words</span>
+          <button class="btn-primary btn-sm" onclick="simplify()" id="simplify-btn" data-i18n="simplify_button">✦ Simplify →</button>
+        </div>
+      </div>
+
+      <!-- OUTPUT PANEL -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="panel-title">📤 <span data-i18n="simplify_output_label">Plain English</span> <span class="panel-badge badge-out" data-i18n="simplify_output_badge">Simplified</span></div>
+          <button class="btn-ghost btn-sm" onclick="copyOutput()" id="copy-out-btn" style="display:none">📋 Copy</button>
+        </div>
+        <div class="panel-body">
+          <div class="output-area empty" id="output-area">
+            <span style="font-size:36px">⚖️</span>
+            <span data-i18n-html="simplifier_output_placeholder">Your plain-language explanation<br>will appear here</span>
+          </div>
+        </div>
+        <div class="panel-foot" id="out-meta" style="display:none">
+          <div class="meta-row">
+            <span id="meta-time">0.0s</span>
+            <span id="meta-words">0 words read</span>
+          </div>
+          <button class="btn-ghost btn-sm" onclick="simplify()">Re-analyse</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<script>
+const SAMPLES = {
+  ipc: `Section 420 in The Indian Penal Code — Cheating and dishonestly inducing delivery of property:
+
+Whoever cheats and thereby dishonestly induces the person deceived to deliver any property to any person, or to make, alter or destroy the whole or any part of a valuable security, or anything which is signed or sealed, and which is capable of being converted into a valuable security, shall be punished with imprisonment of either description for a term which may extend to seven years, and shall also be liable to fine.`,
+
+  notice: `LEGAL NOTICE
+WITHOUT PREJUDICE
+
+To,
+Mr. Ramesh Gupta
+H.No. 34, Sector 22,
+Noida, Uttar Pradesh - 201301
+
+SUB: DEMAND FOR RETURN OF SECURITY DEPOSIT OF RS. 80,000/- (RUPEES EIGHTY THOUSAND ONLY) ALONG WITH INTEREST THEREON
+
+Sir,
+Under instructions from and on behalf of my client, Ms. Priya Sharma, r/o 45, Civil Lines, New Delhi - 110001, I hereby serve upon you this legal notice calling upon you to return the security deposit of Rs. 80,000/- (Rupees Eighty Thousand Only) deposited at the time of commencement of tenancy in respect of premises at H.No. 34, Sector 22, Noida.
+
+My client vacated the said premises on 31.03.2025 after duly serving one month's notice as per the terms of the tenancy agreement. Despite repeated requests orally and in writing, you have failed and neglected to refund the aforesaid security deposit. Your failure to refund the same without any just cause or reason constitutes wrongful retention of my client's hard-earned money.
+
+You are hereby called upon to refund the said amount of Rs. 80,000/- along with interest at 12% per annum within a period of 15 (fifteen) days from the receipt of this notice, failing which my client shall be constrained to initiate appropriate legal proceedings against you before the competent court of law, both civil and criminal, entirely at your risk, cost and consequence.`,
+
+  order: `IN THE HON'BLE HIGH COURT OF DELHI AT NEW DELHI
+Criminal Misc. Application No. 1234 of 2025
+
+State vs. Accused ABC
+FIR No. 567/2024, P.S. Connaught Place, Delhi
+Sections: 302, 34 IPC
+
+ORDER DATED: 15.04.2025
+
+Heard learned Additional Public Prosecutor for the State as well as the learned counsel for the applicant/accused.
+
+Perusal of the application, the FIR, the medical reports and the case diary reveal that the applicant is accused of offence punishable under Section 302 IPC which is a heinous offence against society. The offence is grave in nature and given the serious allegations, the applicant cannot be released on bail as a matter of right.
+
+The prayer for bail is declined. Application stands dismissed.
+
+(JUSTICE A.K. SHARMA)
+HIGH COURT OF DELHI`,
+
+  clause: `LIMITATION OF LIABILITY: Notwithstanding any other provision of this Agreement, in no event shall either party be liable to the other party for any indirect, incidental, special, consequential, exemplary, or punitive damages, including without limitation, loss of profits, loss of data, loss of goodwill, service interruption, computer damage or system failure or the cost of substitute products or services, or for any damages for personal or bodily injury or emotional distress arising out of or in connection with this Agreement or from the use of or inability to use the Services, whether based on warranty, contract, tort (including negligence), product liability, or any other legal theory, and whether or not such party has been informed of the possibility of such damage, even if a limited remedy set forth herein is found to have failed of its essential purpose.`,
+
+  rti_reply: `Government of India
+Ministry of Finance
+Central Public Information Officer
+
+No. RTI/MOF/2025/1234
+Date: 10th April, 2025
+
+To,
+Shri Rajesh Tiwari
+123, Sector 45
+New Delhi - 110065
+
+Subject: Reply to your RTI Application dated 01.03.2025
+
+With reference to your application dated 01.03.2025 received under the Right to Information Act, 2005, the information as sought is furnished as under:
+
+Point No. 1: The total budget allocated for the department in FY 2024-25 was Rs. 450 Crores (as per Union Budget 2024).
+
+Point No. 2: Details of tenders floated above Rs. 1 Crore: Information pertaining to the last 6 months is available on the official website at www.finance.gov.in/tenders.
+
+Point No. 3: The said information relates to third party and is exempt from disclosure under Section 8(1)(d) of the RTI Act, 2005.
+
+In case you are not satisfied with the reply, you may prefer a First Appeal before the First Appellate Authority within 30 days from the date of receipt of this reply.
+
+CPIO, Ministry of Finance`
+};
+
+function loadSample(key) {
+  document.getElementById('simplify-in').value = SAMPLES[key];
+  updateWC();
+}
+
+function updateWC() {
+  const txt = document.getElementById('simplify-in').value;
+  const n = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+  document.getElementById('wc').textContent = n + ' words';
+}
+
+function clearAll() {
+  document.getElementById('simplify-in').value = '';
+  updateWC();
+  const oa = document.getElementById('output-area');
+  oa.className = 'output-area empty';
+  oa.innerHTML = '<span style="font-size:36px">⚖️</span><span data-i18n-html="simplifier_output_placeholder">Your plain-language explanation<br>will appear here</span>';
+  applyTranslations?.(currentStrings);
+  document.getElementById('out-meta').style.display = 'none';
+  document.getElementById('copy-out-btn').style.display = 'none';
+}
+
+function copyOutput() {
+  const text = document.getElementById('output-area').innerText;
+  copyText(text, 'Simplified text copied');
+}
+
+async function simplify() {
+  const text = document.getElementById('simplify-in').value.trim();
+  if (!text) { showToast('Please paste some legal text first', '⚠'); return; }
+
+  const btn = document.getElementById('simplify-btn');
+  btn.disabled = true;
+
+  const oa = document.getElementById('output-area');
+  oa.className = 'output-area loading';
+  oa.innerHTML = `<div class="spinner"></div><span>Analysing legal text…</span>`;
+  document.getElementById('out-meta').style.display = 'none';
+  document.getElementById('copy-out-btn').style.display = 'none';
+
+  const start = Date.now();
+  const wordCount = text.split(/\s+/).length;
+
+  const systemPrompt = `You are NyaySetu's Law Simplifier. You take complex Indian legal text and explain it to a common citizen with no legal background.
+
+You MUST respond in exactly this structured format (use these exact section titles):
+
+PLAIN SUMMARY
+[2-3 sentences that explain what this text says in the simplest possible language. No jargon.]
+
+WHAT THIS MEANS FOR YOU
+[3-5 practical bullet points starting with "• " explaining the direct implications for the reader]
+
+KEY LEGAL TERMS EXPLAINED
+[List important terms in format "Term — Simple meaning" (one per line)]
+
+LAWS / SECTIONS REFERENCED
+[List every law, act, section, or code mentioned. If none, write "No specific sections cited."]
+
+YOUR OPTIONS & NEXT STEPS
+[Numbered practical actions the person can realistically take. Be specific.]
+
+IMPORTANT WARNING
+[Any critical warnings — deadlines, rights that expire, when a lawyer is essential. Be direct.]
+
+Rules: Use plain Hindi words if a concept is commonly known in Hindi. Be empathetic. Never use legalese in your explanation.`;
+
+  try {
+    const result = await callClaude(systemPrompt, `Simplify this legal text:\n\n${text}`);
+    const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+
+    oa.className = 'output-area';
+    oa.innerHTML = renderOutput(result);
+
+    document.getElementById('out-meta').style.display = 'flex';
+    document.getElementById('meta-time').textContent = `Analysed in ${elapsed}s`;
+    document.getElementById('meta-words').textContent = `${wordCount} words processed`;
+    document.getElementById('copy-out-btn').style.display = 'flex';
+    showToast('Legal text simplified', '✦');
+  } catch (err) {
+    oa.className = 'output-area empty';
+    oa.innerHTML = `<span style="font-size:28px;color:var(--red)">⚠</span><span style="color:var(--red)">Analysis failed. Please check your connection and try again.</span>`;
+  }
+
+  btn.disabled = false;
+}
+
+function renderOutput(text) {
+  const SECTIONS = [
+    'PLAIN SUMMARY',
+    'WHAT THIS MEANS FOR YOU',
+    'KEY LEGAL TERMS EXPLAINED',
+    'LAWS / SECTIONS REFERENCED',
+    'YOUR OPTIONS & NEXT STEPS',
+    'IMPORTANT WARNING'
+  ];
+
+  const ICONS = {
+    'PLAIN SUMMARY':              '📋',
+    'WHAT THIS MEANS FOR YOU':    '👤',
+    'KEY LEGAL TERMS EXPLAINED':  '📖',
+    'LAWS / SECTIONS REFERENCED': '⚖',
+    'YOUR OPTIONS & NEXT STEPS':  '✅',
+    'IMPORTANT WARNING':          '⚠'
+  };
+
+  let html = '';
+  let lines = text.split('\n');
+  let currentSection = null;
+  let sectionContent = [];
+
+  function flushSection() {
+    if (!currentSection) return;
+    const content = sectionContent.join('\n').trim();
+    const formatted = formatSectionContent(currentSection, content);
+    html += `<div class="out-section">
+      <div class="out-sec-title">${ICONS[currentSection] || '→'} ${currentSection}</div>
+      <div class="out-text">${formatted}</div>
+    </div>`;
+    sectionContent = [];
+  }
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    const isSection = SECTIONS.includes(trimmed);
+    if (isSection) {
+      flushSection();
+      currentSection = trimmed;
+    } else if (currentSection && trimmed) {
+      sectionContent.push(trimmed);
+    }
+  });
+  flushSection();
+
+  return html || `<div class="out-text"><p>${esc(text).replace(/\n/g,'<br>')}</p></div>`;
+}
+
+function formatSectionContent(section, content) {
+  if (!content) return '';
+
+  let html = content
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+
+  // Highlight law references
+  html = html.replace(/(Section\s[\dA-Za-z]+(?:[A-Z])?(?:\s(?:IPC|CrPC|CPC|IEA))?|IPC\s[\dA-Za-z]+|[A-Z][a-z]+ Act(?:,?\s\d{4})?|RTI Act|CPC|CrPC|IPC)/g,
+    '<span class="law-chip">$1</span>');
+
+  if (section === 'WHAT THIS MEANS FOR YOU') {
+    // Bullets
+    html = html.replace(/^• (.+)$/gm, '<p>• $1</p>');
+    html = html.replace(/^(\d+)\. (.+)$/gm, '<p>$1. $2</p>');
+  } else if (section === 'YOUR OPTIONS & NEXT STEPS') {
+    html = html.replace(/^(\d+)\. (.+)$/gm, '<p style="padding-left:4px">$1. $2</p>');
+    html = html.replace(/^• (.+)$/gm, '<p>• $1</p>');
+  } else if (section === 'KEY LEGAL TERMS EXPLAINED') {
+    html = html.replace(/^([^—\n]+) — (.+)$/gm, '<p><strong>$1</strong> — $2</p>');
+    html = html.replace(/^([^:\n]+): (.+)$/gm, '<p><strong>$1</strong>: $2</p>');
+  } else if (section === 'IMPORTANT WARNING') {
+    html = `<div style="padding:12px 14px;background:var(--reddim);border:1px solid rgba(248,113,113,.15);border-radius:8px;color:var(--tp)">${html}</div>`;
+    return html;
+  }
+
+  // Default: wrap bare lines in <p>
+  html = html.replace(/^(?!<p|<div|<strong)(.+)$/gm, '<p>$1</p>');
+  return html;
+}
+
+updateWC();
+</script>
+</body>
+</html>

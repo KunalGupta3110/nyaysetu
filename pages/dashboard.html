@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="dash_page_title">Dashboard — NyaySetu</title>
+<link rel="stylesheet" href="../styles/base.css">
+<style>
+.dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 64px);margin-top:64px}
+.sidenav{border-right:1px solid var(--border);background:var(--bg1);padding:20px 12px;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
+.sidenav-user{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:var(--bg2);border:1px solid var(--border);margin-bottom:20px}
+.sidenav-avatar{width:36px;height:36px;border-radius:50%;background:var(--adim);border:1px solid rgba(201,169,110,.3);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--accent);flex-shrink:0;overflow:hidden}
+.sidenav-avatar img{width:100%;height:100%;object-fit:cover}
+.sidenav-name{font-size:13px;font-weight:600;color:var(--tp)}
+.sidenav-role{font-size:11px;color:var(--ts)}
+.snav-section{font-size:10px;font-weight:600;letter-spacing:1.3px;text-transform:uppercase;color:var(--tm);padding:14px 10px 6px;font-family:'DM Mono',monospace}
+.snav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--ts);cursor:pointer;margin-bottom:2px;transition:all var(--t) var(--ease);border:1px solid transparent}
+.snav-item:hover{background:var(--bg2);color:var(--tp)}
+.snav-item.active{background:var(--adim);color:var(--accent);border-color:rgba(201,169,110,.18)}
+.snav-ico{font-size:15px;flex-shrink:0}
+.dash-content{padding:32px 36px;overflow-y:auto}
+.dash-pane{display:none}
+.dash-pane.active{display:block}
+
+/* Welcome banner */
+.welcome-banner{background:linear-gradient(135deg,rgba(201,169,110,.08),transparent 70%);border:1px solid rgba(201,169,110,.15);border-radius:var(--rl);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:28px}
+.wb-text h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--tp);margin-bottom:5px}
+.wb-text p{font-size:13px;color:var(--ts)}
+
+/* Quick stats */
+.quick-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.qs-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.qs-val{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--tp);letter-spacing:-1px;margin-bottom:3px}
+.qs-val span{color:var(--accent);font-size:16px}
+.qs-lbl{font-size:12px;color:var(--ts)}
+
+/* Chat history list */
+.session-list{display:flex;flex-direction:column;gap:8px}
+.session-item{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all var(--t) var(--ease)}
+.session-item:hover{border-color:var(--border2);background:var(--bg2)}
+.session-title{font-size:13.5px;color:var(--tp);font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.session-meta{font-size:11px;color:var(--tm);font-family:'DM Mono',monospace;flex-shrink:0}
+.session-del{width:24px;height:24px;border-radius:5px;border:none;background:transparent;color:var(--tm);display:flex;align-items:center;justify-content:center;font-size:13px;transition:all var(--t) var(--ease);flex-shrink:0}
+.session-del:hover{background:var(--reddim);color:var(--red)}
+
+/* Document list */
+.doc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.doc-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:18px;cursor:pointer;transition:all var(--t) var(--ease)}
+.doc-card:hover{border-color:var(--border2);transform:translateY(-1px);box-shadow:var(--shadow)}
+.doc-type-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--accent);font-family:'DM Mono',monospace;margin-bottom:8px}
+.doc-title{font-size:14px;font-weight:500;color:var(--tp);margin-bottom:6px;line-height:1.4}
+.doc-date{font-size:11px;color:var(--tm);font-family:'DM Mono',monospace}
+.doc-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+
+/* Profile form */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.profile-avatar-section{display:flex;align-items:center;gap:16px;padding:20px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);margin-bottom:24px}
+.profile-avatar-big{width:64px;height:64px;border-radius:50%;background:var(--adim);border:2px solid rgba(201,169,110,.3);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:var(--accent);flex-shrink:0;overflow:hidden}
+.profile-avatar-big img{width:100%;height:100%;object-fit:cover}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--tm)}
+.empty-ico{font-size:40px;margin-bottom:12px}
+.empty-title{font-size:15px;font-weight:600;color:var(--ts);margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--tm)}
+
+@media(max-width:860px){
+  .dash-layout{grid-template-columns:1fr}
+  .sidenav{display:none}
+  .quick-stats{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body data-page="dashboard">
+<script type="module">
+import { supabase, auth, profiles, chat, docs, simplify, queries, metrics, notifications } from '../lib/supabase.js'
+import { initTheme, showToast, esc, relativeTime, initScrollAnim } from '../lib/utils.js'
+import '../js/i18n.js'
+initTheme()
+initI18n()
+
+const user = await auth.requireAuth()
+if (!user) throw new Error('not authed')
+
+// Load profile
+const { data: profile } = await profiles.get(user.id)
+const initials = (profile?.full_name || 'U').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)
+
+// Inject nav
+document.body.insertAdjacentHTML('afterbegin', `
+<nav id="nav">
+  <a href="../../index.html" class="nav-logo"><div class="nav-logo-box">N</div><span class="nav-logo-name">NyaySetu</span></a>
+  <div class="nav-tabs">
+    <a class="nav-tab" href="../../index.html" data-page="home" data-i18n="nav_home">Home</a>
+    <a class="nav-tab" href="chat.html" data-page="chat" data-i18n="nav_chat">⚖ AI Chat</a>
+    <a class="nav-tab" href="documents.html" data-page="docs" data-i18n="nav_docs">📄 Documents</a>
+    <a class="nav-tab" href="simplifier.html" data-page="simplify" data-i18n="nav_simplify">📚 Simplifier</a>
+    ${profile?.role === 'student' ? '<a class="nav-tab" href="students.html" data-page="students" data-i18n="nav_students">🎓 Students</a>' : ''}
+  </div>
+  <div class="nav-right">
+    <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
+    <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()">☀</button>
+    <div class="dropdown">
+      <div class="nav-avatar" onclick="toggleDropdown('user-menu')">
+        ${profile?.avatar_url ? `<img src="${esc(profile.avatar_url)}" alt="">` : initials}
+      </div>
+      <div class="dropdown-menu" id="user-menu">
+        <div class="dropdown-item" onclick="showPane('profile')" data-i18n="dash_menu_profile">👤 Profile Settings</div>
+        <div class="dropdown-item" onclick="showPane('docs')" data-i18n="dash_menu_docs">📄 My Documents</div>
+        ${profile?.role === 'student' ? '<div class="dropdown-item" onclick="location.href=\'students.html\'" data-i18n="dash_menu_students">🎓 Student Dashboard</div>' : ''}
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item" style="color:var(--red)" onclick="signOut()" data-i18n="dash_menu_signout">← Sign Out</div>
+      </div>
+    </div>
+  </div>
+</nav>
+<div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span>`)
+
+document.querySelector('.nav-tab[data-page="dashboard"]')?.classList.add('active')
+
+async function signOut() { await auth.signOut() }
+window.signOut = signOut
+
+// Load data
+const [siteMetrics, sessionsRes, docsRes] = await Promise.all([
+  metrics.get(),
+  chat.getSessions(user.id),
+  docs.getAll(user.id)
+])
+
+const sessions = sessionsRes.data || []
+const docList  = docsRes.data || []
+
+// Render welcome
+document.getElementById('wb-name').textContent = profile?.full_name?.split(' ')[0] || 'there'
+document.getElementById('qs-chats').textContent = sessions.length
+document.getElementById('qs-docs').textContent  = docList.length
+
+// Render sessions
+const sl = document.getElementById('session-list')
+if (sessions.length === 0) {
+  sl.innerHTML = `<div class="empty-state"><div class="empty-ico">💬</div><div class="empty-title" data-i18n="dash_no_chats_title">No conversations yet</div><div class="empty-sub" data-i18n="dash_no_chats_sub">Your AI chat history will appear here</div><a href="chat.html" class="btn-primary" style="margin-top:16px;display:inline-flex" data-i18n="dash_start_chatting">Start Chatting →</a></div>`
+} else {
+  sl.innerHTML = sessions.map(s => `
+    <div class="session-item" onclick="location.href='chat.html?session=${s.id}'">
+      <span style="font-size:16px">💬</span>
+      <div class="session-title">${esc(s.title || 'Legal query')}</div>
+      <div class="session-meta">${relativeTime(s.updated_at)}</div>
+      <button class="session-del" onclick="delSession(event,'${s.id}')" title="Delete">✕</button>
+    </div>`).join('')
+}
+
+// Render docs
+const dl = document.getElementById('doc-list')
+if (docList.length === 0) {
+  dl.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-ico">📄</div><div class="empty-title" data-i18n="dash_no_docs_title">No documents yet</div><div class="empty-sub" data-i18n="dash_no_docs_sub">Generate your first legal document</div><a href="documents.html" class="btn-primary" style="margin-top:16px;display:inline-flex" data-i18n="dash_generate_doc">Generate Document →</a></div>`
+} else {
+  dl.innerHTML = docList.map(d => `
+    <div class="doc-card">
+      <div class="doc-type-badge">${esc(d.doc_type.replace('-',' '))}</div>
+      <div class="doc-title">${esc(d.title || d.doc_type)}</div>
+      <div class="doc-date">${new Date(d.created_at).toLocaleDateString('en-IN')}</div>
+      <div class="doc-actions">
+        <button class="btn-ghost btn-sm" onclick="viewDoc('${d.id}')">View</button>
+        <button class="btn-danger btn-sm" onclick="deleteDoc('${d.id}',this)">Delete</button>
+      </div>
+    </div>`).join('')
+}
+
+// Profile form
+document.getElementById('pf-name').value  = profile?.full_name || ''
+document.getElementById('pf-city').value  = profile?.city || ''
+document.getElementById('pf-phone').value = profile?.phone || ''
+document.getElementById('pf-lang').value  = profile?.language_pref || 'en'
+
+// Nav switching
+window.showPane = (name) => {
+  document.querySelectorAll('.dash-pane').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.snav-item').forEach(i => i.classList.remove('active'))
+  document.getElementById('pane-' + name).classList.add('active')
+  document.querySelector(`.snav-item[data-pane="${name}"]`)?.classList.add('active')
+  document.querySelector('.dropdown-menu')?.classList.remove('open')
+}
+
+// Delete session
+window.delSession = async (e, id) => {
+  e.stopPropagation()
+  await chat.deleteSession(id)
+  e.target.closest('.session-item').remove()
+  showToast('Conversation deleted')
+}
+
+// View doc modal
+window.viewDoc = async (id) => {
+  const { data } = await docs.get(id)
+  if (!data) return
+  document.getElementById('modal-doc-title').textContent = data.title || data.doc_type
+  document.getElementById('modal-doc-body').textContent  = data.content
+  document.getElementById('modal-doc-download').onclick  = () => {
+    import('../lib/utils.js').then(({ downloadText }) =>
+      downloadText(data.content, `NyaySetu_${data.doc_type}_${data.id}.txt`))
+  }
+  openModal('doc-modal')
+}
+
+window.deleteDoc = async (id, btn) => {
+  if (!confirm('Delete this document?')) return
+  await docs.delete(id)
+  btn.closest('.doc-card').remove()
+  showToast('Document deleted')
+}
+
+// Save profile
+window.saveProfile = async () => {
+  const updates = {
+    full_name: document.getElementById('pf-name').value.trim(),
+    city: document.getElementById('pf-city').value.trim(),
+    phone: document.getElementById('pf-phone').value.trim(),
+    language_pref: document.getElementById('pf-lang').value
+  }
+  const { error } = await profiles.update(user.id, updates)
+  if (error) showToast('Failed to save', '✕', 'error')
+  else showToast('Profile saved!', '✓', 'success')
+}
+
+// Change password
+window.changePassword = async () => {
+  const np = document.getElementById('pf-newpass').value
+  if (np.length < 8) { showToast('Password too short', '⚠', 'error'); return }
+  const { error } = await supabase.auth.updateUser({ password: np })
+  if (error) showToast(error.message, '✕', 'error')
+  else { showToast('Password updated!', '✓', 'success'); document.getElementById('pf-newpass').value = '' }
+}
+
+// Notifications
+const notifs = await notifications.get(user.id)
+if (notifs.unread > 0) {
+  document.getElementById('notif-btn')?.insertAdjacentHTML('beforeend', '<div class="notif-badge"></div>')
+}
+
+import { initDropdowns } from '../lib/utils.js'
+initDropdowns()
+</script>
+
+<div class="dash-layout">
+  <!-- SIDENAV -->
+  <aside class="sidenav">
+    <div class="sidenav-user" id="sidenav-user">
+      <div class="sidenav-avatar" id="sn-avatar">U</div>
+      <div>
+        <div class="sidenav-name" id="sn-name">Loading…</div>
+        <div class="sidenav-role" id="sn-role">User</div>
+      </div>
+    </div>
+    <div class="snav-section" data-i18n="dash_snav_main">Main</div>
+    <div class="snav-item active" data-pane="home" onclick="showPane('home')"><span class="snav-ico">📊</span><span data-i18n="dash_snav_overview"> Overview</span></div>
+    <div class="snav-item" data-pane="chats" onclick="showPane('chats')"><span class="snav-ico">💬</span><span data-i18n="dash_snav_chats"> Chat History</span></div>
+    <div class="snav-item" data-pane="docs" onclick="showPane('docs')"><span class="snav-ico">📄</span><span data-i18n="dash_snav_docs"> My Documents</span></div>
+    <div class="snav-item" data-pane="simplify" onclick="showPane('simplify')"><span class="snav-ico">📚</span><span data-i18n="dash_snav_simplify"> Simplify History</span></div>
+    <div class="snav-section" data-i18n="dash_snav_account">Account</div>
+    <div class="snav-item" data-pane="profile" onclick="showPane('profile')"><span class="snav-ico">👤</span><span data-i18n="dash_snav_profile"> Profile</span></div>
+    <div class="snav-item" onclick="signOut()" style="color:var(--red)"><span class="snav-ico">←</span><span data-i18n="dash_snav_signout"> Sign Out</span></div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="dash-content">
+
+    <!-- OVERVIEW -->
+    <div class="dash-pane active" id="pane-home">
+      <div class="welcome-banner">
+        <div class="wb-text">
+          <h2 data-i18n-html="dash_welcome_title">Good day, <span id="wb-name">there</span> 👋</h2>
+          <p data-i18n="dash_welcome_sub">Here's a summary of your NyaySetu activity.</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <a href="chat.html" class="btn-primary btn-sm" data-i18n="dash_btn_ask">⚖ Ask a Legal Question</a>
+          <a href="documents.html" class="btn-ghost btn-sm" data-i18n="dash_btn_generate">📄 Generate Document</a>
+        </div>
+      </div>
+      <div class="quick-stats">
+        <div class="qs-card"><div class="qs-val" id="qs-chats">0</div><div class="qs-lbl" data-i18n="dash_stat_chats">Chat Sessions</div></div>
+        <div class="qs-card"><div class="qs-val" id="qs-docs">0</div><div class="qs-lbl" data-i18n="dash_stat_docs">Documents Saved</div></div>
+        <div class="qs-card"><div class="qs-val">0</div><div class="qs-lbl" data-i18n="dash_stat_simplified">Laws Simplified</div></div>
+        <div class="qs-card"><div class="qs-val">0<span>%</span></div><div class="qs-lbl" data-i18n="dash_stat_resolution">Query Resolution</div></div>
+      </div>
+      <h3 class="sh3" style="margin-bottom:14px" data-i18n="dash_recent_convos">Recent Conversations</h3>
+      <div id="session-list-home" class="session-list"></div>
+      <h3 class="sh3" style="margin:24px 0 14px">Quick Actions</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+        <a href="chat.html" style="display:flex;flex-direction:column;gap:8px;padding:20px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);transition:all var(--t) var(--ease)" onmouseover="this.style.borderColor='rgba(201,169,110,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:24px">⚖</span><span style="font-size:13.5px;font-weight:600;color:var(--tp)">AI Legal Chat</span><span style="font-size:12px;color:var(--ts)">Ask any legal question</span>
+        </a>
+        <a href="documents.html" style="display:flex;flex-direction:column;gap:8px;padding:20px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);transition:all var(--t) var(--ease)" onmouseover="this.style.borderColor='rgba(201,169,110,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:24px">📄</span><span style="font-size:13.5px;font-weight:600;color:var(--tp)">Document Generator</span><span style="font-size:12px;color:var(--ts)">Create legal documents</span>
+        </a>
+        <a href="simplifier.html" style="display:flex;flex-direction:column;gap:8px;padding:20px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);transition:all var(--t) var(--ease)" onmouseover="this.style.borderColor='rgba(201,169,110,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:24px">📚</span><span style="font-size:13.5px;font-weight:600;color:var(--tp)">Law Simplifier</span><span style="font-size:12px;color:var(--ts)">Understand legal text</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- CHAT HISTORY -->
+    <div class="dash-pane" id="pane-chats">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h2 class="sh3">Chat History</h2>
+        <a href="chat.html" class="btn-primary btn-sm">+ New Chat</a>
+      </div>
+      <div class="session-list" id="session-list"></div>
+    </div>
+
+    <!-- DOCUMENTS -->
+    <div class="dash-pane" id="pane-docs">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h2 class="sh3">Saved Documents</h2>
+        <a href="documents.html" class="btn-primary btn-sm">+ Generate New</a>
+      </div>
+      <div class="doc-list" id="doc-list"></div>
+    </div>
+
+    <!-- SIMPLIFY HISTORY -->
+    <div class="dash-pane" id="pane-simplify">
+      <h2 class="sh3" style="margin-bottom:20px">Simplify History</h2>
+      <div id="simplify-hist-list">
+        <div class="empty-state"><div class="empty-ico">📚</div><div class="empty-title">No history yet</div><div class="empty-sub">Your simplified legal texts will be saved here</div></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="dash-pane" id="pane-profile">
+      <h2 class="sh3" style="margin-bottom:20px">Profile Settings</h2>
+      <div class="profile-avatar-section">
+        <div class="profile-avatar-big" id="pf-avatar">U</div>
+        <div>
+          <div style="font-size:16px;font-weight:600;color:var(--tp)" id="pf-display-name">Loading…</div>
+          <div style="font-size:12px;color:var(--ts);margin-top:3px" id="pf-email-display"></div>
+          <div style="font-size:11px;color:var(--tm);margin-top:2px" id="pf-joined">Joined recently</div>
+        </div>
+      </div>
+      <div class="profile-grid">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="pf-name" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input class="form-input" id="pf-city" placeholder="Delhi / Mumbai…">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone (Optional)</label>
+          <input class="form-input" id="pf-phone" placeholder="+91-XXXXXXXXXX" type="tel">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preferred Language</label>
+          <select class="form-select" id="pf-lang">
+            <option value="en">English</option>
+            <option value="hi">Hindi (हिंदी)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+
+      <div style="margin-top:36px;padding-top:28px;border-top:1px solid var(--border)">
+        <h3 class="sh3" style="margin-bottom:14px">Change Password</h3>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">New Password</label>
+            <input class="form-input" id="pf-newpass" type="password" placeholder="Min. 8 characters">
+          </div>
+          <button class="btn-ghost" onclick="changePassword()">Update</button>
+        </div>
+      </div>
+
+      <div style="margin-top:36px;padding-top:28px;border-top:1px solid var(--border)">
+        <h3 class="sh3" style="margin-bottom:8px;color:var(--red)">Danger Zone</h3>
+        <p style="font-size:13px;color:var(--ts);margin-bottom:16px">Permanently delete your account and all data. This cannot be undone.</p>
+        <button class="btn-danger" onclick="if(confirm('Delete your account? This is permanent.'))deleteAccount()">Delete My Account</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- DOC VIEWER MODAL -->
+<div class="modal-overlay" id="doc-modal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-doc-title">Document</div>
+      <button class="modal-close" onclick="closeModal('doc-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+      <pre id="modal-doc-body" style="padding:22px;font-family:'DM Mono',monospace;font-size:12.5px;color:var(--tp);line-height:1.8;white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow-y:auto;background:var(--bg)"></pre>
+      <div style="padding:16px 22px;border-top:1px solid var(--border);display:flex;gap:10px">
+        <button class="btn-primary btn-sm" id="modal-doc-download">⬇ Download</button>
+        <button class="btn-ghost btn-sm" onclick="copyText(document.getElementById('modal-doc-body').textContent)">📋 Copy</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// Populate sidenav user info from already-loaded profile
+// (runs after module above)
+document.addEventListener('DOMContentLoaded', () => {})
+</script>
+</body>
+</html>

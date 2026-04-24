@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Ecosystem — NyaySetu</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+/* ── PAGE HERO ── */
+.page-hero { padding: 52px 0 0; border-bottom: 1px solid var(--border); }
+.tab-strip { display: flex; gap: 0; margin-top: 32px; overflow-x: auto; }
+.tab-strip::-webkit-scrollbar { display: none; }
+.strip-tab {
+  padding: 11px 22px; font-size: 13.5px; font-weight: 500; color: var(--ts);
+  background: transparent; border: none; border-bottom: 2px solid transparent;
+  transition: all var(--t) var(--ease); white-space: nowrap; cursor: pointer;
+}
+.strip-tab:hover  { color: var(--tp); }
+.strip-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── CONTENT ── */
+.content-area { padding: 36px 0 80px; }
+.section-pane { display: none; }
+.section-pane.active { display: block; }
+
+/* ── DASHBOARD ── */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--bg1); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 22px; transition: all var(--t) var(--ease);
+}
+.stat-card:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: var(--shadow); }
+.stat-val { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; color: var(--tp); letter-spacing: -1px; margin-bottom: 4px; line-height: 1; }
+.stat-val span { color: var(--accent); font-size: 18px; }
+.stat-lbl { font-size: 12px; color: var(--ts); margin-bottom: 4px; }
+.stat-change { font-size: 11px; color: var(--green); font-family: 'DM Mono', monospace; }
+
+.dash-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.panel { background: var(--bg1); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.panel-head { padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--bg2); display: flex; align-items: center; justify-content: space-between; }
+.panel-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--ts); font-family: 'DM Mono', monospace; }
+.panel-body { padding: 16px 18px; }
+
+/* Activity */
+.act-item { display: flex; align-items: flex-start; gap: 11px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.act-item:last-child { border-bottom: none; }
+.act-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.dot-g { background: var(--green); }
+.dot-a { background: var(--accent); }
+.dot-b { background: var(--blue); }
+.act-text { flex: 1; font-size: 12.5px; color: var(--ts); line-height: 1.5; }
+.act-text strong { color: var(--tp); font-weight: 500; }
+.act-time { font-size: 10.5px; color: var(--tm); font-family: 'DM Mono', monospace; flex-shrink: 0; }
+
+/* Progress bars */
+.perf-item { margin-bottom: 16px; }
+.perf-item:last-child { margin-bottom: 0; }
+.perf-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+.perf-label span:first-child { color: var(--ts); }
+.perf-label span:last-child  { color: var(--accent); font-family: 'DM Mono', monospace; }
+.perf-track { height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.perf-fill  { height: 100%; background: var(--accent); border-radius: 3px; transition: width .8s var(--ease); }
+
+/* ── REVIEW QUEUE ── */
+.queue-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.queue-count { display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--adim); border: 1px solid rgba(201,169,110,.2); border-radius: 8px; }
+
+.review-card {
+  background: var(--bg1); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 22px; margin-bottom: 16px; transition: all var(--t) var(--ease);
+}
+.review-card:last-child { margin-bottom: 0; }
+.review-card.done { opacity: .45; pointer-events: none; }
+.review-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.review-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rcat { padding: 2px 9px; border-radius: 100px; font-size: 10px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; }
+.rcat-p { background: var(--adim);    border: 1px solid rgba(201,169,110,.2); color: var(--accent); }
+.rcat-f { background: var(--bluedim); border: 1px solid rgba(129,140,248,.2); color: var(--blue); }
+.rcat-c { background: var(--greendim);border: 1px solid rgba(74,222,128,.15);  color: var(--green); }
+.rcat-cr{ background: var(--reddim);  border: 1px solid rgba(248,113,113,.15); color: var(--red); }
+.pts-badge { font-size: 11px; color: var(--accent); font-family: 'DM Mono', monospace; flex-shrink: 0; }
+
+.review-q { font-size: 14px; color: var(--tp); line-height: 1.55; margin-bottom: 12px; font-weight: 500; }
+
+.ai-answer-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 14px; }
+.ai-answer-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; color: var(--accent); margin-bottom: 8px; font-family: 'DM Mono', monospace; }
+.ai-answer-text { font-size: 13px; color: var(--ts); line-height: 1.68; }
+.ai-answer-text strong { color: var(--tp); }
+
+.review-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-approve { padding: 7px 16px; border-radius: 7px; border: 1px solid rgba(74,222,128,.2); background: var(--greendim); color: var(--green); font-size: 12.5px; font-weight: 600; transition: all var(--t) var(--ease); }
+.btn-approve:hover { background: rgba(74,222,128,.2); }
+.btn-edit    { padding: 7px 16px; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--ts); font-size: 12.5px; font-weight: 600; transition: all var(--t) var(--ease); }
+.btn-edit:hover    { border-color: var(--border2); color: var(--tp); }
+.btn-flag    { padding: 7px 16px; border-radius: 7px; border: 1px solid rgba(248,113,113,.2); background: var(--reddim); color: var(--red); font-size: 12.5px; font-weight: 600; transition: all var(--t) var(--ease); }
+.btn-flag:hover    { background: rgba(248,113,113,.2); }
+.btn-escalate{ padding: 7px 16px; border-radius: 7px; border: 1px solid rgba(129,140,248,.2); background: var(--bluedim); color: var(--blue); font-size: 12.5px; font-weight: 600; transition: all var(--t) var(--ease); }
+.btn-escalate:hover { background: rgba(129,140,248,.2); }
+
+.edit-area { margin-top: 12px; display: none; }
+.edit-ta { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--tp); resize: vertical; outline: none; min-height: 100px; line-height: 1.6; }
+.edit-ta:focus { border-color: var(--border2); }
+.edit-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+
+/* Action result */
+.action-result { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.res-approve { background: var(--greendim); border: 1px solid rgba(74,222,128,.15); color: var(--green); }
+.res-edit    { background: var(--adim); border: 1px solid rgba(201,169,110,.15); color: var(--accent); }
+.res-flag    { background: var(--reddim); border: 1px solid rgba(248,113,113,.15); color: var(--red); }
+.res-escalate{ background: var(--bluedim); border: 1px solid rgba(129,140,248,.15); color: var(--blue); }
+
+/* ── LEADERBOARD ── */
+.lb-table { border: 1px solid var(--border); border-radius: var(--rl); overflow: hidden; }
+.lb-thead { background: var(--bg2); padding: 12px 20px; display: grid; grid-template-columns: 40px 40px 1fr 100px 80px 80px; gap: 12px; align-items: center; border-bottom: 1px solid var(--border); }
+.lb-th { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--tm); font-family: 'DM Mono', monospace; }
+.lb-row { padding: 12px 20px; display: grid; grid-template-columns: 40px 40px 1fr 100px 80px 80px; gap: 12px; align-items: center; border-bottom: 1px solid var(--border); transition: background var(--t) var(--ease); }
+.lb-row:last-child { border-bottom: none; }
+.lb-row:hover { background: var(--bg2); }
+.lb-row.you  { background: var(--adim); }
+.lb-rank { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--tm); font-weight: 600; }
+.lb-rank.g   { color: #F59E0B; }
+.lb-rank.s   { color: #9CA3AF; }
+.lb-rank.b   { color: #B45309; }
+.lb-avatar   { width: 32px; height: 32px; border-radius: 50%; background: var(--bg2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.lb-name-wrap .lb-name { font-size: 13.5px; font-weight: 500; color: var(--tp); margin-bottom: 2px; }
+.lb-name-wrap .lb-college { font-size: 11px; color: var(--tm); }
+.lb-bar-wrap { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+.lb-bar      { height: 100%; background: var(--accent); border-radius: 2px; }
+.lb-pts      { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 500; }
+.lb-acc      { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--green); }
+
+/* ── SIGNUP ── */
+.signup-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; }
+.benefit-list { display: flex; flex-direction: column; gap: 16px; margin-top: 28px; }
+.benefit { display: flex; align-items: flex-start; gap: 14px; }
+.benefit-ico { width: 36px; height: 36px; border-radius: 9px; background: var(--adim); border: 1px solid rgba(201,169,110,.15); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; margin-top: 2px; }
+.benefit-title { font-size: 14px; font-weight: 600; color: var(--tp); margin-bottom: 3px; }
+.benefit-desc  { font-size: 13px; color: var(--ts); line-height: 1.6; }
+
+.signup-form-card { background: var(--bg1); border: 1px solid var(--border); border-radius: var(--rl); padding: 32px; }
+.signup-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--tp); margin-bottom: 6px; }
+.signup-sub   { font-size: 13px; color: var(--ts); margin-bottom: 24px; }
+.terms-note   { font-size: 11.5px; color: var(--tm); margin-top: 12px; text-align: center; line-height: 1.6; }
+
+@media (max-width: 860px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .dash-grid2 { grid-template-columns: 1fr; }
+  .lb-thead, .lb-row { grid-template-columns: 40px 1fr 80px; }
+  .lb-th:nth-child(2),.lb-th:nth-child(5),.lb-th:nth-child(6),
+  .lb-row > *:nth-child(2),.lb-row > *:nth-child(5),.lb-row > *:nth-child(6) { display: none; }
+  .signup-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body data-page="students">
+<script src="../js/utils.js"></script>
+<script src="../js/i18n.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+function injectNav() {
+  document.body.insertAdjacentHTML('afterbegin', `
+  <nav id="nav">
+    <a href="../index.html" class="nav-logo"><div class="nav-logo-box">N</div><span class="nav-logo-name">NyaySetu</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="../index.html"  data-page="home"><span data-i18n="nav_home">Home</span></a>
+      <a class="nav-tab" href="chat.html"       data-page="chat"><span class="nav-icon">⚖</span> <span data-i18n="nav_chat">AI Chat</span></a>
+      <a class="nav-tab" href="documents.html"  data-page="docs"><span class="nav-icon">📄</span> <span data-i18n="nav_docs">Documents</span></a>
+      <a class="nav-tab" href="simplifier.html" data-page="simplify"><span class="nav-icon">📚</span> <span data-i18n="nav_simplify">Simplifier</span></a>
+      <a class="nav-tab" href="students.html"   data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
+      <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()">☀</button>
+      <a href="chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
+    </div>
+  </nav>
+  <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>`);
+  initTheme(); setActiveNav();
+}
+injectNav();
+</script>
+
+<main style="padding-top:64px">
+
+  <!-- HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow fi" data-i18n="students_title">Student Ecosystem</div>
+      <h1 class="sh2 fi" data-i18n="students_header">Learn by doing. Earn while practicing.</h1>
+      <p class="sub fi" style="max-width:500px;margin-bottom:24px" data-i18n="students_sub">Review real legal queries, build a professional portfolio, and get ranked on India's premier legal AI platform.</p>
+      <div class="tab-strip">
+        <button class="strip-tab active" onclick="showTab('dashboard', this)" data-i18n="students_tab_dashboard">📊 Dashboard</button>
+        <button class="strip-tab" onclick="showTab('review', this)" data-i18n="students_tab_review">✅ Review Queue</button>
+        <button class="strip-tab" onclick="showTab('leaderboard', this)" data-i18n="students_tab_leaderboard">🏆 Leaderboard</button>
+        <button class="strip-tab" onclick="showTab('signup', this)" data-i18n="students_tab_signup">🎓 Join as Student</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="content-area">
+    <div class="container">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="section-pane active" id="pane-dashboard">
+        <div class="stat-grid">
+          <div class="stat-card fi"><div class="stat-val">47<span> cases</span></div><div class="stat-lbl">Cases Reviewed</div><div class="stat-change">↑ +12 this week</div></div>
+          <div class="stat-card fi"><div class="stat-val">94<span>%</span></div><div class="stat-lbl">Accuracy Rate</div><div class="stat-change">↑ +2% this month</div></div>
+          <div class="stat-card fi"><div class="stat-val">₹2.4<span>k</span></div><div class="stat-lbl">Total Earned</div><div class="stat-change">↑ ₹480 this week</div></div>
+          <div class="stat-card fi"><div class="stat-val">#<span>7</span></div><div class="stat-lbl">National Rank</div><div class="stat-change">↑ +3 positions</div></div>
+        </div>
+        <div class="dash-grid2">
+          <div class="panel fi">
+            <div class="panel-head"><span class="panel-title">Recent Activity</span><span style="font-size:10.5px;color:var(--tm);font-family:'DM Mono',monospace">Today</span></div>
+            <div class="panel-body">
+              <div class="act-item"><div class="act-dot dot-g"></div><div class="act-text"><strong>Approved</strong> AI response — tenant rights, deposit recovery</div><div class="act-time">2h ago</div></div>
+              <div class="act-item"><div class="act-dot dot-a"></div><div class="act-text"><strong>Edited</strong> IPC 420 explanation — added cheating elements</div><div class="act-time">4h ago</div></div>
+              <div class="act-item"><div class="act-dot dot-b"></div><div class="act-text"><strong>Escalated</strong> complex divorce + property case to advocate</div><div class="act-time">6h ago</div></div>
+              <div class="act-item"><div class="act-dot dot-g"></div><div class="act-text"><strong>Approved</strong> consumer complaint guidance — e-commerce fraud</div><div class="act-time">Yesterday</div></div>
+              <div class="act-item"><div class="act-dot dot-a"></div><div class="act-text"><strong>Reviewed</strong> RTI application template for MGNREGA</div><div class="act-time">Yesterday</div></div>
+            </div>
+          </div>
+          <div class="panel fi">
+            <div class="panel-head"><span class="panel-title">Performance by Category</span></div>
+            <div class="panel-body" style="padding-top:20px">
+              <div class="perf-item"><div class="perf-label"><span>Property & Tenancy</span><span>97%</span></div><div class="perf-track"><div class="perf-fill" style="width:97%"></div></div></div>
+              <div class="perf-item"><div class="perf-label"><span>Consumer Law</span><span>94%</span></div><div class="perf-track"><div class="perf-fill" style="width:94%"></div></div></div>
+              <div class="perf-item"><div class="perf-label"><span>Criminal Law (IPC)</span><span>88%</span></div><div class="perf-track"><div class="perf-fill" style="width:88%"></div></div></div>
+              <div class="perf-item"><div class="perf-label"><span>Family Law</span><span>91%</span></div><div class="perf-track"><div class="perf-fill" style="width:91%"></div></div></div>
+              <div class="perf-item"><div class="perf-label"><span>Labour & Service</span><span>85%</span></div><div class="perf-track"><div class="perf-fill" style="width:85%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REVIEW QUEUE ── -->
+      <div class="section-pane" id="pane-review">
+        <div class="queue-header">
+          <div>
+            <h2 class="sh3">Review Queue</h2>
+            <p style="font-size:13px;color:var(--ts);margin-top:4px">Review AI responses for accuracy. Approve, edit, flag issues, or escalate complex cases.</p>
+          </div>
+          <div class="queue-count">
+            <span style="font-size:13px;color:var(--accent);font-weight:600" id="pending-count">3 Pending</span>
+            <span style="font-size:11px;color:var(--ts)">· avg +15 pts</span>
+          </div>
+        </div>
+
+        <div id="review-list">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <!-- ── LEADERBOARD ── -->
+      <div class="section-pane" id="pane-leaderboard">
+        <h2 class="sh3" style="margin-bottom:6px">National Leaderboard</h2>
+        <p style="font-size:13px;color:var(--ts);margin-bottom:24px">Top law students ranked by review accuracy and volume. Updated daily.</p>
+        <div class="lb-table">
+          <div class="lb-thead">
+            <div class="lb-th">Rank</div>
+            <div class="lb-th">Avt</div>
+            <div class="lb-th">Student</div>
+            <div class="lb-th">Progress</div>
+            <div class="lb-th">Points</div>
+            <div class="lb-th">Accuracy</div>
+          </div>
+          <div id="lb-body">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SIGNUP ── -->
+      <div class="section-pane" id="pane-signup">
+        <div class="signup-grid">
+          <div>
+            <div class="eyebrow fi">For Law Students</div>
+            <h2 class="sh2 fi">Your career starts here</h2>
+            <p class="sub fi" style="max-width:440px">Join 840+ law students across India who are building real legal experience on NyaySetu.</p>
+            <div class="benefit-list">
+              <div class="benefit fi">
+                <div class="benefit-ico">🔍</div>
+                <div><div class="benefit-title">Real Case Experience</div><div class="benefit-desc">Review actual queries from real people — not textbook problems. Build a credible portfolio from day one.</div></div>
+              </div>
+              <div class="benefit fi">
+                <div class="benefit-ico">💰</div>
+                <div><div class="benefit-title">Earn as You Learn</div><div class="benefit-desc">Earn monetary credits for every validated review. Top students earn ₹5,000–₹15,000 per month.</div></div>
+              </div>
+              <div class="benefit fi">
+                <div class="benefit-ico">🏆</div>
+                <div><div class="benefit-title">Ranked & Recognised</div><div class="benefit-desc">Get ranked nationally. Top performers get access to internships, mentorship from advocates, and certificates.</div></div>
+              </div>
+              <div class="benefit fi">
+                <div class="benefit-ico">🎓</div>
+                <div><div class="benefit-title">Mentorship from Advocates</div><div class="benefit-desc">Complex escalated cases connect you with senior advocates for guidance and learning.</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="signup-form-card fi">
+            <div class="signup-title">Join NyaySetu Students</div>
+            <div class="signup-sub">Create your student account and start reviewing today.</div>
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input class="form-input" id="s-name" placeholder="Your full name" type="text">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input class="form-input" id="s-email" placeholder="your@email.com" type="email">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Law College / University</label>
+              <input class="form-input" id="s-college" placeholder="NLU Delhi / NALSAR / GLC Mumbai..." type="text">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Year of Study</label>
+                <select class="form-select" id="s-year">
+                  <option value="">Select year</option>
+                  <option>1st Year (5-year LLB)</option>
+                  <option>2nd Year (5-year LLB)</option>
+                  <option>3rd Year (5-year LLB)</option>
+                  <option>4th Year (5-year LLB)</option>
+                  <option>5th Year (5-year LLB)</option>
+                  <option>1st Year (3-year LLB)</option>
+                  <option>2nd Year (3-year LLB)</option>
+                  <option>3rd Year (3-year LLB)</option>
+                  <option>LLM / Post-Graduate</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Area of Interest</label>
+                <select class="form-select" id="s-area">
+                  <option value="">Select area</option>
+                  <option>Criminal Law</option>
+                  <option>Civil / Property Law</option>
+                  <option>Family Law</option>
+                  <option>Consumer Law</option>
+                  <option>Constitutional Law</option>
+                  <option>Corporate / Commercial</option>
+                  <option>All Areas</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bar Council / Enrollment No. (if enrolled)</label>
+              <input class="form-input" id="s-bar" placeholder="Optional — for enrolled advocates" type="text">
+            </div>
+            <button class="btn-primary" style="width:100%;justify-content:center;font-size:14.5px;padding:13px" onclick="submitSignup()">
+              🎓 Create Student Account
+            </button>
+            <p class="terms-note">By joining, you agree to NyaySetu's <a href="#" style="color:var(--accent)">Terms of Service</a> and <a href="#" style="color:var(--accent)">Student Code of Conduct</a>.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+// ── TAB SWITCHING ──
+function showTab(name, btn) {
+  document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.strip-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('pane-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── REVIEW QUEUE DATA ──
+const REVIEW_ITEMS = [
+  {
+    id: 'r1', cat: 'property', catLabel: 'Property', catCls: 'rcat-p', pts: '+15 pts',
+    question: 'My landlord entered my rented flat without any prior notice while I was away and removed some of my furniture claiming I owed rent. What legal action can I take against him?',
+    aiAnswer: `Under the <strong>Transfer of Property Act, 1882</strong>, a landlord cannot enter the tenant's premises without prior notice (minimum 24 hours). The landlord's actions may constitute:
+
+• <strong>Criminal Trespass</strong> under Section 441 IPC — entering property with intent to commit an offence
+• <strong>Theft</strong> under Section 378 IPC — if property was taken without consent
+
+Your immediate steps:
+1. File an FIR at the nearest police station under Sections 441 and 378 IPC
+2. Send a legal notice demanding return of furniture within 15 days
+3. Document everything — photos of missing items, witnesses
+4. Approach the Rent Control Authority for protection
+
+<em>Note: This is AI guidance. For filing a criminal case, consult an advocate.</em>`
+  },
+  {
+    id: 'r2', cat: 'family', catLabel: 'Family Law', catCls: 'rcat-f', pts: '+20 pts',
+    question: 'My husband has been mentally and emotionally abusing me for 3 years. We have two young children. What are my options for divorce, custody, and maintenance?',
+    aiAnswer: `Mental and emotional cruelty is a valid ground for divorce under <strong>Section 13(1)(ia) of the Hindu Marriage Act, 1955</strong>. You have multiple legal options:
+
+<strong>For Divorce:</strong> File a petition on grounds of cruelty at the Family Court. Mental cruelty includes verbal abuse, humiliation, and controlling behaviour — courts have accepted these consistently.
+
+<strong>For Child Custody:</strong> Courts follow the "best interest of the child" principle. Mothers typically get physical custody of children under 5 years. You can apply for interim custody pending final order.
+
+<strong>Immediate Protection:</strong> File under <strong>Protection of Women from Domestic Violence Act, 2005</strong> — this gives you:
+• Residence order (right to stay in the house)
+• Protection order (prevent further abuse)
+• Maintenance under Section 20
+
+<strong>Financial Remedies:</strong>
+• Interim maintenance under Section 24 HMA during proceedings
+• Return of your Streedhan (jewellery, gifts)
+
+<em>Strongly recommend consulting a family law advocate. Many NGOs provide free legal aid.</em>`
+  },
+  {
+    id: 'r3', cat: 'consumer', catLabel: 'Consumer', catCls: 'rcat-c', pts: '+12 pts',
+    question: 'I ordered a laptop online for ₹65,000 from a major e-commerce site. It arrived damaged and neither the seller nor the platform is accepting my return request for the past 3 weeks.',
+    aiAnswer: `Under the <strong>Consumer Protection Act, 2019</strong>, you have a right to replacement, refund, or compensation for defective goods. Their refusal constitutes "deficiency in service."
+
+<strong>Immediate Steps:</strong>
+1. Send a formal email to both seller and platform with photos, subject: "Legal Notice — Defective Product Refund Demand"
+2. File a complaint on <strong>National Consumer Helpline: 1800-11-4000</strong> (free, toll-free)
+3. Raise a complaint on <strong>e-Daakhil portal</strong> (consumerhelpline.gov.in) — online forum for e-commerce complaints
+
+<strong>Forum Jurisdiction:</strong>
+• District Consumer Disputes Redressal Commission — for claims up to ₹50 lakhs
+• No court fee for claims under ₹5 lakhs
+
+<strong>What you can claim:</strong>
+• Full product cost: ₹65,000
+• Compensation for mental harassment
+• Litigation costs
+
+Preserve all: order confirmation, screenshots of return request, delivery photos, all communication.
+
+<em>Most e-commerce companies settle quickly after a formal consumer forum complaint is filed.</em>`
+  }
+];
+
+let pendingCount = REVIEW_ITEMS.length;
+
+function renderReviewQueue() {
+  const container = document.getElementById('review-list');
+  container.innerHTML = REVIEW_ITEMS.map(item => `
+    <div class="review-card" id="${item.id}">
+      <div class="review-card-top">
+        <div class="review-meta">
+          <span class="rcat ${item.catCls}">${item.catLabel}</span>
+          <span style="font-size:11.5px;color:var(--ts)">New query · Awaiting review</span>
+        </div>
+        <span class="pts-badge">${item.pts}</span>
+      </div>
+      <div class="review-q">${esc(item.question)}</div>
+      <div class="ai-answer-block">
+        <div class="ai-answer-label">⚖ AI Response — your review required</div>
+        <div class="ai-answer-text">${item.aiAnswer}</div>
+      </div>
+      <div class="review-actions">
+        <button class="btn-approve"   onclick="reviewAction('${item.id}', 'approve')">✓ Approve</button>
+        <button class="btn-edit"      onclick="toggleEdit('${item.id}')">✎ Edit & Approve</button>
+        <button class="btn-flag"      onclick="reviewAction('${item.id}', 'flag')">⚑ Flag Issue</button>
+        <button class="btn-escalate"  onclick="reviewAction('${item.id}', 'escalate')">↑ Escalate to Advocate</button>
+      </div>
+      <div class="edit-area" id="edit-${item.id}">
+        <textarea class="edit-ta" id="edit-ta-${item.id}" placeholder="Edit the AI response here before approving...">${item.aiAnswer.replace(/<[^>]+>/g,'')}</textarea>
+        <div class="edit-footer">
+          <button class="btn-ghost btn-sm" onclick="toggleEdit('${item.id}')">Cancel</button>
+          <button class="btn-primary btn-sm" onclick="reviewAction('${item.id}', 'edit')">Save & Approve</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleEdit(id) {
+  const ea = document.getElementById('edit-' + id);
+  ea.style.display = ea.style.display === 'block' ? 'none' : 'block';
+  if (ea.style.display === 'block') document.getElementById('edit-ta-' + id).focus();
+}
+
+function reviewAction(id, action) {
+  const card = document.getElementById(id);
+  const msgs = {
+    approve:  ['✓ Approved and published  — +15 pts earned', 'res-approve'],
+    edit:     ['✎ Edited & Approved — +20 pts earned', 'res-edit'],
+    flag:     ['⚑ Flagged for expert review — sent to supervisor', 'res-flag'],
+    escalate: ['↑ Escalated to licensed advocate — +10 pts', 'res-escalate']
+  };
+  const [msg, cls] = msgs[action];
+
+  card.querySelector('.review-actions').innerHTML = `<div class="action-result ${cls}">${msg}</div>`;
+  document.getElementById('edit-' + id).style.display = 'none';
+
+  setTimeout(() => { card.classList.add('done'); }, 600);
+
+  pendingCount--;
+  document.getElementById('pending-count').textContent = `${pendingCount} Pending`;
+  showToast(msg, action === 'approve' || action === 'edit' ? '✦' : '⚑');
+}
+
+// ── LEADERBOARD DATA ──
+const LB_DATA = [
+  { rank: 1, cls: 'g', emoji: '👑', name: 'Priya Sharma',    college: 'NLU Delhi',          pts: 312, pct: 100, acc: '97%', you: false },
+  { rank: 2, cls: 's', emoji: '⭐', name: 'Arjun Mehta',     college: 'NALSAR, Hyderabad',   pts: 256, pct: 82,  acc: '96%', you: false },
+  { rank: 3, cls: 'b', emoji: '🌟', name: 'Kavya Nair',      college: 'ILS, Pune',           pts: 218, pct: 70,  acc: '95%', you: false },
+  { rank: 4, cls: '',  emoji: '😊', name: 'Rohit Verma',     college: 'Faculty of Law, DU',  pts: 187, pct: 60,  acc: '93%', you: false },
+  { rank: 5, cls: '',  emoji: '🙂', name: 'Sneha Patel',     college: 'GLC, Mumbai',         pts: 165, pct: 53,  acc: '92%', you: false },
+  { rank: 6, cls: '',  emoji: '😄', name: 'Akash Rao',       college: 'NUJS, Kolkata',       pts: 143, pct: 46,  acc: '90%', you: false },
+  { rank: 7, cls: '',  emoji: '🎓', name: 'You',             college: 'Your College',         pts: 138, pct: 44,  acc: '94%', you: true  },
+  { rank: 8, cls: '',  emoji: '😊', name: 'Divya Singh',     college: 'RMLNLU, Lucknow',     pts: 121, pct: 39,  acc: '91%', you: false },
+  { rank: 9, cls: '',  emoji: '🙂', name: 'Kiran Sharma',    college: 'Symbiosis Law, Pune',  pts: 104, pct: 33,  acc: '89%', you: false },
+  { rank:10, cls: '',  emoji: '😊', name: 'Tarun Malhotra',  college: 'Army Law, Noida',     pts: 89,  pct: 28,  acc: '88%', you: false },
+];
+
+function renderLeaderboard() {
+  document.getElementById('lb-body').innerHTML = LB_DATA.map(r => `
+    <div class="lb-row ${r.you ? 'you' : ''}">
+      <div class="lb-rank ${r.cls}">#${r.rank}</div>
+      <div class="lb-avatar">${r.emoji}</div>
+      <div class="lb-name-wrap">
+        <div class="lb-name" style="${r.you ? 'color:var(--accent)' : ''}">${r.name}${r.you ? ' (You)' : ''}</div>
+        <div class="lb-college">${r.college}</div>
+      </div>
+      <div class="lb-bar-wrap"><div class="lb-bar" style="width:${r.pct}%"></div></div>
+      <div class="lb-pts">${r.pts} pts</div>
+      <div class="lb-acc">${r.acc}</div>
+    </div>`).join('');
+}
+
+// ── SIGNUP ──
+function submitSignup() {
+  const name    = document.getElementById('s-name').value.trim();
+  const email   = document.getElementById('s-email').value.trim();
+  const college = document.getElementById('s-college').value.trim();
+  const year    = document.getElementById('s-year').value;
+
+  if (!name || !email || !college || !year) {
+    showToast('Please fill in all required fields', '⚠');
+    return;
+  }
+  if (!email.includes('@')) {
+    showToast('Please enter a valid email address', '⚠');
+    return;
+  }
+
+  // Simulate success
+  const card = document.querySelector('.signup-form-card');
+  card.innerHTML = `
+    <div style="text-align:center;padding:40px 20px">
+      <div style="font-size:52px;margin-bottom:16px">🎓</div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--tp);margin-bottom:8px">Welcome, ${esc(name)}!</div>
+      <div style="font-size:14px;color:var(--ts);line-height:1.7;max-width:300px;margin:0 auto 24px">Your student account has been created. Check your email at <strong style="color:var(--tp)">${esc(email)}</strong> for verification.</div>
+      <button class="btn-primary" onclick="showTab('review', document.querySelector('.strip-tab:nth-child(2)'))" style="margin:0 auto">
+        → Start Reviewing Cases
+      </button>
+      <p style="font-size:11.5px;color:var(--tm);margin-top:14px">You'll earn your first points within minutes.</p>
+    </div>`;
+  showToast('Account created successfully!', '🎓');
+}
+
+// ── INIT ──
+renderReviewQueue();
+renderLeaderboard();
+initScrollAnim();
+</script>
+</body>
+</html>

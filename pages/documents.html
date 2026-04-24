@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Generator — NyaySetu</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+.page-hero { padding: 56px 0 44px; border-bottom: 1px solid var(--border); }
+
+/* Doc type picker */
+.doc-picker { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 36px; }
+.doc-type {
+  background: var(--bg1); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 18px 14px; cursor: pointer; transition: all var(--t) var(--ease);
+  text-align: center; position: relative;
+}
+.doc-type:hover  { border-color: rgba(201,169,110,.3); background: var(--bg2); }
+.doc-type.on     { border-color: var(--accent); background: var(--adim); }
+.doc-type.on::after {
+  content: '✓'; position: absolute; top: 8px; right: 10px;
+  font-size: 11px; color: var(--accent); font-weight: 700;
+}
+.dt-icon  { font-size: 26px; margin-bottom: 10px; }
+.dt-title { font-size: 12.5px; font-weight: 600; color: var(--tp); margin-bottom: 4px; }
+.dt-desc  { font-size: 11px; color: var(--ts); line-height: 1.45; }
+
+/* Main area */
+.doc-area { padding: 44px 0 80px; }
+.doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+
+/* Form panel */
+.form-panel { background: var(--bg1); border: 1px solid var(--border); border-radius: var(--rl); padding: 30px; }
+.form-panel-title { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; color: var(--tp); margin-bottom: 22px; }
+
+/* Preview panel */
+.preview-panel {
+  background: var(--bg1); border: 1px solid var(--border); border-radius: var(--rl);
+  overflow: hidden; position: sticky; top: 84px; min-height: 520px;
+  display: flex; flex-direction: column;
+}
+.preview-head {
+  padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--bg2);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.preview-title { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--ts); font-family: 'DM Mono', monospace; }
+.preview-actions { display: flex; gap: 8px; }
+.preview-body {
+  flex: 1; padding: 22px; overflow-y: auto;
+  font-size: 12.5px; font-family: 'DM Mono', monospace;
+  line-height: 1.85; white-space: pre-wrap; word-break: break-word;
+  color: var(--ts); max-height: 560px;
+}
+.preview-body.ready { color: var(--tp); }
+.preview-placeholder {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 280px; color: var(--tm); gap: 12px; font-size: 13px; text-align: center;
+}
+.generating {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 280px; gap: 16px; color: var(--ts); font-size: 13px;
+}
+.gen-steps { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--tm); font-family: 'DM Mono', monospace; }
+.gen-step.active { color: var(--accent); }
+.gen-step.done   { color: var(--green); }
+
+/* Progress steps at top */
+.step-bar { display: flex; align-items: center; gap: 0; margin-bottom: 28px; }
+.step-bar-item { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--tm); }
+.step-bar-item.active { color: var(--tp); }
+.step-bar-item.done   { color: var(--green); }
+.step-circle { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; transition: all var(--t) var(--ease); }
+.step-bar-item.active .step-circle { border-color: var(--accent); background: var(--adim); color: var(--accent); }
+.step-bar-item.done   .step-circle { border-color: var(--green); background: var(--greendim); color: var(--green); }
+.step-bar-line { flex: 1; height: 1px; background: var(--border); margin: 0 8px; }
+
+@media (max-width: 900px) {
+  .doc-picker { grid-template-columns: repeat(3, 1fr); }
+  .doc-grid { grid-template-columns: 1fr; }
+  .preview-panel { position: static; }
+}
+@media (max-width: 560px) {
+  .doc-picker { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body data-page="docs">
+<script src="../js/utils.js"></script>
+<script src="../js/i18n.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+function injectNav() {
+  document.body.insertAdjacentHTML('afterbegin', `
+  <nav id="nav">
+    <a href="../index.html" class="nav-logo"><div class="nav-logo-box">N</div><span class="nav-logo-name">NyaySetu</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="../index.html"  data-page="home"><span data-i18n="nav_home">Home</span></a>
+      <a class="nav-tab" href="chat.html"       data-page="chat"><span class="nav-icon">⚖</span> <span data-i18n="nav_chat">AI Chat</span></a>
+      <a class="nav-tab" href="documents.html"  data-page="docs"><span class="nav-icon">📄</span> <span data-i18n="nav_docs">Documents</span></a>
+      <a class="nav-tab" href="simplifier.html" data-page="simplify"><span class="nav-icon">📚</span> <span data-i18n="nav_simplify">Simplifier</span></a>
+      <a class="nav-tab" href="students.html"   data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
+      <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()">☀</button>
+      <a href="chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
+    </div>
+  </nav>
+  <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>`);
+  initTheme(); setActiveNav();
+}
+injectNav();
+</script>
+
+<main style="padding-top:64px">
+
+  <!-- HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow fi" data-i18n="docs_title">Document Generator</div>
+      <h1 class="sh2 fi" data-i18n="docs_header">Generate legal documents in minutes</h1>
+      <p class="sub fi" style="max-width:520px;margin-bottom:0" data-i18n="docs_sub">AI-powered, legally accurate templates for every common Indian legal need. Fill in your details — ready to use in under 60 seconds.</p>
+
+      <div class="doc-picker fi" id="doc-picker">
+        <div class="doc-type on" id="dt-legal-notice" onclick="selectType('legal-notice')">
+          <div class="dt-icon">📬</div>
+          <div class="dt-title">Legal Notice</div>
+          <div class="dt-desc">Send formal notice before legal action</div>
+        </div>
+        <div class="doc-type" id="dt-affidavit" onclick="selectType('affidavit')">
+          <div class="dt-icon">📜</div>
+          <div class="dt-title">Affidavit</div>
+          <div class="dt-desc">Sworn statement of facts</div>
+        </div>
+        <div class="doc-type" id="dt-rent-agreement" onclick="selectType('rent-agreement')">
+          <div class="dt-icon">🏠</div>
+          <div class="dt-title">Rent Agreement</div>
+          <div class="dt-desc">Landlord–tenant lease agreement</div>
+        </div>
+        <div class="doc-type" id="dt-consumer-complaint" onclick="selectType('consumer-complaint')">
+          <div class="dt-icon">⚠️</div>
+          <div class="dt-title">Consumer Complaint</div>
+          <div class="dt-desc">Forum complaint for deficiency</div>
+        </div>
+        <div class="doc-type" id="dt-rti" onclick="selectType('rti')">
+          <div class="dt-icon">📋</div>
+          <div class="dt-title">RTI Application</div>
+          <div class="dt-desc">Right to Information request</div>
+        </div>
+        <div class="doc-type" id="dt-bail-application" onclick="selectType('bail-application')">
+          <div class="dt-icon">⚖️</div>
+          <div class="dt-title">Bail Application</div>
+          <div class="dt-desc">Regular or anticipatory bail</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORM + PREVIEW -->
+  <section class="doc-area">
+    <div class="container">
+      <div class="doc-grid">
+
+        <!-- FORM -->
+        <div class="form-panel">
+          <div class="form-panel-title">
+            <span id="f-icon">📬</span>
+            <span id="f-title">Legal Notice Details</span>
+          </div>
+          <div id="f-fields"></div>
+          <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="generateDocument()" id="gen-btn" data-i18n="docs_gen_button">
+            ✦ Generate Document
+          </button>
+          <p style="font-size:11px;color:var(--tm);text-align:center;margin-top:10px">AI will draft a complete, court-ready document from your inputs.</p>
+        </div>
+
+        <!-- PREVIEW -->
+        <div class="preview-panel">
+          <div class="preview-head">
+            <span class="preview-title" data-i18n="docs_preview_title">Document Preview</span>
+            <div class="preview-actions" id="preview-actions" style="display:none">
+              <button class="btn-ghost btn-sm" onclick="copyDoc()" data-i18n="docs_copy">📋 Copy</button>
+              <button class="btn-primary btn-sm" onclick="downloadPDF()" data-i18n="docs_download">📄 Download PDF</button>
+            </div>
+          </div>
+          <div class="preview-body" id="preview-body">
+            <div class="preview-placeholder">
+              <span style="font-size:36px">📄</span>
+              <span data-i18n-html="docs_preview_placeholder">Fill in the form on the left<br>and click <strong style="color:var(--accent)">"Generate Document"</strong></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ── DOC CONFIG ──
+const DOCS = {
+  'legal-notice': {
+    icon: '📬', title: 'Legal Notice Details',
+    type: 'Legal Notice under Indian law (Transfer of Property Act / applicable statute)',
+    fields: [
+      { id: 'sender_name', label: 'Your Full Name', ph: 'Ramesh Kumar Singh', req: true },
+      { id: 'sender_addr', label: 'Your Complete Address', ph: '123, Civil Lines, New Delhi - 110001', req: true, ta: true },
+      { id: 'recipient_name', label: 'Recipient Name', ph: 'Mr. Suresh Sharma', req: true },
+      { id: 'recipient_addr', label: 'Recipient Address', ph: '456, Lajpat Nagar, New Delhi - 110024', req: true, ta: true },
+      { id: 'subject', label: 'Subject of Dispute', ph: 'Non-refund of security deposit', req: true },
+      { id: 'amount', label: 'Amount / Property Involved', ph: '₹50,000 security deposit', req: false },
+      { id: 'facts', label: 'Facts of the Case', ph: 'Describe what happened, dates, and the issue clearly...', req: true, ta: true },
+      { id: 'demand', label: 'Your Specific Demand', ph: 'Return the security deposit of ₹50,000 within 15 days', req: true },
+      { id: 'time_limit', label: 'Time Limit Given', ph: '15 days / 30 days', req: false },
+    ]
+  },
+  'affidavit': {
+    icon: '📜', title: 'Affidavit Details',
+    type: 'Sworn Affidavit under Indian Evidence Act',
+    fields: [
+      { id: 'deponent_name', label: 'Deponent Full Name', ph: 'Priya Ramesh Sharma', req: true },
+      { id: 'deponent_age', label: 'Age', ph: '35 years', req: true },
+      { id: 'deponent_addr', label: 'Permanent Address', ph: 'Full residential address with PIN code', req: true, ta: true },
+      { id: 'purpose', label: 'Purpose of Affidavit', ph: 'Change of name / Lost document / Residence proof / Identity proof', req: true },
+      { id: 'statement', label: 'Statement of Facts (Each point on a new line)', ph: '1. I am a citizen of India...\n2. I solemnly declare that...\n3. The facts stated above are true to the best of my knowledge...', req: true, ta: true },
+      { id: 'state', label: 'State / City Where Being Sworn', ph: 'New Delhi', req: true },
+    ]
+  },
+  'rent-agreement': {
+    icon: '🏠', title: 'Rent Agreement Details',
+    type: 'Residential Lease / Rent Agreement under Transfer of Property Act 1882',
+    fields: [
+      { id: 'landlord_name', label: 'Landlord Full Name', ph: 'Arun Kumar Kapoor', req: true },
+      { id: 'landlord_addr', label: 'Landlord Permanent Address', ph: 'Landlord\'s own address', req: true, ta: true },
+      { id: 'tenant_name', label: 'Tenant Full Name', ph: 'Vijay Mehta', req: true },
+      { id: 'tenant_addr', label: 'Tenant Permanent Address', ph: 'Tenant\'s home/native address', req: true, ta: true },
+      { id: 'property_addr', label: 'Rental Property Address', ph: 'Full address of the property being rented, with PIN code', req: true, ta: true },
+      { id: 'rent', label: 'Monthly Rent (₹)', ph: '₹15,000', req: true },
+      { id: 'deposit', label: 'Security Deposit (₹)', ph: '₹45,000', req: true },
+      { id: 'start_date', label: 'Lease Start Date', ph: '1st June 2025', req: true },
+      { id: 'duration', label: 'Duration', ph: '11 months', req: true },
+      { id: 'lock_in', label: 'Lock-in Period', ph: '3 months', req: false },
+      { id: 'purpose_use', label: 'Purpose of Use', ph: 'Residential purpose only', req: false },
+    ]
+  },
+  'consumer-complaint': {
+    icon: '⚠️', title: 'Consumer Complaint Details',
+    type: 'Consumer Complaint before Consumer Disputes Redressal Commission under Consumer Protection Act 2019',
+    fields: [
+      { id: 'complainant', label: 'Complainant Full Name', ph: 'Nisha Suresh Verma', req: true },
+      { id: 'complainant_addr', label: 'Complainant Address', ph: 'Your full address with PIN code', req: true, ta: true },
+      { id: 'complainant_phone', label: 'Phone / Email', ph: '+91-9XXXXXXXXX / email@example.com', req: false },
+      { id: 'company', label: 'Opposite Party (Company / Seller)', ph: 'Flipkart Internet Private Limited', req: true },
+      { id: 'company_addr', label: 'Opposite Party Address', ph: 'Registered office address of the company', req: true, ta: true },
+      { id: 'product', label: 'Product / Service', ph: 'Samsung 55" LED TV — Order No. FK-12345678', req: true },
+      { id: 'amount_paid', label: 'Amount Paid (₹)', ph: '₹65,000', req: true },
+      { id: 'purchase_date', label: 'Date of Purchase / Transaction', ph: '15th March 2025', req: false },
+      { id: 'complaint', label: 'Nature of Deficiency / Defect', ph: 'Describe the defect, deficiency of service, or unfair trade practice in detail...', req: true, ta: true },
+      { id: 'relief', label: 'Relief / Compensation Sought', ph: 'Full refund of ₹65,000 + compensation for mental harassment + litigation costs', req: true },
+    ]
+  },
+  'rti': {
+    icon: '📋', title: 'RTI Application Details',
+    type: 'RTI Application under Right to Information Act 2005',
+    fields: [
+      { id: 'applicant', label: 'Applicant Full Name', ph: 'Rajesh Kumar Tiwari', req: true },
+      { id: 'applicant_addr', label: 'Applicant Address', ph: 'Your complete postal address with PIN code', req: true, ta: true },
+      { id: 'applicant_phone', label: 'Phone / Email (Optional)', ph: '+91-9XXXXXXXXX', req: false },
+      { id: 'pio_name', label: 'Public Information Officer (PIO)', ph: 'The Public Information Officer', req: false },
+      { id: 'department', label: 'Public Authority / Department', ph: 'Municipal Corporation of Delhi — PWD Department', req: true },
+      { id: 'department_addr', label: 'Department Address', ph: 'Full address of the public authority', req: true, ta: true },
+      { id: 'info_sought', label: 'Information / Documents Sought', ph: 'List each point clearly:\n1. Certified copy of...\n2. Details of expenditure on...\n3. Status of complaint No...', req: true, ta: true },
+      { id: 'time_period', label: 'Time Period / Year of Information', ph: 'Financial Year 2023-24', req: false },
+      { id: 'fee_mode', label: 'Fee Payment Mode', ph: 'Court Fee Stamp / Demand Draft / Online', req: false },
+    ]
+  },
+  'bail-application': {
+    icon: '⚖️', title: 'Bail Application Details',
+    type: 'Application for Bail before Sessions Court in India under CrPC',
+    fields: [
+      { id: 'accused_name', label: 'Applicant / Accused Full Name', ph: 'Mohit Kumar Verma', req: true },
+      { id: 'accused_age', label: 'Age of Accused', ph: '28 years', req: true },
+      { id: 'accused_addr', label: 'Accused Permanent Address', ph: 'Full address with PIN code', req: true, ta: true },
+      { id: 'fir_no', label: 'FIR No. / Case No.', ph: 'FIR No. 123/2025', req: true },
+      { id: 'police_station', label: 'Police Station', ph: 'PS Connaught Place, New Delhi', req: true },
+      { id: 'sections', label: 'Sections Charged Under', ph: 'Sections 420, 406, 34 IPC', req: true },
+      { id: 'court', label: 'Court Name', ph: 'Sessions Court, Delhi (Central)', req: true },
+      { id: 'custody_since', label: 'In Custody Since', ph: '15th April 2025', req: false },
+      { id: 'bail_type', label: 'Type of Bail', ph: 'Regular Bail / Anticipatory Bail', req: true },
+      { id: 'grounds', label: 'Grounds for Bail', ph: 'E.g.: No criminal antecedents, permanent resident, will cooperate with investigation, offence is bailable, ill health, family dependents...', req: true, ta: true },
+      { id: 'surety', label: 'Surety Details (if known)', ph: 'Name and address of surety person', req: false },
+    ]
+  }
+};
+
+let selectedType = 'legal-notice';
+let generatedText = '';
+
+function selectType(type) {
+  document.querySelectorAll('.doc-type').forEach(d => d.classList.remove('on'));
+  document.getElementById('dt-' + type).classList.add('on');
+  selectedType = type;
+  renderForm();
+  resetPreview();
+}
+
+function renderForm() {
+  const cfg = DOCS[selectedType];
+  document.getElementById('f-icon').textContent = cfg.icon;
+  document.getElementById('f-title').textContent = cfg.title;
+
+  let html = '';
+  cfg.fields.forEach(f => {
+    html += `<div class="form-group">
+      <label class="form-label">${f.label}${f.req ? ' <span style="color:var(--accent)">*</span>' : ''}</label>`;
+    if (f.ta) {
+      html += `<textarea class="form-textarea" id="ff-${f.id}" placeholder="${f.ph}" rows="3"></textarea>`;
+    } else {
+      html += `<input class="form-input" id="ff-${f.id}" placeholder="${f.ph}" type="text">`;
+    }
+    html += `</div>`;
+  });
+  document.getElementById('f-fields').innerHTML = html;
+}
+
+function resetPreview() {
+  document.getElementById('preview-body').className = 'preview-body';
+  document.getElementById('preview-body').innerHTML = `<div class="preview-placeholder"><span style="font-size:36px">📄</span><span data-i18n-html="docs_preview_placeholder">Fill in the form on the left<br>and click <strong style="color:var(--accent)">"Generate Document"</strong></span></div>`;
+  applyTranslations?.(currentStrings);
+  document.getElementById('preview-actions').style.display = 'none';
+  generatedText = '';
+}
+
+async function generate() {
+  const cfg = DOCS[selectedType];
+  const btn = document.getElementById('gen-btn');
+
+  // Collect fields
+  let fields = {};
+  let missingRequired = [];
+  cfg.fields.forEach(f => {
+    const el = document.getElementById('ff-' + f.id);
+    if (!el) return;
+    fields[f.label] = el.value.trim();
+    if (f.req && !el.value.trim()) missingRequired.push(f.label);
+  });
+
+  if (missingRequired.length > 2) {
+    showToast('Please fill in the required fields (*)', '⚠');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Generating…';
+
+  const pb = document.getElementById('preview-body');
+  pb.className = 'preview-body';
+  pb.innerHTML = `<div class="generating">
+    <div class="spinner"></div>
+    <div style="font-size:13px;color:var(--ts)">AI is drafting your document…</div>
+    <div class="gen-steps">
+      <div class="gen-step active" id="gs1">→ Analysing inputs</div>
+      <div class="gen-step" id="gs2">→ Applying relevant laws</div>
+      <div class="gen-step" id="gs3">→ Formatting document</div>
+    </div>
+  </div>`;
+
+  // Animate steps
+  setTimeout(() => { document.getElementById('gs1').className = 'gen-step done'; document.getElementById('gs2').className = 'gen-step active'; }, 600);
+  setTimeout(() => { document.getElementById('gs2').className = 'gen-step done'; document.getElementById('gs3').className = 'gen-step active'; }, 1400);
+
+  const fieldsText = Object.entries(fields)
+    .map(([k, v]) => `${k}: ${v || '[Not provided]'}`)
+    .join('\n');
+
+  const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const prompt = `Generate a formal, complete, court-ready ${cfg.type} using these details:
+
+${fieldsText}
+
+Date: ${today}
+
+Requirements:
+- Use proper Indian legal document formatting
+- Include all standard legal clauses and recitals appropriate for this document type
+- Cite specific relevant Indian laws, acts, and section numbers
+- For Legal Notices: Start with "WITHOUT PREJUDICE", include proper cause of action, consequence of non-compliance
+- For Affidavits: Include proper verification clause at end, deponent details
+- For Rent Agreements: Include all standard clauses — maintenance, notice period, sub-letting prohibition, etc.
+- For Consumer Complaints: Reference Consumer Protection Act 2019, include prayer for relief
+- For RTI: Reference RTI Act 2005, proper format with fee details
+- For Bail: Reference relevant CrPC sections, grounds clearly stated
+- Include proper signature block and date
+- Use capital letters for party names in formal sections
+- Output ONLY the document text — no explanations or commentary before or after`;
+
+  try {
+    const doc = await callClaude(
+      'You are a professional Indian legal document drafter with 20 years of experience. Generate complete, formal, accurate legal documents for Indian courts and authorities. Output ONLY the document text — no preamble, no explanation, no markdown formatting. Use plain text with proper spacing and legal formatting conventions.',
+      prompt
+    );
+
+    generatedText = doc;
+    pb.className = 'preview-body ready';
+    pb.textContent = doc;
+    document.getElementById('preview-actions').style.display = 'flex';
+    showToast('Document generated successfully', '✦');
+  } catch (err) {
+    pb.innerHTML = `<div class="generating" style="color:var(--red)"><span style="font-size:28px">⚠</span><span>Generation failed. Please try again.</span></div>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✦ Generate Document';
+}
+
+function copyDoc() {
+  if (generatedText) { copyText(generatedText, 'Document copied to clipboard'); }
+}
+
+function downloadDoc() {
+  if (!generatedText) return;
+  const name = `NyaySetu_${selectedType.replace('-','_')}_${Date.now()}.txt`;
+  downloadText(generatedText, name);
+  showToast('Document downloaded', '⬇');
+}
+
+// Init
+renderForm();
+initScrollAnim();
+</script>
+<script>
+async function generateDocument() {
+  window.currentDocType = selectedType;
+  const inputs = document.querySelectorAll("input, textarea");
+  let formData = "";
+
+  inputs.forEach(input => {
+    if (input.value.trim() !== "") {
+      const label = input.previousElementSibling?.innerText || "Field";
+      formData += label + ": " + input.value + "\n";
+    }
+  });
+
+  document.getElementById("preview-body").innerText = "Generating document...";
+
+  const res = await fetch("http://localhost:5000/generate-doc", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ formData })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("preview-body").innerText = data.document;
+
+  // ✅ SHOW BUTTONS
+  document.getElementById("preview-actions").style.display = "flex";
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF({
+    unit: "mm",
+    format: "a4"
+  });
+
+  const margin = 20;
+  const maxWidth = 170;
+
+  let text = document.getElementById("preview-body").innerText;
+
+  // 🔥 CLEAN TEXT (BUT KEEP LINE BREAKS)
+  text = text.replace(/\*\*/g, "");
+  text = text.replace(/---/g, "");
+
+  // 🔥 SPLIT INTO PARAGRAPHS (IMPORTANT)
+  const paragraphs = text.split("\n");
+
+  let y = 50;
+
+  // 🔥 HEADER
+  doc.setFont("Times", "Bold");
+  doc.setFontSize(18);
+  doc.text("NyaySetu", margin, 20);
+
+  doc.setFont("Times", "Normal");
+  doc.setFontSize(10);
+  doc.text("AI Legal Assistant", margin, 25);
+
+  doc.line(margin, 30, 190, 30);
+
+  // 🔥 TITLE
+  doc.setFont("Times", "Bold");
+  doc.setFontSize(14);
+  doc.text("LEGAL NOTICE", 105, 40, { align: "center" });
+
+  // 🔥 BODY
+  doc.setFont("Times", "Normal");
+  doc.setFontSize(12);
+
+  paragraphs.forEach(p => {
+    p = p.trim();
+
+    if (!p) {
+      y += 6;
+      return;
+    }
+
+    if (y > 270) {
+      doc.addPage();
+      y = 20;
+    }
+
+    const lines = doc.splitTextToSize(p, maxWidth);
+
+    doc.text(lines, margin, y, {
+      lineHeightFactor: 1.5
+    });
+
+    y += lines.length * 6 + 4; // spacing between paragraphs
+  });
+
+  // 🔥 SIGNATURE
+  y += 10;
+  doc.text("__________________________", 130, y);
+  doc.text("Authorized Signature", 135, y + 6);
+
+  // 🔥 FOOTER
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text("Generated by NyaySetu", 105, 290, { align: "center" });
+
+  doc.save("NyaySetu_Legal_Document.pdf");
+}
+</script>
+</body>
+</html>

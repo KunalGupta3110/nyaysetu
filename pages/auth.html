@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="auth_page_title">Sign In — NyaySetu</title>
+<link rel="stylesheet" href="../styles/base.css">
+<style>
+html,body{height:100%}
+body{display:flex;align-items:center;justify-content:center;padding:20px;min-height:100vh}
+
+.auth-wrap{display:grid;grid-template-columns:1fr 1fr;max-width:900px;width:100%;background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadowlg)}
+
+/* Left panel */
+.auth-left{background:linear-gradient(135deg,rgba(201,169,110,.07) 0%,transparent 60%);border-right:1px solid var(--border);padding:48px 44px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.auth-left-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.5}
+.auth-left-content{position:relative;z-index:2}
+.auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:48px}
+.auth-brand-box{width:36px;height:36px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#0A0A0A}
+.auth-brand-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--tp)}
+.auth-left h2{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--tp);line-height:1.2;letter-spacing:-.5px;margin-bottom:16px}
+.auth-left p{font-size:14px;color:var(--ts);line-height:1.7;margin-bottom:32px}
+.auth-features{display:flex;flex-direction:column;gap:14px}
+.auth-feat{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--ts)}
+.auth-feat-ico{width:30px;height:30px;border-radius:7px;background:var(--adim);border:1px solid rgba(201,169,110,.15);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.auth-bottom{position:relative;z-index:2;font-size:11px;color:var(--tm);line-height:1.6}
+
+/* Right panel */
+.auth-right{padding:48px 44px;display:flex;flex-direction:column;justify-content:center}
+.auth-tabs{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:28px}
+.auth-tab{flex:1;padding:9px;font-size:13px;font-weight:500;background:transparent;border:none;color:var(--ts);transition:all var(--t) var(--ease)}
+.auth-tab.active{background:var(--adim);color:var(--accent)}
+.auth-panel{display:none}
+.auth-panel.active{display:block}
+.auth-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--tp);margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--ts);margin-bottom:24px;line-height:1.5}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0;font-size:12px;color:var(--tm)}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-footer-link{font-size:12px;color:var(--ts);text-align:center;margin-top:16px}
+.auth-footer-link a{color:var(--accent)}
+.role-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.role-card{padding:12px;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all var(--t) var(--ease);text-align:center}
+.role-card:hover,.role-card.on{border-color:rgba(201,169,110,.35);background:var(--adim)}
+.role-card.on::after{content:none}
+.role-ico{font-size:22px;margin-bottom:6px}
+.role-title{font-size:12.5px;font-weight:600;color:var(--tp)}
+.role-desc{font-size:11px;color:var(--ts);margin-top:2px}
+
+/* Password strength */
+.pw-bar{height:3px;border-radius:2px;background:var(--bg3);overflow:hidden;margin-top:6px}
+.pw-fill{height:100%;border-radius:2px;transition:all .3s ease;width:0}
+.pw-weak{background:var(--red);width:33%}
+.pw-fair{background:#F59E0B;width:66%}
+.pw-strong{background:var(--green);width:100%}
+
+/* Loading overlay */
+.auth-loading{display:none;position:absolute;inset:0;background:rgba(10,10,10,.7);backdrop-filter:blur(4px);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:12px;border-radius:var(--rl)}
+.auth-loading.show{display:flex}
+
+@media(max-width:700px){
+  .auth-wrap{grid-template-columns:1fr}
+  .auth-left{display:none}
+}
+</style>
+</head>
+<body data-page="auth">
+<div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
+
+<div class="auth-wrap" style="position:relative">
+  <div class="auth-loading" id="auth-loading">
+    <div class="spinner"></div>
+    <span style="font-size:13px;color:var(--ts)">Signing you in…</span>
+  </div>
+
+  <!-- LEFT -->
+  <div class="auth-left">
+    <div class="auth-left-grid"></div>
+    <div class="auth-left-content">
+      <div class="auth-brand">
+        <div class="auth-brand-box">N</div>
+        <span class="auth-brand-name">NyaySetu</span>
+      </div>
+      <h2 data-i18n-html="auth_brand_title">Your legal rights,<br>one login away.</h2>
+      <p data-i18n="auth_brand_sub">Access AI-powered legal guidance, generate documents, and get answers reviewed by law professionals — all free.</p>
+      <div class="auth-features">
+        <div class="auth-feat"><div class="auth-feat-ico">⚖</div><span data-i18n="auth_feature_chat">AI legal chat with real law references</span></div>
+        <div class="auth-feat"><div class="auth-feat-ico">📄</div><span data-i18n="auth_feature_docs">Generate legal documents in minutes</span></div>
+        <div class="auth-feat"><div class="auth-feat-ico">📚</div><span data-i18n="auth_feature_simplify">Simplify any legal text instantly</span></div>
+        <div class="auth-feat"><div class="auth-feat-ico">🔒</div><span data-i18n="auth_feature_private">Your data is private and secure</span></div>
+      </div>
+    </div>
+    <div class="auth-bottom" data-i18n-html="auth_terms">
+      By signing in, you agree to our Terms of Service.<br>
+      NyaySetu is not a law firm. AI guidance ≠ legal advice.
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="auth-right">
+    <!-- Google -->
+    <button class="btn-google" id="google-btn" onclick="signInGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      <span data-i18n="auth_google">Continue with Google</span>
+    </button>
+    <div class="auth-divider" data-i18n="auth_email_continue">or continue with email</div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('signin')" data-i18n="auth_tab_signin">Sign In</button>
+      <button class="auth-tab" onclick="switchTab('signup')" data-i18n="auth_tab_signup">Create Account</button>
+    </div>
+
+    <!-- SIGN IN -->
+    <div class="auth-panel active" id="panel-signin">
+      <div class="auth-title" data-i18n="auth_signin_title">Welcome back</div>
+      <div class="auth-sub" data-i18n="auth_signin_sub">Sign in to your NyaySetu account.</div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="auth_email_label">Email Address</label>
+        <input class="form-input" id="si-email" type="email" data-i18n="auth_email_placeholder" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="auth_password_label">Password</label>
+        <input class="form-input" id="si-pass" type="password" data-i18n="auth_password_placeholder" autocomplete="current-password" onkeydown="if(event.key==='Enter')signIn()">
+      </div>
+      <div style="text-align:right;margin-bottom:18px">
+        <a href="#" style="font-size:12px;color:var(--accent)" onclick="switchTab('reset')" data-i18n="auth_forgot_password">Forgot password?</a>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center" onclick="signIn()" id="signin-btn" data-i18n="auth_signin_button">
+        Sign In →
+      </button>
+      <div class="auth-footer-link" data-i18n-html="auth_no_account">Don't have an account? <a href="#" onclick="switchTab('signup')">Create one free</a></div>
+    </div>
+
+    <!-- SIGN UP -->
+    <div class="auth-panel" id="panel-signup">
+      <div class="auth-title" data-i18n="auth_signup_title">Create your account</div>
+      <div class="auth-sub" data-i18n="auth_signup_sub">Free forever. No credit card required.</div>
+
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label" data-i18n="auth_role_label">I am a</label>
+        <div class="role-select-grid" id="role-grid">
+          <div class="role-card on" data-role="user" onclick="selectRole(this,'user')">
+            <div class="role-ico">🧑‍💼</div>
+            <div class="role-title" data-i18n="auth_role_citizen">Citizen</div>
+            <div class="role-desc" data-i18n="auth_role_citizen_desc">Seeking legal help</div>
+          </div>
+          <div class="role-card" data-role="student" onclick="selectRole(this,'student')">
+            <div class="role-ico">🎓</div>
+            <div class="role-title" data-i18n="auth_role_student">Law Student</div>
+            <div class="role-desc" data-i18n="auth_role_student_desc">Want to review & earn</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="su-name" type="text" data-i18n="auth_fullname_placeholder">
+        </div>
+        <div class="form-group">
+          <label class="form-label">City</label>
+          <input class="form-input" id="su-city" type="text" data-i18n="auth_city_placeholder">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="auth_email_label">Email Address</label>
+        <input class="form-input" id="su-email" type="email" data-i18n="auth_email_placeholder">
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="auth_password_label">Password</label>
+        <input class="form-input" id="su-pass" type="password" data-i18n="auth_password_hint" oninput="checkPwStrength(this.value)">
+        <div class="pw-bar"><div class="pw-fill" id="pw-fill"></div></div>
+      </div>
+
+      <!-- Student extra fields (hidden by default) -->
+      <div id="student-fields" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Law College</label>
+            <input class="form-input" id="su-college" type="text" data-i18n="auth_college_placeholder">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Year of Study</label>
+            <select class="form-select" id="su-year">
+              <option value="">Select year</option>
+              <option>1st Year (5-yr LLB)</option>
+              <option>2nd Year (5-yr LLB)</option>
+              <option>3rd Year (5-yr LLB)</option>
+              <option>4th Year (5-yr LLB)</option>
+              <option>5th Year (5-yr LLB)</option>
+              <option>1st Year (3-yr LLB)</option>
+              <option>2nd Year (3-yr LLB)</option>
+              <option>3rd Year (3-yr LLB)</option>
+              <option>LLM / PG</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="auth_area_label">Area of Interest</label>
+          <select class="form-select" id="su-area">
+            <option value="" data-i18n="auth_select_area">Select area</option>
+            <option data-i18n="auth_area_criminal">Criminal Law</option>
+            <option data-i18n="auth_area_civil">Civil / Property Law</option>
+            <option data-i18n="auth_area_family">Family Law</option>
+            <option data-i18n="auth_area_consumer">Consumer Law</option>
+            <option data-i18n="auth_area_constitutional">Constitutional Law</option>
+            <option data-i18n="auth_area_all">All Areas</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="signUp()" id="signup-btn" data-i18n="auth_create_button">
+        Create Account →
+      </button>
+      <div class="auth-footer-link" data-i18n-html="auth_already_account">Already have an account? <a href="#" onclick="switchTab('signin')">Sign in</a></div>
+    </div>
+
+    <!-- RESET -->
+    <div class="auth-panel" id="panel-reset">
+      <div class="auth-title" data-i18n="auth_reset_title">Reset password</div>
+      <div class="auth-sub" data-i18n="auth_reset_sub">Enter your email and we'll send a reset link.</div>
+      <div class="form-group">
+        <label class="form-label" data-i18n="auth_email_label">Email Address</label>
+        <input class="form-input" id="rst-email" type="email" data-i18n="auth_email_placeholder">
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center" onclick="resetPass()" id="reset-btn" data-i18n="auth_send_reset">
+        Send Reset Link
+      </button>
+      <div class="auth-footer-link" data-i18n="auth_back_to_signin"><a href="#" onclick="switchTab('signin')">← Back to sign in</a></div>
+    </div>
+  </div>
+</div>
+<script src="../js/i18n.js"></script>
+
+<script type="module">
+import { supabase, auth } from '../lib/supabase.js'
+import { showToast, initTheme } from '../lib/utils.js'
+initTheme()
+
+// Check if already logged in
+auth.getUser().then(user => { if (user) window.location.href = '/src/pages/dashboard.html' })
+
+let selectedRole = 'user'
+
+window.selectRole = (el, role) => {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('on'))
+  el.classList.add('on')
+  selectedRole = role
+  document.getElementById('student-fields').style.display = role === 'student' ? 'block' : 'none'
+}
+
+window.switchTab = (tab) => {
+  document.querySelectorAll('.auth-tab').forEach((t, i) => {
+    t.classList.toggle('active', ['signin','signup','reset'][i] === tab)
+  })
+  document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'))
+  document.getElementById('panel-' + tab).classList.add('active')
+}
+
+window.checkPwStrength = (pw) => {
+  const fill = document.getElementById('pw-fill')
+  if (pw.length < 1) { fill.className = 'pw-fill'; return }
+  const strong = pw.length >= 10 && /[A-Z]/.test(pw) && /[0-9]/.test(pw) && /[^a-zA-Z0-9]/.test(pw)
+  const fair   = pw.length >= 8
+  fill.className = 'pw-fill ' + (strong ? 'pw-strong' : fair ? 'pw-fair' : 'pw-weak')
+}
+
+window.signIn = async () => {
+  const email = document.getElementById('si-email').value.trim()
+  const pass  = document.getElementById('si-pass').value
+  if (!email || !pass) { showToast('Please fill in all fields', '⚠', 'error'); return }
+
+  const btn = document.getElementById('signin-btn')
+  btn.disabled = true; btn.textContent = 'Signing in…'
+  document.getElementById('auth-loading').classList.add('show')
+
+  const { data, error } = await auth.signIn(email, pass)
+  if (error) {
+    showToast(error.message === 'Invalid login credentials' ? 'Wrong email or password' : error.message, '✕', 'error')
+    btn.disabled = false; btn.textContent = 'Sign In →'
+    document.getElementById('auth-loading').classList.remove('show')
+  } else {
+    window.location.href = '/src/pages/dashboard.html'
+  }
+}
+
+window.signUp = async () => {
+  const name   = document.getElementById('su-name').value.trim()
+  const city   = document.getElementById('su-city').value.trim()
+  const email  = document.getElementById('su-email').value.trim()
+  const pass   = document.getElementById('su-pass').value
+
+  if (!name || !email || !pass) { showToast('Please fill required fields', '⚠', 'error'); return }
+  if (pass.length < 8) { showToast('Password must be at least 8 characters', '⚠', 'error'); return }
+
+  const btn = document.getElementById('signup-btn')
+  btn.disabled = true; btn.textContent = 'Creating account…'
+  document.getElementById('auth-loading').classList.add('show')
+
+  const { data, error } = await auth.signUp(email, pass, { full_name: name, city, role: selectedRole })
+
+  if (error) {
+    showToast(error.message, '✕', 'error')
+    btn.disabled = false; btn.textContent = 'Create Account →'
+    document.getElementById('auth-loading').classList.remove('show')
+    return
+  }
+
+  // If student, create student profile after email confirmation
+  if (selectedRole === 'student' && data.user) {
+    const college = document.getElementById('su-college').value.trim()
+    const year    = document.getElementById('su-year').value
+    const area    = document.getElementById('su-area').value
+    await supabase.from('student_profiles').insert({
+      id: data.user.id, college, year_of_study: year, area_of_interest: area
+    })
+    await supabase.from('profiles').update({ role: 'student', city }).eq('id', data.user.id)
+  } else if (data.user) {
+    await supabase.from('profiles').update({ city }).eq('id', data.user.id)
+  }
+
+  // Show verify email message
+  document.getElementById('auth-loading').classList.remove('show')
+  document.querySelector('.auth-right').innerHTML = `
+    <div style="text-align:center;padding:20px">
+      <div style="font-size:48px;margin-bottom:16px">📬</div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--tp);margin-bottom:8px">Check your email</div>
+      <div style="font-size:14px;color:var(--ts);line-height:1.7;max-width:300px;margin:0 auto 20px">
+        We sent a verification link to <strong style="color:var(--tp)">${esc(email)}</strong>.<br>Click it to activate your account.
+      </div>
+      <a href="/src/pages/auth.html" class="btn-ghost">← Back to Sign In</a>
+    </div>`
+}
+
+window.resetPass = async () => {
+  const email = document.getElementById('rst-email').value.trim()
+  if (!email) { showToast('Please enter your email', '⚠', 'error'); return }
+  const btn = document.getElementById('reset-btn')
+  btn.disabled = true; btn.textContent = 'Sending…'
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/src/pages/auth.html?mode=reset'
+  })
+  if (error) { showToast(error.message, '✕', 'error'); btn.disabled = false; btn.textContent = 'Send Reset Link' }
+  else { showToast('Reset link sent! Check your inbox.', '📬', 'success'); btn.textContent = 'Sent ✓' }
+}
+
+window.signInGoogle = async () => {
+  document.getElementById('auth-loading').classList.add('show')
+  await auth.signInWithGoogle()
+}
+
+function esc(s) { return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+</script>
+</body>
+</html>

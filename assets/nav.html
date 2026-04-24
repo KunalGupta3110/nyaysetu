@@ -1,0 +1,42 @@
+<!-- Shared Nav Component — save this as a reference -->
+<!-- Each page includes this directly, adjusting relative paths as needed -->
+
+<div id="loading-screen">
+  <div class="logo-loading">NyaySetu <span>न्यायसेतु</span></div>
+  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
+
+<nav class="navbar">
+  <div class="container">
+    <a href="../index.html" class="nav-logo">NyaySetu <span class="devanagari">न्यायसेतु</span></a>
+    <ul class="nav-links">
+      <li><a href="chat.html" data-i18n="nav_chat">AI Chat</a></li>
+      <li><a href="documents.html" data-i18n="nav_docs">Documents</a></li>
+      <li><a href="simplifier.html" data-i18n="nav_simplify">Simplifier</a></li>
+      <li><a href="students.html" data-i18n="nav_students">Students</a></li>
+      <li><a href="dashboard.html" data-i18n="nav_dashboard">Dashboard</a></li>
+    </ul>
+    <div class="nav-right">
+      <select id="langSelect" class="lang-select" title="Language">
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="ta">தமிழ்</option>
+        <option value="te">తెలుగు</option>
+        <option value="bn">বাংলা</option>
+        <option value="mr">मराठी</option>
+      </select>
+      <button class="nav-btn" id="themeBtn" title="Toggle theme">☀️</button>
+      <button class="nav-btn" id="authNavBtn" title="Account">👤</button>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<nav class="mobile-menu" id="mobileMenu">
+  <a href="chat.html" data-i18n="nav_chat">AI Chat</a>
+  <a href="documents.html" data-i18n="nav_docs">Documents</a>
+  <a href="simplifier.html" data-i18n="nav_simplify">Simplifier</a>
+  <a href="students.html" data-i18n="nav_students">Students</a>
+  <a href="dashboard.html" data-i18n="nav_dashboard">Dashboard</a>
+</nav>

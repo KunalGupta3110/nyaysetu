@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Chat — NyaySetu</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+html, body { height: 100%; overflow: hidden; }
+body { display: flex; flex-direction: column; }
+.chat-shell { display: flex; flex-direction: column; height: 100vh; padding-top: 64px; }
+.chat-layout { flex: 1; display: grid; grid-template-columns: 268px 1fr; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  border-right: 1px solid var(--border); background: var(--bg1);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.sidebar-top {
+  padding: 18px 16px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.sidebar-heading { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--ts); font-family: 'DM Mono', monospace; }
+.new-btn {
+  width: 28px; height: 28px; border-radius: 6px; background: var(--adim);
+  border: 1px solid rgba(201,169,110,.2); color: var(--accent); font-size: 18px;
+  display: flex; align-items: center; justify-content: center; line-height: 1;
+  transition: all var(--t) var(--ease);
+}
+.new-btn:hover { background: var(--accent); color: #0A0A0A; }
+
+.sidebar-scroll { flex: 1; overflow-y: auto; padding: 10px 10px; }
+.sidebar-scroll::-webkit-scrollbar { width: 2px; }
+.section-lbl { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tm); padding: 14px 8px 6px; font-family: 'DM Mono', monospace; }
+.topic {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 9px 10px; border-radius: 8px; font-size: 12.5px;
+  color: var(--ts); cursor: pointer; margin-bottom: 2px;
+  transition: all var(--t) var(--ease); line-height: 1.4; border: 1px solid transparent;
+}
+.topic:hover  { background: var(--bg2); color: var(--tp); }
+.topic.active { background: var(--bg2); color: var(--tp); border-color: var(--border); }
+.topic-ico { flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+
+.sidebar-foot {
+  padding: 14px 16px; border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.lang-select {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg); color: var(--tp); font-size: 13px; outline: none;
+}
+
+/* ── CHAT MAIN ── */
+.chat-main { display: flex; flex-direction: column; overflow: hidden; }
+.chat-topbar {
+  padding: 13px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg1); flex-shrink: 0;
+}
+.chat-name { font-size: 14px; font-weight: 600; color: var(--tp); margin-bottom: 2px; }
+.chat-online { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--green); font-family: 'DM Mono', monospace; }
+.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pdot 2s ease-in-out infinite; }
+
+.chat-messages { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+.chat-messages::-webkit-scrollbar { width: 3px; }
+
+/* ── WELCOME ── */
+.welcome {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center; padding: 40px; gap: 28px;
+}
+.welcome-ico  { font-size: 52px; margin-bottom: 6px; }
+.welcome-h    { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--tp); margin-bottom: 8px; letter-spacing: -.4px; }
+.welcome-sub  { font-size: 14px; color: var(--ts); max-width: 380px; line-height: 1.7; }
+.pill-grid    { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 520px; }
+.pill {
+  padding: 9px 15px; border-radius: 9px; border: 1px solid var(--border);
+  background: var(--bg1); font-size: 12.5px; color: var(--ts); cursor: pointer;
+  transition: all var(--t) var(--ease); text-align: left; line-height: 1.4;
+}
+.pill:hover { border-color: rgba(201,169,110,.3); color: var(--tp); background: var(--adim); }
+
+/* ── MESSAGES ── */
+.msg-row { display: flex; flex-direction: column; max-width: 78%; }
+.msg-row.u { align-self: flex-end; align-items: flex-end; }
+.msg-row.a { align-self: flex-start; align-items: flex-start; }
+.msg-from { font-size: 10.5px; color: var(--tm); font-family: 'DM Mono', monospace; margin-bottom: 5px; padding: 0 4px; }
+.msg-bubble {
+  padding: 12px 16px; border-radius: 14px;
+  font-size: 13.5px; line-height: 1.65; color: var(--tp);
+}
+.msg-row.u .msg-bubble { background: var(--adim); border: 1px solid rgba(201,169,110,.15); border-bottom-right-radius: 4px; }
+.msg-row.a .msg-bubble { background: var(--bg1); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+.msg-bubble .mb8 { margin-bottom: 8px; }
+.msg-bubble .mb0 { margin-bottom: 0; }
+.law-chip {
+  display: inline-flex; align-items: center; padding: 1px 6px;
+  background: var(--adim); border: 1px solid rgba(201,169,110,.2);
+  border-radius: 4px; font-size: 11px; color: var(--accent);
+  font-family: 'DM Mono', monospace; font-weight: 500; white-space: nowrap;
+}
+.msg-actions { display: flex; gap: 6px; margin-top: 8px; padding: 0 4px; flex-wrap: wrap; }
+.msg-act {
+  padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border);
+  background: transparent; font-size: 11px; color: var(--ts);
+  transition: all var(--t) var(--ease);
+}
+.msg-act:hover { border-color: var(--border2); color: var(--tp); background: var(--bg2); }
+
+/* ── TYPING ── */
+.typing-wrap { align-self: flex-start; }
+.typing {
+  display: flex; align-items: center; gap: 4px;
+  padding: 13px 16px; background: var(--bg1); border: 1px solid var(--border);
+  border-radius: 14px; border-bottom-left-radius: 4px;
+}
+.typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--ts); animation: bounce 1.3s ease-in-out infinite; }
+.typing span:nth-child(2) { animation-delay: .18s; }
+.typing span:nth-child(3) { animation-delay: .36s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px);} }
+
+/* ── INPUT ── */
+.chat-input-zone { padding: 16px 24px; border-top: 1px solid var(--border); background: var(--bg1); flex-shrink: 0; }
+.input-wrap {
+  display: flex; align-items: flex-end; gap: 10px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px;
+  transition: border-color var(--t) var(--ease);
+}
+.input-wrap:focus-within { border-color: var(--border2); }
+.chat-ta { flex: 1; background: transparent; border: none; outline: none; font-size: 14px; color: var(--tp); resize: none; line-height: 1.5; max-height: 130px; min-height: 24px; }
+.chat-ta::placeholder { color: var(--tm); }
+.send-btn {
+  width: 38px; height: 38px; border-radius: 8px; background: var(--accent); border: none;
+  color: #0A0A0A; font-size: 18px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all var(--t) var(--ease);
+}
+.send-btn:hover:not(:disabled)  { background: var(--accent2); transform: scale(1.06); }
+.send-btn:disabled { opacity: .4; cursor: not-allowed; }
+.chat-hint { font-size: 11px; color: var(--tm); text-align: center; margin-top: 8px; }
+
+/* ── DISCLAIMER BADGE ── */
+.disclaimer { display: flex; align-items: flex-start; gap: 8px; padding: 10px 14px; background: var(--adim); border: 1px solid rgba(201,169,110,.15); border-radius: 8px; font-size: 11.5px; color: var(--ts); line-height: 1.5; margin-bottom: 6px; }
+
+@media (max-width: 860px) {
+  .sidebar { display: none; }
+  .chat-layout { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body data-page="chat">
+<script src="../js/utils.js"></script>
+<script src="../js/i18n.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+// Fix nav paths for pages/ subdirectory
+function injectNav() {
+  document.body.insertAdjacentHTML('afterbegin', `
+  <nav id="nav">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-box">N</div>
+      <span class="nav-logo-name">NyaySetu</span>
+    </a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="../index.html"  data-page="home"><span data-i18n="nav_home">Home</span></a>
+      <a class="nav-tab" href="chat.html"       data-page="chat"><span class="nav-icon">⚖</span> <span data-i18n="nav_chat">AI Chat</span></a>
+      <a class="nav-tab" href="documents.html"  data-page="docs"><span class="nav-icon">📄</span> <span data-i18n="nav_docs">Documents</span></a>
+      <a class="nav-tab" href="simplifier.html" data-page="simplify"><span class="nav-icon">📚</span> <span data-i18n="nav_simplify">Simplifier</span></a>
+      <a class="nav-tab" href="students.html"   data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
+      <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀</button>
+      <a href="chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
+    </div>
+  </nav>
+  <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>`);
+  initTheme(); setActiveNav(); initI18n?.();
+}
+injectNav();
+</script>
+
+<div class="chat-shell">
+  <div class="chat-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <span class="sidebar-heading" data-i18n="sidebar_topics">Topics</span>
+        <button class="new-btn" onclick="clearChat()" title="New chat">+</button>
+      </div>
+      <div class="sidebar-scroll">
+        <div class="section-lbl">Common Questions</div>
+        <div class="topic" onclick="prefill('What is an FIR and how do I file one?')"><span class="topic-ico">📋</span>How to file an FIR</div>
+        <div class="topic" onclick="prefill('My landlord is not returning my security deposit for 3 months. What can I do legally?')"><span class="topic-ico">🏠</span>Security deposit dispute</div>
+        <div class="topic" onclick="prefill('What are my rights if police arrest me without a warrant?')"><span class="topic-ico">🚔</span>Rights on arrest</div>
+        <div class="topic" onclick="prefill('How do I file a consumer complaint against a company that cheated me?')"><span class="topic-ico">🛒</span>Consumer complaint</div>
+        <div class="topic" onclick="prefill('What is Section 498A IPC — explain it simply with penalties.')"><span class="topic-ico">📖</span>Section 498A IPC</div>
+        <div class="topic" onclick="prefill('How to apply for anticipatory bail and what is the court process?')"><span class="topic-ico">⚖️</span>Anticipatory bail</div>
+        <div class="topic" onclick="prefill('How do I file for divorce in India? What are the grounds and procedure?')"><span class="topic-ico">👨‍👩‍👧</span>Divorce procedure</div>
+        <div class="topic" onclick="prefill('What is the RTI application process and who can I file it against?')"><span class="topic-ico">📄</span>RTI application</div>
+        <div class="topic" onclick="prefill('My employer has not paid my salary for 2 months. What legal options do I have?')"><span class="topic-ico">💼</span>Unpaid salary</div>
+        <div class="topic" onclick="prefill('What is the process for registering a property in India and what documents are needed?')"><span class="topic-ico">🏡</span>Property registration</div>
+        <div class="section-lbl">Criminal Law</div>
+        <div class="topic" onclick="prefill('What are the bail provisions under CrPC and when can bail be denied?')"><span class="topic-ico">⛓</span>Bail provisions CrPC</div>
+        <div class="topic" onclick="prefill('What is the difference between cognizable and non-cognizable offences?')"><span class="topic-ico">📘</span>Cognizable offences</div>
+        <div class="topic" onclick="prefill('What are the rights of an accused person under Indian law?')"><span class="topic-ico">🛡</span>Rights of accused</div>
+        <div class="section-lbl">Family & Property</div>
+        <div class="topic" onclick="prefill('What are a woman\'s rights in ancestral property under Hindu Succession Act?')"><span class="topic-ico">👩‍⚖️</span>Women property rights</div>
+        <div class="topic" onclick="prefill('How does child custody work in India after divorce?')"><span class="topic-ico">👶</span>Child custody India</div>
+      </div>
+      <div class="sidebar-foot">
+        <div style="font-size:11px;color:var(--tm);margin-bottom:8px;font-family:'DM Mono',monospace">Use the top language selector for UI and response language.</div>
+      </div>
+    </aside>
+
+    <!-- CHAT MAIN -->
+    <main class="chat-main">
+      <div class="chat-topbar">
+        <div>
+          <div class="chat-name" data-i18n="chat_name">⚖ NyaySetu Legal AI</div>
+          <div class="chat-online"><div class="online-dot"></div><span data-i18n="chat_online">Online · Reviewed by law professionals</span></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost btn-sm" onclick="clearChat()" data-i18n="chat_new">New Chat</button>
+          <a href="documents.html" class="btn-ghost btn-sm"><span data-i18n="chat_doc_link">📄 Generate Document</span></a>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="messages">
+        <div class="welcome" id="welcome">
+          <div>
+            <div class="welcome-ico">⚖️</div>
+            <div class="welcome-h" data-i18n="chat_welcome_heading">How can NyaySetu help?</div>
+            <div class="welcome-sub" data-i18n="chat_welcome_sub">Ask any legal question in English, Hindi, Urdu, or any Indian language. Our AI will analyse your situation, identify relevant laws, and provide actionable guidance.</div>
+          </div>
+          <div class="pill-grid">
+            <div class="pill" onclick="prefill('My landlord is not returning my security deposit. What can I do?')">🏠 Security deposit problem</div>
+            <div class="pill" onclick="prefill('What are my rights if police arrest me without a warrant?')">🚔 Police arrested me</div>
+            <div class="pill" onclick="prefill('How do I file a consumer complaint against a company?')">🛒 Company cheated me</div>
+            <div class="pill" onclick="prefill('What is Section 498A IPC and what are its penalties?')">📖 Explain Section 498A</div>
+            <div class="pill" onclick="prefill('My employer has not paid my salary for 2 months. What should I do?')">💼 Unpaid salary</div>
+            <div class="pill" onclick="prefill('How to apply for anticipatory bail and what is the process?')">⚖️ Anticipatory bail</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-zone">
+        <div class="disclaimer">
+          <span>⚠</span>
+          <span data-i18n="chat_disclaimer">NyaySetu provides legal guidance, not professional legal advice. For serious matters, consult a qualified advocate.</span>
+        </div>
+        <div class="input-wrap">
+          <textarea class="chat-ta" id="chat-input" data-i18n-placeholder="chat_placeholder" placeholder="Ask your legal question here..." rows="1"
+            onkeydown="onKey(event)" oninput="autoGrow(this)"></textarea>
+          <button class="send-btn" id="send-btn" onclick="send()">→</button>
+        </div>
+        <div class="chat-hint" data-i18n="chat_hint">Enter to send · Shift+Enter for new line</div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let history = [];
+let lang = 'en';
+let busy = false;
+
+const LANGUAGE_PROMPTS = {
+  en: 'Respond in clear English.',
+  hi: 'Respond in Hindi using Devanagari script and proper legal Hindi terminology.',
+  ur: 'Respond in Urdu using Perso-Arabic script and proper legal Urdu terminology.',
+  bn: 'Respond in Bengali using Bengali script and proper legal Bengali terminology.',
+  pa: 'Respond in Punjabi using Gurmukhi script and proper legal Punjabi terminology.',
+  gu: 'Respond in Gujarati using Gujarati script and proper legal Gujarati terminology.',
+  mr: 'Respond in Marathi using Devanagari script and proper legal Marathi terminology.',
+  ta: 'Respond in Tamil using Tamil script and proper legal Tamil terminology.',
+  te: 'Respond in Telugu using Telugu script and proper legal Telugu terminology.',
+  kn: 'Respond in Kannada using Kannada script and proper legal Kannada terminology.',
+  ml: 'Respond in Malayalam using Malayalam script and proper legal Malayalam terminology.',
+  or: 'Respond in Odia using Odia script and proper legal Odia terminology.',
+  as: 'Respond in Assamese using Assamese script and proper legal Assamese terminology.',
+  mai: 'Respond in Maithili using Devanagari script and proper legal Maithili terminology.',
+  sa: 'Respond in Sanskrit using Devanagari script and proper legal Sanskrit terminology.',
+  ne: 'Respond in Nepali using Devanagari script and proper legal Nepali terminology.',
+  sd: 'Respond in Sindhi using Perso-Arabic script and proper legal Sindhi terminology.',
+  ks: 'Respond in Kashmiri using Perso-Arabic script and proper legal Kashmiri terminology.',
+  kok: 'Respond in Konkani using Devanagari script and proper legal Konkani terminology.',
+  sat: 'Respond in Santali using Ol Chiki script and proper legal Santali terminology.',
+  doi: 'Respond in Dogri using Devanagari script and proper legal Dogri terminology.',
+  brx: 'Respond in Bodo using Devanagari script and proper legal Bodo terminology.',
+  mni: 'Respond in Manipuri using Bengali script and proper legal Manipuri terminology.'
+};
+
+window.onLanguageChange = (l) => {
+  lang = l;
+};
+
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
+}
+
+function onKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+
+function prefill(q) {
+  const inp = document.getElementById('chat-input');
+  inp.value = q; autoGrow(inp);
+  send();
+}
+
+function clearChat() {
+  history = [];
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = '';
+  msgs.insertAdjacentHTML('beforeend', welcomeHTML());
+  applyTranslations?.(currentStrings);
+}
+
+function welcomeHTML() {
+  return `<div class="welcome" id="welcome">
+    <div>
+      <div class="welcome-ico">⚖️</div>
+      <div class="welcome-h" data-i18n="chat_welcome_heading">How can NyaySetu help?</div>
+      <div class="welcome-sub" data-i18n="chat_welcome_sub">Ask any legal question in English, Hindi, Urdu, or any Indian language. Our AI will analyse your situation, identify relevant laws, and provide actionable guidance.</div>
+    </div>
+    <div class="pill-grid">
+      <div class="pill" onclick="prefill('My landlord is not returning my security deposit. What can I do?')">🏠 Security deposit problem</div>
+      <div class="pill" onclick="prefill('What are my rights if police arrest me?')">🚔 Police arrested me</div>
+      <div class="pill" onclick="prefill('How do I file a consumer complaint?')">🛒 Company cheated me</div>
+      <div class="pill" onclick="prefill('Explain Section 498A IPC simply.')">📖 Section 498A</div>
+      <div class="pill" onclick="prefill('My employer has not paid salary for 2 months.')">💼 Unpaid salary</div>
+      <div class="pill" onclick="prefill('How to apply for anticipatory bail?')">⚖️ Anticipatory bail</div>
+    </div>
+  </div>`;
+}
+
+async function send() {
+  if (busy) return;
+  const inp = document.getElementById('chat-input');
+  const text = inp.value.trim();
+  if (!text) return;
+
+  // Remove welcome
+  document.getElementById('welcome')?.remove();
+
+  busy = true;
+  document.getElementById('send-btn').disabled = true;
+  inp.value = ''; inp.style.height = 'auto';
+
+  const msgs = document.getElementById('messages');
+
+  // User bubble
+  msgs.insertAdjacentHTML('beforeend', `
+    <div class="msg-row u">
+      <div class="msg-from">You</div>
+      <div class="msg-bubble">${esc(text)}</div>
+    </div>`);
+  scrollDown();
+
+  // Typing
+  const tid = 'ty' + Date.now();
+  msgs.insertAdjacentHTML('beforeend', `
+    <div class="typing-wrap" id="${tid}">
+      <div class="msg-from">⚖ NyaySetu AI</div>
+      <div class="typing"><span></span><span></span><span></span></div>
+    </div>`);
+  scrollDown();
+
+  const langInstr = typeof getLanguagePrompt === 'function'
+    ? getLanguagePrompt(lang)
+    : (LANGUAGE_PROMPTS[lang] || LANGUAGE_PROMPTS.en);
+
+  const systemPrompt = `You are NyaySetu, an expert Indian legal AI assistant helping Indian citizens understand their legal rights and options. ${langInstr}
+
+Structure every response clearly:
+1. **Plain Summary** — What is the legal situation in simple language (2-3 sentences)
+2. **Relevant Laws** — Cite specific sections (IPC, CrPC, CPC, Consumer Protection Act, Transfer of Property Act, Hindu Marriage Act, etc.) with section numbers
+3. **Practical Steps** — Numbered list of concrete actions the person can take immediately
+4. **When to Get a Lawyer** — Brief note on when professional legal help is essential
+
+Rules:
+- Use **bold** for section names and key legal terms
+- Be accurate and empathetic
+- Reference Indian laws only
+- Always end with a brief disclaimer that this is guidance, not legal advice
+- Keep responses concise but complete`;
+
+  try {
+    history.push({ role: 'user', content: text });
+    const reply = await callClaude(systemPrompt, history.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n\n'));
+    history.push({ role: 'assistant', content: reply });
+
+    document.getElementById(tid)?.remove();
+
+    const mid = 'msg' + Date.now();
+    msgs.insertAdjacentHTML('beforeend', `
+      <div class="msg-row a" id="${mid}">
+        <div class="msg-from">⚖ NyaySetu AI &nbsp;·&nbsp; Reviewed by law professionals</div>
+        <div class="msg-bubble">${formatMarkdown(reply)}</div>
+        <div class="msg-actions">
+          <button class="msg-act" onclick="copyText(document.getElementById('${mid}').querySelector('.msg-bubble').innerText)">📋 Copy</button>
+          <a href="documents.html" class="msg-act" style="text-decoration:none">📄 Generate Document</a>
+          <a href="simplifier.html" class="msg-act" style="text-decoration:none">📚 Simplify a Law</a>
+        </div>
+      </div>`);
+    scrollDown();
+  } catch (err) {
+    document.getElementById(tid)?.remove();
+    msgs.insertAdjacentHTML('beforeend', `
+      <div class="msg-row a">
+        <div class="msg-from">⚖ NyaySetu AI</div>
+        <div class="msg-bubble" style="border-color:rgba(248,113,113,.2);background:var(--reddim)">
+          <p class="mb0" style="color:var(--red)">⚠ Unable to connect to the AI service. Please check your internet connection and try again.</p>
+        </div>
+      </div>`);
+    scrollDown();
+  }
+
+  busy = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('chat-input').focus();
+}
+
+function scrollDown() {
+  const m = document.getElementById('messages');
+  m.scrollTop = m.scrollHeight;
+}
+</script>
+</body>
+</html>
