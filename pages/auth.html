@@ -440,10 +440,37 @@ window.resetPass = () => {
   showToast('Password reset is not enabled yet. Please contact support.', '⚠');
 };
 
-window.signInGoogle = () => {
-  showToast('Google sign-in is not connected yet. Please use email login.', '⚠');
-};
-</script>
 
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script>
+window.addEventListener("load", () => {
+  google.accounts.id.initialize({
+    client_id: "147158442170-tqsuuoefn4oi2uvemtrcth6976254u66.apps.googleusercontent.com",
+    callback: handleGoogleLogin
+  });
+});
+
+function signInGoogle() {
+  google.accounts.id.prompt();
+}
+
+function handleGoogleLogin(response) {
+  const data = JSON.parse(atob(response.credential.split('.')[1]));
+
+  const user = {
+    name: data.name,
+    email: data.email,
+    picture: data.picture
+  };
+
+  localStorage.setItem("user", JSON.stringify(user));
+
+  alert("Login successful 🚀");
+
+  window.location.href = "../index.html";
+}
+</script>
 </body>
 </html>
