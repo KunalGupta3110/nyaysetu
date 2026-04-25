@@ -290,6 +290,271 @@ const LOCAL_TRANSLATIONS = {
   }
 };
 
+const EXTRA_TRANSLATIONS = {
+  en: {
+    auth_brand_title: 'Your legal rights,<br>one login away.',
+    auth_brand_sub: 'Access AI-powered legal guidance, generate documents, and get answers reviewed by law professionals - all free.',
+    auth_feature_chat: 'AI legal chat with real law references',
+    auth_feature_docs: 'Generate legal documents in minutes',
+    auth_feature_simplify: 'Simplify any legal text instantly',
+    auth_feature_private: 'Your data is private and secure',
+    auth_terms: 'By signing in, you agree to our Terms of Service.<br>NyaySetu is not a law firm. AI guidance is not legal advice.',
+    auth_google: 'Continue with Google',
+    auth_email_continue: 'or continue with email',
+    auth_tab_signin: 'Sign In',
+    auth_tab_signup: 'Create Account',
+    auth_signin_title: 'Welcome back',
+    auth_signin_sub: 'Sign in to your NyaySetu account.',
+    auth_email_label: 'Email Address',
+    auth_email_placeholder: 'Enter your email',
+    auth_password_label: 'Password',
+    auth_password_placeholder: 'Enter your password',
+    auth_forgot_password: 'Forgot password?',
+    auth_signin_button: 'Sign In ->',
+    auth_no_account: 'Don\'t have an account? <a href="#" onclick="switchTab(\'signup\')">Create one free</a>',
+    auth_signup_title: 'Create your account',
+    auth_signup_sub: 'Free forever. No credit card required.',
+    auth_role_label: 'I am a',
+    auth_role_citizen: 'Citizen',
+    auth_role_citizen_desc: 'Seeking legal help',
+    auth_role_student: 'Law Student',
+    auth_role_student_desc: 'Want to review & earn',
+    auth_fullname_placeholder: 'Full name',
+    auth_city_placeholder: 'City',
+    auth_password_hint: 'Create a strong password',
+    auth_college_placeholder: 'Law college',
+    auth_area_label: 'Area of Interest',
+    auth_select_area: 'Select area',
+    auth_area_criminal: 'Criminal Law',
+    auth_area_civil: 'Civil / Property Law',
+    auth_area_family: 'Family Law',
+    auth_area_consumer: 'Consumer Law',
+    auth_area_constitutional: 'Constitutional Law',
+    auth_area_all: 'All Areas',
+    auth_create_button: 'Create Account ->',
+    auth_already_account: 'Already have an account? <a href="#" onclick="switchTab(\'signin\')">Sign in</a>',
+    auth_reset_title: 'Reset password',
+    auth_reset_sub: 'Enter your email and we\'ll send a reset link.',
+    auth_send_reset: 'Send Reset Link',
+    auth_back_to_signin: '<a href="#" onclick="switchTab(\'signin\')">← Back to sign in</a>',
+    dash_menu_profile: '👤 Profile Settings',
+    dash_menu_docs: '📄 My Documents',
+    dash_menu_students: '🎓 Student Dashboard',
+    dash_menu_signout: '← Sign Out',
+    dash_no_chats_title: 'No conversations yet',
+    dash_no_chats_sub: 'Your AI chat history will appear here',
+    dash_start_chatting: 'Start Chatting ->',
+    dash_no_docs_title: 'No documents yet',
+    dash_no_docs_sub: 'Generate your first legal document',
+    dash_generate_doc: 'Generate Document ->',
+    dash_snav_main: 'Main',
+    dash_snav_overview: 'Overview',
+    dash_snav_chats: 'Chat History',
+    dash_snav_docs: 'My Documents',
+    dash_snav_simplify: 'Simplify History',
+    dash_snav_account: 'Account',
+    dash_snav_profile: 'Profile',
+    dash_snav_signout: 'Sign Out',
+    dash_welcome_title: 'Good day, <span id="wb-name">there</span> 👋',
+    dash_welcome_sub: 'Here\'s a summary of your NyaySetu activity.',
+    dash_btn_ask: '⚖ Ask a Legal Question',
+    dash_btn_generate: '📄 Generate Document',
+    dash_stat_chats: 'Chat Sessions',
+    dash_stat_docs: 'Documents Saved',
+    dash_stat_simplified: 'Laws Simplified',
+    dash_stat_resolution: 'Query Resolution',
+    dash_recent_convos: 'Recent Conversations'
+  },
+  hi: {
+    auth_brand_title: 'आपके कानूनी अधिकार,<br>बस एक लॉगिन दूर।',
+    auth_brand_sub: 'AI कानूनी सहायता, दस्तावेज़ निर्माण और कानून पेशेवरों द्वारा समीक्षा किए गए उत्तर पाएं - बिल्कुल मुफ्त।',
+    auth_google: 'Google से जारी रखें',
+    auth_email_continue: 'या ईमेल से जारी रखें',
+    auth_tab_signin: 'साइन इन',
+    auth_tab_signup: 'खाता बनाएं',
+    auth_signin_title: 'वापसी पर स्वागत है',
+    auth_signin_sub: 'अपने NyaySetu खाते में साइन इन करें।',
+    auth_email_label: 'ईमेल पता',
+    auth_email_placeholder: 'अपना ईमेल दर्ज करें',
+    auth_password_label: 'पासवर्ड',
+    auth_password_placeholder: 'अपना पासवर्ड दर्ज करें',
+    auth_signin_button: 'साइन इन करें ->',
+    auth_signup_title: 'अपना खाता बनाएं',
+    auth_signup_sub: 'हमेशा मुफ्त। क्रेडिट कार्ड की जरूरत नहीं।',
+    auth_role_label: 'मैं हूं',
+    auth_role_citizen: 'नागरिक',
+    auth_role_student: 'कानून छात्र',
+    auth_create_button: 'खाता बनाएं ->',
+    auth_reset_title: 'पासवर्ड रीसेट करें',
+    auth_send_reset: 'रीसेट लिंक भेजें'
+  },
+  ur: {
+    page_title: 'NyaySetu - بھارت کے لیے AI قانونی رسائی',
+    home_page_title: 'NyaySetu - بھارت کے لیے AI قانونی رسائی',
+    chat_page_title: 'AI چیٹ - NyaySetu',
+    docs_page_title: 'دستاویز جنریٹر - NyaySetu',
+    simplify_page_title: 'قانون آسان بنانے والا - NyaySetu',
+    students_page_title: 'طلبہ ایکو سسٹم - NyaySetu',
+    auth_page_title: 'سائن ان - NyaySetu',
+    dash_page_title: 'ڈیش بورڈ - NyaySetu',
+    nav_home: 'ہوم',
+    nav_chat: 'AI چیٹ',
+    nav_docs: 'دستاویزات',
+    nav_simplify: 'آسان فہم',
+    nav_students: 'طلبہ',
+    nav_ask: 'سوال پوچھیں',
+    hero_badge: 'AI سے چلنے والی · قانونی رسائی · بھارت',
+    hero_title: 'انصاف اس بات پر منحصر نہیں ہونا چاہیے\nکہ آپ کس کو جانتے ہیں۔',
+    hero_sub: 'NyaySetu لوگوں اور قانون کے درمیان فاصلہ کم کرتا ہے۔ آسان زبان میں قانونی سوال پوچھیں - انگریزی، ہندی، اردو یا کسی بھی بھارتی زبان میں - AI کی مدد سے۔',
+    hero_start: 'مفت شروع کریں ->',
+    hero_how: 'یہ کیسے کام کرتا ہے',
+    hero_note: '🔒 سائن اپ ضروری نہیں · ہندی، اردو اور مزید بھارتی زبانیں · 12,400+ سوالات حل',
+    metric_queries: 'قانونی سوالات حل ہوئے',
+    metric_students: 'قانون کے طلبہ شامل',
+    metric_docs: 'دستاویزات بنیں',
+    metric_satisfaction: 'صارفین کی اطمینان',
+    process_title: 'طریقہ کار',
+    process_header: 'وضاحت کے لیے بنایا گیا نظام',
+    process_sub: 'ہر سوال AI تجزیے اور انسانی جائزے سے گزرتا ہے - تیز اور قابل اعتماد۔',
+    process_step1_title: 'آپ پوچھتے ہیں',
+    process_step1_desc: 'اپنا قانونی سوال انگریزی، ہندی، اردو یا کسی بھارتی زبان میں بھیجیں۔ قانونی علم ضروری نہیں۔',
+    process_step2_title: 'AI تجزیہ کرتا ہے',
+    process_step2_desc: 'قانونی AI متعلقہ قوانین، دفعات اور نظائر فوراً شناخت کرتا ہے۔',
+    process_step3_title: 'طالب علم جائزہ لیتا ہے',
+    process_step3_desc: 'تصدیق شدہ قانون کا طالب علم جواب کا جائزہ لے کر پیشہ ورانہ سیاق شامل کرتا ہے۔',
+    process_step4_title: 'وکیل تک رسائی',
+    process_step4_desc: 'پیچیدہ معاملات لائسنس یافتہ وکلا تک بھیجے جاتے ہیں - تیز اور کم خرچ۔',
+    tag_citizen: 'شہری',
+    tag_ai: 'NyaySetu AI',
+    tag_law_student: 'قانون کا طالب علم',
+    tag_advocate: 'وکیل',
+    features_title: 'صلاحیتیں',
+    features_sub: 'ہر قانونی ضرورت، ایک جگہ',
+    feat_ai_title: 'AI قانونی معاون',
+    feat_ai_desc: 'سادہ زبان میں کچھ بھی پوچھیں - FIR، جائیداد کے تنازعات، صارف حقوق۔ AI سیکنڈوں میں متعلقہ قانون بتاتا ہے۔',
+    feat_ai_action: 'چیٹ کھولیں',
+    feat_docs_title: 'دستاویز جنریٹر',
+    feat_docs_desc: 'قانونی نوٹس، حلف نامہ، کرایہ نامہ، صارف شکایت اور RTI درخواست منٹوں میں بنائیں۔',
+    feat_docs_action: 'ابھی بنائیں',
+    feat_simplify_title: 'قانون آسان بنانے والا',
+    feat_simplify_desc: 'کوئی بھی قانونی متن پیسٹ کریں اور آسان زبان میں عملی وضاحت حاصل کریں۔',
+    feat_simplify_action: 'آزمائیں',
+    feat_students_title: 'طلبہ ایکو سسٹم',
+    feat_students_desc: 'قانون کے طلبہ حقیقی سوالات کا جائزہ لے کر کریڈٹ کماتے ہیں اور اپنا پورٹ فولیو بناتے ہیں۔',
+    feat_students_action: 'طالب علم کے طور پر شامل ہوں',
+    advantage_label: 'فائدہ',
+    advantage_title: 'NyaySetu کیوں موجود ہے',
+    advantage_sub: 'روایتی قانونی مدد سست، مہنگی اور مشکل ہے۔ ہم نے NyaySetu ان تینوں کو بدلنے کے لیے بنایا۔',
+    why_fast_title: 'تیز - ہفتوں نہیں، منٹوں میں',
+    why_fast_desc: 'روایتی مشاورت شروع ہونے میں دن لگ سکتے ہیں۔ NyaySetu 30 سیکنڈ سے کم میں ابتدائی جواب دیتا ہے۔',
+    why_fast_metric: '⟳ 30 سیکنڈ سے کم ابتدائی جواب',
+    why_affordable_title: 'کم خرچ - ₹5,000 فی گھنٹہ نہیں',
+    why_affordable_desc: 'بھارت میں قانونی مدد مہنگی ہے۔ NyaySetu شروع کرنے کے لیے مفت ہے۔',
+    why_affordable_metric: '₹ روایتی خرچ کا ایک حصہ',
+    why_access_title: 'قابل رسائی - کہیں بھی، کسی کے لیے بھی',
+    why_access_desc: 'اگر آپ کے پاس فون ہے تو آپ قانونی رہنمائی تک رسائی رکھتے ہیں۔ دفتر جانے یا اپائنٹمنٹ کی ضرورت نہیں۔',
+    why_access_metric: '📱 کوئی بھی ڈیوائس، کوئی بھی جگہ',
+    cta_title: 'آج ہی شروع کریں',
+    cta_header: 'آپ کے حقوق اہم ہیں۔<br>انہیں جانیں۔',
+    cta_sub: 'اپنا پہلا قانونی سوال مفت پوچھیں۔ شروع کرنے کے لیے سائن اپ ضروری نہیں۔',
+    cta_button: 'مفت شروع کریں ->',
+    cta_note: 'کریڈٹ کارڈ ضروری نہیں · ہندی اور انگریزی · 12,400+ سوالات حل',
+    footer_privacy: 'پرائیویسی پالیسی',
+    footer_terms: 'استعمال کی شرائط',
+    footer_disclaimer: 'قانونی دستبرداری',
+    footer_contact: 'ہم سے رابطہ کریں',
+    footer_copy: '© 2025 NyaySetu · قانونی مشورے کا متبادل نہیں',
+    chat_welcome_heading: 'NyaySetu آپ کی کیسے مدد کر سکتا ہے؟',
+    chat_welcome_sub: 'کوئی بھی قانونی سوال انگریزی، ہندی، اردو یا کسی بھارتی زبان میں پوچھیں۔',
+    chat_placeholder: 'اپنا قانونی سوال یہاں لکھیں...',
+    chat_new: 'نئی چیٹ',
+    chat_doc_link: '📄 دستاویز بنائیں',
+    chat_simplify_link: '📚 قانون آسان کریں',
+    chat_disclaimer: 'NyaySetu قانونی رہنمائی فراہم کرتا ہے، پیشہ ورانہ قانونی مشورہ نہیں۔',
+    chat_name: '⚖ NyaySetu قانونی AI',
+    chat_online: 'آن لائن · قانون پیشہ ور افراد کے ذریعے جائزہ',
+    chat_hint: 'بھیجنے کے لیے Enter · نئی لائن کے لیے Shift+Enter',
+    sidebar_topics: 'موضوعات',
+    docs_title: 'دستاویز جنریٹر',
+    docs_header: 'قانونی دستاویزات منٹوں میں بنائیں',
+    docs_sub: 'عام بھارتی قانونی ضرورتوں کے لیے AI سے چلنے والے درست ٹیمپلیٹس۔',
+    docs_gen_button: '✦ دستاویز بنائیں',
+    docs_preview_title: 'دستاویز کا پیش نظارہ',
+    docs_preview_placeholder: 'بائیں طرف فارم بھریں<br>اور <strong style="color:var(--accent)">"دستاویز بنائیں"</strong> پر کلک کریں',
+    docs_copy: '📋 کاپی',
+    docs_download: '📄 PDF ڈاؤن لوڈ',
+    simplifier_title: 'قانون آسان بنانے والا',
+    simplifier_header: 'کوئی بھی قانونی متن فوراً سمجھیں',
+    simplifier_sub: 'عدالتی حکم، قانونی نوٹس، معاہدہ یا سرکاری سرکلر پیسٹ کریں اور آسان وضاحت پائیں۔',
+    simplifier_try_sample: 'نمونہ آزمائیں:',
+    simplify_input_label: 'قانونی متن',
+    simplify_input_badge: 'یہاں پیسٹ کریں',
+    simplify_clear: 'صاف کریں',
+    simplify_button: '✦ آسان کریں ->',
+    simplify_output_label: 'آسان اردو',
+    simplify_output_badge: 'آسان بنایا گیا',
+    simplifier_output_placeholder: 'آپ کی آسان زبان میں وضاحت<br>یہاں نظر آئے گی',
+    students_title: 'طلبہ ایکو سسٹم',
+    students_header: 'کام کرتے ہوئے سیکھیں۔ مشق کرتے ہوئے کمائیں۔',
+    students_sub: 'حقیقی قانونی سوالات کا جائزہ لیں، پیشہ ورانہ پورٹ فولیو بنائیں اور رینک حاصل کریں۔',
+    students_tab_dashboard: '📊 ڈیش بورڈ',
+    students_tab_review: '✅ جائزہ قطار',
+    students_tab_leaderboard: '🏆 لیڈر بورڈ',
+    students_tab_signup: '🎓 طالب علم کے طور پر شامل ہوں',
+    auth_brand_title: 'آپ کے قانونی حقوق،<br>صرف ایک لاگ ان دور۔',
+    auth_brand_sub: 'AI قانونی رہنمائی، دستاویزات اور قانون پیشہ ور افراد کے جائزہ شدہ جوابات حاصل کریں - بالکل مفت۔',
+    auth_feature_chat: 'حقیقی قانونی حوالوں کے ساتھ AI چیٹ',
+    auth_feature_docs: 'منٹوں میں قانونی دستاویزات بنائیں',
+    auth_feature_simplify: 'کسی بھی قانونی متن کو فوراً آسان کریں',
+    auth_feature_private: 'آپ کا ڈیٹا نجی اور محفوظ ہے',
+    auth_terms: 'سائن ان کرکے آپ ہماری شرائط سے اتفاق کرتے ہیں۔<br>NyaySetu قانون فرم نہیں ہے۔ AI رہنمائی قانونی مشورہ نہیں۔',
+    auth_google: 'Google سے جاری رکھیں',
+    auth_email_continue: 'یا ای میل سے جاری رکھیں',
+    auth_tab_signin: 'سائن ان',
+    auth_tab_signup: 'اکاؤنٹ بنائیں',
+    auth_signin_title: 'واپسی پر خوش آمدید',
+    auth_signin_sub: 'اپنے NyaySetu اکاؤنٹ میں سائن ان کریں۔',
+    auth_email_label: 'ای میل پتہ',
+    auth_email_placeholder: 'اپنا ای میل درج کریں',
+    auth_password_label: 'پاس ورڈ',
+    auth_password_placeholder: 'اپنا پاس ورڈ درج کریں',
+    auth_forgot_password: 'پاس ورڈ بھول گئے؟',
+    auth_signin_button: 'سائن ان ->',
+    auth_no_account: 'اکاؤنٹ نہیں ہے؟ <a href="#" onclick="switchTab(\'signup\')">مفت بنائیں</a>',
+    auth_signup_title: 'اپنا اکاؤنٹ بنائیں',
+    auth_signup_sub: 'ہمیشہ مفت۔ کریڈٹ کارڈ ضروری نہیں۔',
+    auth_role_label: 'میں ہوں',
+    auth_role_citizen: 'شہری',
+    auth_role_citizen_desc: 'قانونی مدد چاہیے',
+    auth_role_student: 'قانون کا طالب علم',
+    auth_role_student_desc: 'جائزہ لینا اور کمانا چاہتے ہیں',
+    auth_fullname_placeholder: 'پورا نام',
+    auth_city_placeholder: 'شہر',
+    auth_password_hint: 'مضبوط پاس ورڈ بنائیں',
+    auth_college_placeholder: 'قانون کالج',
+    auth_area_label: 'دلچسپی کا شعبہ',
+    auth_select_area: 'شعبہ منتخب کریں',
+    auth_area_criminal: 'فوجداری قانون',
+    auth_area_civil: 'دیوانی / جائیداد قانون',
+    auth_area_family: 'خاندانی قانون',
+    auth_area_consumer: 'صارف قانون',
+    auth_area_constitutional: 'آئینی قانون',
+    auth_area_all: 'تمام شعبے',
+    auth_create_button: 'اکاؤنٹ بنائیں ->',
+    auth_already_account: 'پہلے سے اکاؤنٹ ہے؟ <a href="#" onclick="switchTab(\'signin\')">سائن ان کریں</a>',
+    auth_reset_title: 'پاس ورڈ ری سیٹ کریں',
+    auth_reset_sub: 'اپنا ای میل درج کریں، ہم ری سیٹ لنک بھیجیں گے۔',
+    auth_send_reset: 'ری سیٹ لنک بھیجیں',
+    auth_back_to_signin: '<a href="#" onclick="switchTab(\'signin\')">← سائن ان پر واپس</a>'
+  }
+};
+
+const translations = {
+  en: { ...BASE_STRINGS, ...EXTRA_TRANSLATIONS.en },
+  hi: { ...BASE_STRINGS, ...(LOCAL_TRANSLATIONS.hi || {}), ...EXTRA_TRANSLATIONS.hi },
+  ur: { ...BASE_STRINGS, ...EXTRA_TRANSLATIONS.ur }
+};
+
 const LANGUAGE_SCRIPT_HINTS = {
   bn: 'বাংলা', te: 'తెలుగు', mr: 'मराठी', ta: 'தமிழ்', ur: 'اردو', gu: 'ગુજરાતી',
   kn: 'ಕನ್ನಡ', ml: 'മലയാളം', or: 'ଓଡ଼ିଆ', pa: 'ਪੰਜਾਬੀ', as: 'অসমীয়া',
@@ -302,14 +567,14 @@ const LANGUAGE_SCRIPT_HINTS = {
 };
 
 function getSavedLanguage() {
-  const saved = localStorage.getItem('ns-lang');
+  const saved = localStorage.getItem('lang') || localStorage.getItem('ns-lang');
   if (saved && LANGUAGE_NAMES[saved]) return saved;
   const browserLang = navigator.language?.split('-')[0];
   return LANGUAGE_NAMES[browserLang] ? browserLang : DEFAULT_LOCALE;
 }
 
 function getLangSelectHTML() {
-  return `<select class="lang-select" id="lang-select" aria-label="Select language" onchange="setLang(this.value)">` +
+  return `<select class="lang-select" id="lang-select" aria-label="Select language" onchange="changeLanguage(this.value)">` +
     Object.entries(LANGUAGE_NAMES).map(([code, label]) =>
       `<option value="${code}">${label}</option>`
     ).join('') +
@@ -354,8 +619,8 @@ async function translateDictionary(lang, dictionary, cacheKey) {
 }
 
 async function fetchTranslationSet(lang) {
-  if (LOCAL_TRANSLATIONS[lang]) {
-    return { ...BASE_STRINGS, ...LOCAL_TRANSLATIONS[lang] };
+  if (translations[lang]) {
+    return translations[lang];
   }
   return translateDictionary(lang, BASE_STRINGS, I18N_CACHE_PREFIX + lang);
 }
@@ -523,6 +788,7 @@ async function loadLanguage(lang) {
   const select = document.getElementById('lang-select');
   if (select) select.value = currentLang;
   localStorage.setItem('ns-lang', currentLang);
+  localStorage.setItem('lang', currentLang);
   if (typeof window.onLanguageChange === 'function') window.onLanguageChange(currentLang);
 }
 
@@ -546,7 +812,11 @@ function observeDynamicText() {
 }
 
 function setLang(lang) {
-  loadLanguage(lang);
+  changeLanguage(lang);
+}
+
+function changeLanguage(lang) {
+  return loadLanguage(lang);
 }
 
 function initI18n() {
@@ -567,11 +837,13 @@ function getLanguagePrompt(lang) {
 
 window.getLangSelectHTML = getLangSelectHTML;
 window.setLang = setLang;
+window.changeLanguage = changeLanguage;
 window.initI18n = initI18n;
 window.applyTranslations = applyTranslations;
 window.autoTranslatePage = autoTranslatePage;
 window.getLanguagePrompt = getLanguagePrompt;
 window.currentStrings = currentStrings;
 window.onLanguageChange = null;
+window.translations = translations;
 
 setTimeout(() => initI18n(), 0);
