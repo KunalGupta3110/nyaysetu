@@ -50,6 +50,8 @@ window.LANGUAGE_NAMES = {
 const DEFAULT_LOCALE = 'en';
 const I18N_CACHE_PREFIX = 'ns-i18n-v2-';
 const AUTO_CACHE_PREFIX = 'ns-auto-i18n-v2-';
+const JSON_TRANSLATION_LANGS = ['en', 'hi', 'bn', 'ta'];
+const TRANSLATION_API_URL = 'https://translate.googleapis.com/translate_a/single';
 const TEXT_NODE_ORIGINALS = new WeakMap();
 const ATTR_ORIGINALS = new WeakMap();
 let currentLang = DEFAULT_LOCALE;
@@ -550,9 +552,7 @@ const EXTRA_TRANSLATIONS = {
 };
 
 const translations = {
-  en: { ...BASE_STRINGS, ...EXTRA_TRANSLATIONS.en },
-  hi: { ...BASE_STRINGS, ...(LOCAL_TRANSLATIONS.hi || {}), ...EXTRA_TRANSLATIONS.hi },
-  ur: { ...BASE_STRINGS, ...EXTRA_TRANSLATIONS.ur }
+  en: { ...BASE_STRINGS, ...EXTRA_TRANSLATIONS.en }
 };
 
 const LANGUAGE_SCRIPT_HINTS = {
@@ -589,6 +589,63 @@ function parseLocalizedJSON(text) {
   try { return JSON.parse(text.slice(start, end + 1)); } catch (err) { return null; }
 }
 
+function getTranslationBasePath() {
+  return window.location.pathname.includes('/pages/') ? '../translations' : 'translations';
+}
+
+async function loadTranslationJSON(lang) {
+  if (!JSON_TRANSLATION_LANGS.includes(lang)) return null;
+  try {
+    const response = await fetch(`${getTranslationBasePath()}/${lang}.json`, { cache: 'no-cache' });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (err) {
+    console.warn(`Could not load ${lang}.json translation pack.`, err);
+    return null;
+  }
+}
+
+function splitHtmlValue(value) {
+  return String(value).split(/(<[^>]+>)/g);
+}
+
+function rejoinHtmlValue(parts, translatedText) {
+  const textParts = translatedText.split('\n');
+  let textIndex = 0;
+  return parts.map(part => {
+    if (/^<[^>]+>$/.test(part)) return part;
+    return textParts[textIndex++] ?? part;
+  }).join('');
+}
+
+async function translateTextViaGoogle(text, lang) {
+  if (!text || lang === DEFAULT_LOCALE) return text;
+  const cacheKey = `${AUTO_CACHE_PREFIX}${lang}-${stableHash(text)}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) return cached;
+
+  const url = `${TRANSLATION_API_URL}?client=gtx&sl=en&tl=${encodeURIComponent(lang)}&dt=t&q=${encodeURIComponent(text)}`;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Translation API request failed.');
+  const data = await response.json();
+  const translated = Array.isArray(data?.[0])
+    ? data[0].map(part => part?.[0] || '').join('')
+    : text;
+
+  localStorage.setItem(cacheKey, translated);
+  return translated;
+}
+
+async function translateValue(value, lang) {
+  const parts = splitHtmlValue(value);
+  const textPayload = parts
+    .filter(part => !/^<[^>]+>$/.test(part))
+    .join('\n');
+  if (!textPayload.trim()) return value;
+  const translatedPayload = await translateTextViaGoogle(textPayload, lang);
+  return rejoinHtmlValue(parts, translatedPayload);
+}
+
 async function translateDictionary(lang, dictionary, cacheKey) {
   if (lang === DEFAULT_LOCALE) return dictionary;
   const cached = localStorage.getItem(cacheKey);
@@ -596,33 +653,56 @@ async function translateDictionary(lang, dictionary, cacheKey) {
     try { return JSON.parse(cached); } catch (err) {}
   }
 
-  const language = LANGUAGE_NAMES[lang] || lang;
-  const system = [
-    'You are a professional Indian website localizer.',
-    `Translate every JSON value into ${language}.`,
-    'Keep the exact same JSON keys.',
-    'Preserve HTML tags, placeholders, numbers, brand names, legal acronyms, emojis, and punctuation where appropriate.',
-    'Return only valid JSON. Do not add markdown or explanation.'
-  ].join(' ');
+  const translated = {};
+  for (const [key, value] of Object.entries(dictionary)) {
+    translated[key] = await translateValue(value, lang);
+  }
 
-  const response = await fetch('https://nyaysetu-a5vj.onrender.com/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ system, message: JSON.stringify(dictionary, null, 2) })
-  });
-
-  const data = await response.json();
-  const translated = parseLocalizedJSON(data.reply);
-  if (!translated) throw new Error('Translation service did not return JSON.');
   localStorage.setItem(cacheKey, JSON.stringify(translated));
   return translated;
 }
 
-async function fetchTranslationSet(lang) {
-  if (translations[lang]) {
-    return translations[lang];
-  }
-  return translateDictionary(lang, BASE_STRINGS, I18N_CACHE_PREFIX + lang);
+function collectPageI18nDefaults() {
+  const defaults = {};
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (!key || defaults[key]) return;
+    defaults[key] = (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')
+      ? el.placeholder
+      : el.textContent.trim();
+  });
+
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    if (key && !defaults[key]) defaults[key] = el.innerHTML.trim();
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (key && !defaults[key]) defaults[key] = el.placeholder;
+  });
+
+  return defaults;
+}
+
+async function fetchTranslationSet(lang, pageDefaults = {}) {
+  const baseDictionary = { ...(translations.en || BASE_STRINGS), ...pageDefaults };
+  const localPack = await loadTranslationJSON(lang);
+  if (lang === DEFAULT_LOCALE) return { ...baseDictionary, ...(localPack || {}) };
+
+  const bundledPack = translations[lang] || {};
+  const mergedPack = { ...bundledPack, ...(localPack || {}) };
+  const missing = {};
+
+  Object.keys(baseDictionary).forEach(key => {
+    if (!mergedPack[key]) missing[key] = baseDictionary[key];
+  });
+
+  if (!Object.keys(missing).length) return { ...baseDictionary, ...mergedPack };
+
+  const autoTranslated = await translateDictionary(lang, missing, `${I18N_CACHE_PREFIX}${lang}-${stableHash(JSON.stringify(missing))}`);
+  return { ...baseDictionary, ...mergedPack, ...autoTranslated };
 }
 
 function makeVisibleFallback(lang) {
@@ -769,7 +849,7 @@ async function loadLanguage(lang) {
   currentLang = LANGUAGE_NAMES[lang] ? lang : DEFAULT_LOCALE;
   isApplyingI18n = true;
   try {
-    currentStrings = { ...BASE_STRINGS, ...(await fetchTranslationSet(currentLang)) };
+    currentStrings = await fetchTranslationSet(currentLang, collectPageI18nDefaults());
   } catch (err) {
     console.warn('Translation failed, using local fallback.', err);
     currentStrings = makeVisibleFallback(currentLang);

@@ -1,0 +1,17 @@
+{
+  "nav_home": "होम",
+  "nav_chat": "एआई चैट",
+  "nav_docs": "दस्तावेज़",
+  "nav_simplify": "सरलीकरण",
+  "nav_students": "छात्र",
+  "nav_ask": "प्रश्न पूछें",
+  "hero_title": "न्याय इस बात पर निर्भर नहीं होना चाहिए\nकि आप किसे जानते हैं।",
+  "hero_start": "मुफ्त शुरू करें ->",
+  "hero_how": "यह कैसे काम करता है",
+  "features_title": "क्षमताएं",
+  "docs_title": "दस्तावेज़ जनरेटर",
+  "simplifier_title": "कानून सरलीकरण",
+  "students_title": "छात्र इकोसिस्टम",
+  "auth_signin_title": "वापसी पर स्वागत है",
+  "auth_signup_title": "अपना खाता बनाएं"
+}

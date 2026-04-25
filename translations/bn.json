@@ -1,0 +1,17 @@
+{
+  "nav_home": "হোম",
+  "nav_chat": "এআই চ্যাট",
+  "nav_docs": "নথি",
+  "nav_simplify": "সরলীকরণ",
+  "nav_students": "শিক্ষার্থী",
+  "nav_ask": "প্রশ্ন করুন",
+  "hero_title": "ন্যায়বিচার নির্ভর করা উচিত নয়\nআপনি কাকে চেনেন তার উপর।",
+  "hero_start": "বিনামূল্যে শুরু করুন ->",
+  "hero_how": "কীভাবে কাজ করে",
+  "features_title": "সুবিধাসমূহ",
+  "docs_title": "নথি জেনারেটর",
+  "simplifier_title": "আইন সরলীকরণ",
+  "students_title": "শিক্ষার্থী ইকোসিস্টেম",
+  "auth_signin_title": "ফিরে আসায় স্বাগতম",
+  "auth_signup_title": "আপনার অ্যাকাউন্ট তৈরি করুন"
+}
