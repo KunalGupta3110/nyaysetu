@@ -21,6 +21,7 @@ function injectNav() {
       <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
       <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀</button>
       <a href="pages/chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
+      <span id="auth-nav-slot"></span>
     </div>
   </nav>
   <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>`;

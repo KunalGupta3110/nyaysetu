@@ -150,6 +150,7 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; }
 .btn-sm { padding: 7px 15px !important; font-size: 12.5px !important; border-radius: 8px !important; }
 .btn-nav { padding: 8px 18px; border-radius: 8px; border: none; background: var(--accent); color: #0A0A0A; font-size: 13px; font-weight: 600; transition: all var(--t) var(--ease); }
 .btn-nav:hover { background: var(--accent2); transform: translateY(-1px); }
+.nav-user-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ts); font-size: 12.5px; }
 
 /* ── TYPOGRAPHY ── */
 .eyebrow {

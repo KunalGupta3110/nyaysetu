@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-i18n="auth_page_title">Sign In — NyaySetu</title>
-<link rel="stylesheet" href="../styles/base.css">
+<link rel="stylesheet" href="../css/base.css">
 <style>
 html,body{height:100%}
 body{display:flex;align-items:center;justify-content:center;padding:20px;min-height:100vh}
@@ -63,6 +63,7 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 }
 </style>
 </head>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <body data-page="auth">
 <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
 
@@ -230,15 +231,14 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
     </div>
   </div>
 </div>
+<script src="../js/utils.js"></script>
 <script src="../js/i18n.js"></script>
 
-<script type="module">
-import { supabase, auth } from '../lib/supabase.js'
-import { showToast, initTheme } from '../lib/utils.js'
-initTheme()
-
-// Check if already logged in
-auth.getUser().then(user => { if (user) window.location.href = '/src/pages/dashboard.html' })
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  if (getStoredUser()) window.location.href = '../index.html';
+});
 
 let selectedRole = 'user'
 
@@ -274,7 +274,7 @@ window.signIn = async () => {
   btn.disabled = true; btn.textContent = 'Signing in…'
   document.getElementById('auth-loading').classList.add('show')
 
-  const { data, error } = await auth.signIn(email, pass)
+  const { data, error } = { data: null, error: new Error('Legacy handler disabled') }
   if (error) {
     showToast(error.message === 'Invalid login credentials' ? 'Wrong email or password' : error.message, '✕', 'error')
     btn.disabled = false; btn.textContent = 'Sign In →'
@@ -297,7 +297,7 @@ window.signUp = async () => {
   btn.disabled = true; btn.textContent = 'Creating account…'
   document.getElementById('auth-loading').classList.add('show')
 
-  const { data, error } = await auth.signUp(email, pass, { full_name: name, city, role: selectedRole })
+  const { data, error } = { data: null, error: new Error('Legacy handler disabled') }
 
   if (error) {
     showToast(error.message, '✕', 'error')
@@ -311,12 +311,12 @@ window.signUp = async () => {
     const college = document.getElementById('su-college').value.trim()
     const year    = document.getElementById('su-year').value
     const area    = document.getElementById('su-area').value
-    await supabase.from('student_profiles').insert({
+    await Promise.resolve({
       id: data.user.id, college, year_of_study: year, area_of_interest: area
     })
-    await supabase.from('profiles').update({ role: 'student', city }).eq('id', data.user.id)
+    await Promise.resolve()
   } else if (data.user) {
-    await supabase.from('profiles').update({ city }).eq('id', data.user.id)
+    await Promise.resolve()
   }
 
   // Show verify email message
@@ -337,19 +337,106 @@ window.resetPass = async () => {
   if (!email) { showToast('Please enter your email', '⚠', 'error'); return }
   const btn = document.getElementById('reset-btn')
   btn.disabled = true; btn.textContent = 'Sending…'
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = { error: new Error('Password reset is not enabled yet.') }
+  void ({
     redirectTo: window.location.origin + '/src/pages/auth.html?mode=reset'
   })
   if (error) { showToast(error.message, '✕', 'error'); btn.disabled = false; btn.textContent = 'Send Reset Link' }
   else { showToast('Reset link sent! Check your inbox.', '📬', 'success'); btn.textContent = 'Sent ✓' }
 }
 
-window.signInGoogle = async () => {
-  document.getElementById('auth-loading').classList.add('show')
-  await auth.signInWithGoogle()
+window.onload = function () {
+  google.accounts.id.initialize({
+    client_id: "147158442170-tqsuuoefn4oi2uvemtrcth6976254u66.apps.googleusercontent.com",
+    callback: handleGoogleLogin
+  });
+};
+
+window.signInGoogle = () => {
+  google.accounts.id.prompt(); // opens Google popup
+};
+
+function handleGoogleLogin(response) {
+  const data = JSON.parse(atob(response.credential.split('.')[1]));
+
+  const user = {
+    name: data.name,
+    email: data.email,
+    picture: data.picture
+  };
+
+  localStorage.setItem("user", JSON.stringify(user));
+
+  showToast("Login successful 🚀", "✓");
+
+  window.location.href = "../index.html";
 }
 
 function esc(s) { return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+</script>
+<script>
+window.signIn = async () => {
+  const email = document.getElementById('si-email').value.trim();
+  const password = document.getElementById('si-pass').value;
+  if (!email || !password) { showToast('Please fill in all fields', '⚠'); return; }
+
+  const btn = document.getElementById('signin-btn');
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+  document.getElementById('auth-loading').classList.add('show');
+
+  try {
+    await loginUser({ email, password });
+    showToast('Signed in successfully', '✓');
+    window.location.href = '../index.html';
+  } catch (err) {
+    showToast(err.message || 'Wrong email or password', '✕');
+    btn.disabled = false;
+    btn.textContent = 'Sign In ->';
+    document.getElementById('auth-loading').classList.remove('show');
+  }
+};
+
+window.signUp = async () => {
+  const name = document.getElementById('su-name').value.trim();
+  const city = document.getElementById('su-city').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const password = document.getElementById('su-pass').value;
+
+  if (!name || !email || !password) { showToast('Please fill required fields', '⚠'); return; }
+  if (password.length < 8) { showToast('Password must be at least 8 characters', '⚠'); return; }
+
+  const profile = { city, role: selectedRole };
+  if (selectedRole === 'student') {
+    profile.college = document.getElementById('su-college').value.trim();
+    profile.year = document.getElementById('su-year').value;
+    profile.area = document.getElementById('su-area').value;
+  }
+
+  const btn = document.getElementById('signup-btn');
+  btn.disabled = true;
+  btn.textContent = 'Creating account...';
+  document.getElementById('auth-loading').classList.add('show');
+
+  try {
+    await signupUser({ name, email, password, profile });
+    showToast('Account created successfully', '✓');
+    window.location.href = '../index.html';
+  } catch (err) {
+    showToast(err.message || 'Signup failed. Please try again.', '✕');
+    btn.disabled = false;
+    btn.textContent = 'Create Account ->';
+    document.getElementById('auth-loading').classList.remove('show');
+  }
+};
+
+window.resetPass = () => {
+  showToast('Password reset is not enabled yet. Please contact support.', '⚠');
+};
+
+window.signInGoogle = () => {
+  showToast('Google sign-in is not connected yet. Please use email login.', '⚠');
+};
 </script>
 </body>
 </html>

@@ -19,6 +19,8 @@ function toggleTheme() {
   if (btn) btn.textContent = isDark ? '☽' : '☀';
 }
 
+const API_BASE_URL = "https://nyaysetu-a5vj.onrender.com";
+
 // ── TOAST ──
 function showToast(msg, icon = '✓') {
   let t = document.getElementById('toast');
@@ -39,7 +41,7 @@ function showToast(msg, icon = '✓') {
 async function callClaude(system, userMsg, history = []) {
 
   try {
-    const res = await fetch("https://nyaysetu-a5vj.onrender.com/chat", {
+    const res = await fetch(`${API_BASE_URL}/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -56,6 +58,75 @@ async function callClaude(system, userMsg, history = []) {
 
   } catch (err) {
     return "Unable to connect to server.";
+  }
+}
+
+function getStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem('nyaysetu_user') || 'null');
+  } catch (err) {
+    return null;
+  }
+}
+
+function saveAuthSession(data) {
+  if (data.token) localStorage.setItem('nyaysetu_token', data.token);
+  if (data.user) localStorage.setItem('nyaysetu_user', JSON.stringify(data.user));
+}
+
+function getHomeHref() {
+  return window.location.pathname.includes('/pages/') ? '../index.html' : 'index.html';
+}
+
+function getAuthHref() {
+  return window.location.pathname.includes('/pages/') ? 'auth.html' : 'pages/auth.html';
+}
+
+function logoutUser() {
+  localStorage.removeItem('nyaysetu_token');
+  localStorage.removeItem('nyaysetu_user');
+  window.location.href = getHomeHref();
+}
+
+async function authRequest(endpoint, payload) {
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  let data = {};
+  try { data = await res.json(); } catch (err) {}
+  if (!res.ok || data.error) {
+    throw new Error(data.error || 'Authentication failed. Please try again.');
+  }
+  return data;
+}
+
+async function signupUser(payload) {
+  const data = await authRequest('/signup', payload);
+  saveAuthSession(data);
+  return data;
+}
+
+async function loginUser(payload) {
+  const data = await authRequest('/login', payload);
+  saveAuthSession(data);
+  return data;
+}
+
+function updateAuthNav() {
+  const slot = document.getElementById('auth-nav-slot');
+  if (!slot) return;
+
+  const user = getStoredUser();
+  if (user) {
+    slot.innerHTML = `
+      <span class="nav-user-name">${esc(user.name || 'User')}</span>
+      <button class="btn-nav" type="button" onclick="logoutUser()">Logout</button>
+    `;
+  } else {
+    slot.innerHTML = `<a href="${getAuthHref()}" class="btn-nav">Login / Signup</a>`;
   }
 }
 
@@ -118,6 +189,7 @@ function downloadText(content, filename) {
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   setActiveNav();
+  updateAuthNav();
   initScrollAnim();
   if (typeof initI18n === 'function') initI18n();
 });

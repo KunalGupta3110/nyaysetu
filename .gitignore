@@ -1,6 +1,7 @@
 # Environment variables
 .env
 backend/.env 
+backend/users.json
 .env.local
 .env.production
 
