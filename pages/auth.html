@@ -64,6 +64,38 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 </style>
 </head>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<script>
+window.addEventListener("load", () => {
+  // Initialize Google
+  google.accounts.id.initialize({
+    client_id: "YOUR_CLIENT_ID_HERE",
+    callback: handleGoogleLogin
+  });
+});
+
+// Button click
+function signInGoogle() {
+  google.accounts.id.prompt();
+}
+
+// Handle response
+function handleGoogleLogin(response) {
+  const data = JSON.parse(atob(response.credential.split('.')[1]));
+
+  const user = {
+    name: data.name,
+    email: data.email,
+    picture: data.picture
+  };
+
+  localStorage.setItem("user", JSON.stringify(user));
+
+  alert("Login successful 🚀");
+
+  window.location.href = "../index.html";
+}
+</script>
 <body data-page="auth">
 <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
 
@@ -345,32 +377,6 @@ window.resetPass = async () => {
   else { showToast('Reset link sent! Check your inbox.', '📬', 'success'); btn.textContent = 'Sent ✓' }
 }
 
-window.onload = function () {
-  google.accounts.id.initialize({
-    client_id: "147158442170-tqsuuoefn4oi2uvemtrcth6976254u66.apps.googleusercontent.com",
-    callback: handleGoogleLogin
-  });
-};
-
-window.signInGoogle = () => {
-  google.accounts.id.prompt(); // opens Google popup
-};
-
-function handleGoogleLogin(response) {
-  const data = JSON.parse(atob(response.credential.split('.')[1]));
-
-  const user = {
-    name: data.name,
-    email: data.email,
-    picture: data.picture
-  };
-
-  localStorage.setItem("user", JSON.stringify(user));
-
-  showToast("Login successful 🚀", "✓");
-
-  window.location.href = "../index.html";
-}
 
 function esc(s) { return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;') }
 </script>
@@ -438,5 +444,6 @@ window.signInGoogle = () => {
   showToast('Google sign-in is not connected yet. Please use email login.', '⚠');
 };
 </script>
+
 </body>
 </html>
