@@ -63,7 +63,7 @@ async function callClaude(system, userMsg, history = []) {
 
 function getStoredUser() {
   try {
-    return JSON.parse(localStorage.getItem('nyaysetu_user') || 'null');
+    return JSON.parse(localStorage.getItem('user') || localStorage.getItem('nyaysetu_user') || 'null');
   } catch (err) {
     return null;
   }
@@ -71,7 +71,10 @@ function getStoredUser() {
 
 function saveAuthSession(data) {
   if (data.token) localStorage.setItem('nyaysetu_token', data.token);
-  if (data.user) localStorage.setItem('nyaysetu_user', JSON.stringify(data.user));
+  if (data.user) {
+    localStorage.setItem('user', JSON.stringify(data.user));
+    localStorage.setItem('nyaysetu_user', JSON.stringify(data.user));
+  }
 }
 
 function getHomeHref() {
@@ -83,9 +86,10 @@ function getAuthHref() {
 }
 
 function logoutUser() {
+  localStorage.removeItem('user');
   localStorage.removeItem('nyaysetu_token');
   localStorage.removeItem('nyaysetu_user');
-  window.location.href = getHomeHref();
+  window.location.reload();
 }
 
 async function authRequest(endpoint, payload) {
@@ -121,8 +125,9 @@ function updateAuthNav() {
 
   const user = getStoredUser();
   if (user) {
+    const displayName = user.name || user.full_name || user.email || 'User';
     slot.innerHTML = `
-      <span class="nav-user-name">${esc(user.name || 'User')}</span>
+      <span class="nav-user-name">${esc(displayName)}</span>
       <button class="btn-nav" type="button" onclick="logoutUser()">Logout</button>
     `;
   } else {
