@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-i18n="dash_page_title">Dashboard — NyaySetu</title>
-<link rel="stylesheet" href="../styles/base.css">
+<link rel="stylesheet" href="../css/base.css">
 <style>
 .dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 64px);margin-top:64px}
 .sidenav{border-right:1px solid var(--border);background:var(--bg1);padding:20px 12px;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
@@ -71,7 +71,7 @@
 </style>
 </head>
 <body data-page="dashboard">
-<script type="module">
+<script type="application/json" id="legacy-dashboard-script">
 import { supabase, auth, profiles, chat, docs, simplify, queries, metrics, notifications } from '../lib/supabase.js'
 import { initTheme, showToast, esc, relativeTime, initScrollAnim } from '../lib/utils.js'
 import '../js/i18n.js'
@@ -240,6 +240,151 @@ if (notifs.unread > 0) {
 import { initDropdowns } from '../lib/utils.js'
 initDropdowns()
 </script>
+<script src="../js/utils.js"></script>
+<script src="../js/i18n.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+function getDashboardUser() {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    if (!user) return null;
+    const profile = user.profile || {};
+    return {
+      ...user,
+      role: String(user.role || profile.role || 'user').toLowerCase(),
+      city: user.city || profile.city || '',
+      college: user.college || profile.college || '',
+      year: user.year || profile.year || profile.year_of_study || '',
+      area: user.area || profile.area || profile.area_of_interest || ''
+    };
+  } catch (err) {
+    return null;
+  }
+}
+
+const dashboardUser = getDashboardUser();
+if (!dashboardUser) {
+  window.location.replace('auth.html');
+} else if (dashboardUser.role !== 'student') {
+  window.location.replace('../index.html');
+}
+
+function injectNav() {
+  document.body.insertAdjacentHTML('afterbegin', `
+  <nav id="nav">
+    <a href="../index.html" class="nav-logo"><div class="nav-logo-box">N</div><span class="nav-logo-name">NyaySetu</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="../index.html" data-page="home"><span data-i18n="nav_home">Home</span></a>
+      <a class="nav-tab" href="chat.html" data-page="chat"><span class="nav-icon"></span> <span data-i18n="nav_chat">AI Chat</span></a>
+      <a class="nav-tab" href="documents.html" data-page="docs"><span class="nav-icon"></span> <span data-i18n="nav_docs">Documents</span></a>
+      <a class="nav-tab" href="simplifier.html" data-page="simplify"><span class="nav-icon"></span> <span data-i18n="nav_simplify">Simplifier</span></a>
+      <a class="nav-tab" href="students.html" data-page="students"><span class="nav-icon"></span> <span data-i18n="nav_students">Students</span></a>
+      <a class="nav-tab" href="dashboard.html" data-page="dashboard"><span class="nav-icon"></span> <span data-i18n="nav_dashboard">Dashboard</span></a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
+      <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">&#9728;</button>
+      <a href="chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
+      <span id="auth-nav-slot"><button class="btn-nav" type="button" onclick="signOut()">Logout</button></span>
+    </div>
+  </nav>
+  <div id="toast"><span id="toast-icon">&#10003;</span><span id="toast-msg"></span></div>`);
+  initTheme();
+  setActiveNav();
+}
+
+function signOut() {
+  localStorage.removeItem('user');
+  localStorage.removeItem('nyaysetu_user');
+  localStorage.removeItem('nyaysetu_token');
+  window.location.href = '../index.html';
+}
+
+function showPane(name) {
+  document.querySelectorAll('.dash-pane').forEach((pane) => pane.classList.remove('active'));
+  document.querySelectorAll('.snav-item').forEach((item) => item.classList.remove('active'));
+  document.getElementById('pane-' + name)?.classList.add('active');
+  document.querySelector(`.snav-item[data-pane="${name}"]`)?.classList.add('active');
+}
+
+function saveProfile() {
+  const current = getDashboardUser();
+  if (!current) return;
+  const updated = {
+    ...current,
+    name: document.getElementById('pf-name')?.value.trim() || current.name,
+    city: document.getElementById('pf-city')?.value.trim() || ''
+  };
+  localStorage.setItem('user', JSON.stringify(updated));
+  showToast('Profile saved');
+}
+
+function changePassword() {
+  showToast('Password change is not available in this static dashboard yet');
+}
+
+function deleteAccount() {
+  signOut();
+}
+
+function closeModal(id) {
+  document.getElementById(id)?.classList.remove('open');
+}
+
+function fillText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value || '';
+}
+
+function fillValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value || '';
+}
+
+function getInitials(nameOrEmail) {
+  return String(nameOrEmail || 'U').split(/\s+/).map((part) => part[0]).join('').toUpperCase().slice(0, 2) || 'U';
+}
+
+function renderList(id, emptyTitle, emptySub) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = `<div class="empty-state"><div class="empty-title">${emptyTitle}</div><div class="empty-sub">${emptySub}</div></div>`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!dashboardUser || dashboardUser.role !== 'student') return;
+
+  injectNav();
+
+  const name = dashboardUser.name || dashboardUser.full_name || dashboardUser.email || 'Student';
+  const firstName = name.split(' ')[0] || 'there';
+  const initials = getInitials(name);
+  const roleLabel = dashboardUser.role || 'student';
+  const sessions = JSON.parse(localStorage.getItem('nyaysetu_sessions') || '[]');
+  const docs = JSON.parse(localStorage.getItem('nyaysetu_docs') || '[]');
+  const stats = JSON.parse(localStorage.getItem('nyaysetu_stats') || '{}');
+
+  fillText('wb-name', firstName);
+  fillText('sn-avatar', initials);
+  fillText('sn-name', name);
+  fillText('sn-role', roleLabel);
+  fillText('pf-avatar', initials);
+  fillText('pf-display-name', name);
+  fillText('pf-email-display', dashboardUser.email || '');
+  fillText('pf-role-display', roleLabel);
+  fillText('pf-college-display', dashboardUser.college || 'Not provided');
+  fillText('pf-year-display', dashboardUser.year || 'Not provided');
+  fillText('pf-area-display', dashboardUser.area || 'Not provided');
+  fillValue('pf-name', name);
+  fillValue('pf-city', dashboardUser.city || '');
+  fillText('qs-chats', sessions.length || stats.chats || 0);
+  fillText('qs-docs', docs.length || stats.docs || stats.saved || 0);
+
+  renderList('session-list-home', 'No conversations yet', 'Your recent chats will appear here.');
+  renderList('session-list', 'No conversations yet', 'Your AI chat history will appear here.');
+  renderList('doc-list', 'No documents yet', 'Generated documents will appear here.');
+});
+</script>
 
 <div class="dash-layout">
   <!-- SIDENAV -->
@@ -272,8 +417,9 @@ initDropdowns()
           <p data-i18n="dash_welcome_sub">Here's a summary of your NyaySetu activity.</p>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <a href="pages/chat.html" class="btn-primary btn-sm" data-i18n="dash_btn_ask">⚖ Ask a Legal Question</a>
-          <a href="pages/documents.html" class="btn-ghost btn-sm" data-i18n="dash_btn_generate">📄 Generate Document</a>
+          <button class="btn-ghost btn-sm" type="button" onclick="signOut()">Logout</button>
+          <a href="chat.html" class="btn-primary btn-sm" data-i18n="dash_btn_ask">⚖ Ask a Legal Question</a>
+          <a href="documents.html" class="btn-ghost btn-sm" data-i18n="dash_btn_generate">📄 Generate Document</a>
         </div>
       </div>
       <div class="quick-stats">
@@ -334,6 +480,12 @@ initDropdowns()
           <div style="font-size:12px;color:var(--ts);margin-top:3px" id="pf-email-display"></div>
           <div style="font-size:11px;color:var(--tm);margin-top:2px" id="pf-joined">Joined recently</div>
         </div>
+      </div>
+      <div class="profile-grid" style="margin-bottom:24px">
+        <div class="qs-card"><div class="qs-lbl">Role</div><div class="sidenav-name" id="pf-role-display">student</div></div>
+        <div class="qs-card"><div class="qs-lbl">College</div><div class="sidenav-name" id="pf-college-display">Not provided</div></div>
+        <div class="qs-card"><div class="qs-lbl">Year</div><div class="sidenav-name" id="pf-year-display">Not provided</div></div>
+        <div class="qs-card"><div class="qs-lbl">Area</div><div class="sidenav-name" id="pf-area-display">Not provided</div></div>
       </div>
       <div class="profile-grid">
         <div class="form-group">

@@ -82,14 +82,15 @@ function handleGoogleLogin(response) {
   const user = {
     name: data.name,
     email: data.email,
-    picture: data.picture
+    picture: data.picture,
+    role: "user"
   };
 
   localStorage.setItem("user", JSON.stringify(user));
 
   alert("Login successful 🚀");
 
-  window.location.href = "../index.html";
+  redirectAfterAuth(user);
 }
 </script>
 <body data-page="auth">
@@ -265,10 +266,15 @@ function handleGoogleLogin(response) {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
-  if (getStoredUser()) window.location.href = '../index.html';
+  const user = getStoredUser();
+  if (user) redirectAfterAuth(user);
 });
 
 let selectedRole = 'user'
+
+function redirectAfterAuth(user = getStoredUser()) {
+  window.location.href = user && user.role === 'student' ? 'dashboard.html' : '../index.html';
+}
 
 window.selectRole = (el, role) => {
   document.querySelectorAll('.role-card').forEach(c => c.classList.remove('on'))
@@ -308,7 +314,7 @@ window.signIn = async () => {
     btn.disabled = false; btn.textContent = 'Sign In →'
     document.getElementById('auth-loading').classList.remove('show')
   } else {
-    window.location.href = '/src/pages/dashboard.html'
+    redirectAfterAuth()
   }
 }
 
@@ -356,7 +362,7 @@ window.signUp = async () => {
       <div style="font-size:14px;color:var(--ts);line-height:1.7;max-width:300px;margin:0 auto 20px">
         We sent a verification link to <strong style="color:var(--tp)">${esc(email)}</strong>.<br>Click it to activate your account.
       </div>
-      <a href="/src/pages/auth.html" class="btn-ghost">← Back to Sign In</a>
+      <a href="auth.html" class="btn-ghost">← Back to Sign In</a>
     </div>`
 }
 
@@ -367,7 +373,7 @@ window.resetPass = async () => {
   btn.disabled = true; btn.textContent = 'Sending…'
   const { error } = { error: new Error('Password reset is not enabled yet.') }
   void ({
-    redirectTo: window.location.origin + '/src/pages/auth.html?mode=reset'
+    redirectTo: window.location.origin + window.location.pathname + '?mode=reset'
   })
   if (error) { showToast(error.message, '✕', 'error'); btn.disabled = false; btn.textContent = 'Send Reset Link' }
   else { showToast('Reset link sent! Check your inbox.', '📬', 'success'); btn.textContent = 'Sent ✓' }
@@ -390,7 +396,7 @@ window.signIn = async () => {
   try {
     await loginUser({ email, password });
     showToast('Signed in successfully', '✓');
-    window.location.href = '../index.html';
+    redirectAfterAuth();
   } catch (err) {
     showToast(err.message || 'Wrong email or password', '✕');
     btn.disabled = false;
@@ -423,7 +429,7 @@ window.signUp = async () => {
   try {
     await signupUser({ name, email, password, profile });
     showToast('Account created successfully', '✓');
-    window.location.href = '../index.html';
+    redirectAfterAuth();
   } catch (err) {
     showToast(err.message || 'Signup failed. Please try again.', '✕');
     btn.disabled = false;
@@ -458,14 +464,15 @@ function handleGoogleLogin(response) {
   const user = {
     name: data.name,
     email: data.email,
-    picture: data.picture
+    picture: data.picture,
+    role: "user"
   };
 
   localStorage.setItem("user", JSON.stringify(user));
 
   alert("Login successful 🚀");
 
-  window.location.href = "../index.html";
+  redirectAfterAuth(user);
 }
 </script>
 </body>

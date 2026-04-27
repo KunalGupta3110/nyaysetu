@@ -231,3 +231,346 @@ input, textarea, select { font-family: 'DM Sans', sans-serif; }
   .nav-tabs { display: none; }
   .form-row { grid-template-columns: 1fr; }
 }
+
+/* Mobile responsiveness */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+#nav {
+  min-width: 0;
+}
+
+.nav-menu-toggle {
+  display: none;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg2);
+  color: var(--tp);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.nav-menu-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transition: transform var(--t) var(--ease), opacity var(--t) var(--ease);
+}
+
+.nav-menu-toggle.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-menu-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-menu-toggle.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 860px) {
+  #nav {
+    height: 64px;
+    padding: 0 16px;
+    gap: 10px;
+  }
+
+  .nav-logo {
+    min-width: 0;
+  }
+
+  .nav-logo-name {
+    font-size: 16px;
+  }
+
+  .nav-tabs {
+    display: flex !important;
+    position: fixed;
+    top: 72px;
+    left: 12px;
+    right: 12px;
+    margin-left: 0;
+    padding: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    max-height: calc(100dvh - 88px);
+    overflow-y: auto;
+    background: rgba(10, 10, 10, .96);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    box-shadow: var(--shadowlg);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity var(--t) var(--ease), transform var(--t) var(--ease), visibility var(--t) var(--ease);
+  }
+
+  [data-theme="light"] .nav-tabs {
+    background: rgba(244, 242, 239, .98);
+  }
+
+  .nav-tabs.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .nav-tab {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 12px 14px;
+    border-radius: 10px;
+    white-space: normal;
+  }
+
+  .nav-right {
+    min-width: 0;
+    gap: 8px;
+  }
+
+  .nav-lang,
+  .nav-right > a.btn-nav {
+    display: none !important;
+  }
+
+  .nav-user-name {
+    display: none;
+  }
+
+  .nav-icon-btn,
+  .nav-menu-toggle {
+    width: 38px;
+    height: 38px;
+  }
+
+  .nav-menu-toggle {
+    display: flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .container,
+  .container-md,
+  .container-sm {
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  main {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .metrics-grid,
+  .feat-grid,
+  .why-grid,
+  .steps,
+  .stat-grid,
+  .quick-stats,
+  .profile-grid,
+  .doc-grid,
+  .simplify-layout,
+  .dash-grid2,
+  .signup-grid,
+  .doc-layout,
+  .auth-wrap,
+  .dash-pane [style*="grid-template-columns"] {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+  }
+
+  .doc-picker {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+  }
+
+  .dash-layout {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+
+  .dash-content {
+    padding: 22px 16px !important;
+    overflow-x: hidden;
+  }
+
+  .sidenav {
+    display: flex !important;
+    position: static !important;
+    height: auto !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 8px;
+    padding: 12px 16px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+  }
+
+  .sidenav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sidenav-user,
+  .snav-section {
+    display: none !important;
+  }
+
+  .snav-item {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    margin-bottom: 0 !important;
+  }
+
+  .page-hero,
+  .content-area,
+  .page-header {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .hero {
+    min-height: auto !important;
+    padding: 56px 0 44px !important;
+  }
+
+  .hero-title {
+    font-size: clamp(34px, 12vw, 46px) !important;
+    letter-spacing: 0 !important;
+  }
+
+  .sh1 {
+    font-size: clamp(32px, 10vw, 42px);
+  }
+
+  .sh2 {
+    font-size: clamp(26px, 8vw, 34px);
+  }
+
+  .sub,
+  .hero-sub {
+    font-size: 14.5px !important;
+  }
+
+  .hero-actions,
+  .review-actions,
+  .doc-actions,
+  .preview-actions,
+  .queue-header,
+  .welcome-banner,
+  .profile-avatar-section {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .hero-actions a,
+  .hero-actions button,
+  .welcome-banner a,
+  .welcome-banner button,
+  .queue-header .queue-count {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .tab-strip {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    margin-left: -16px;
+    margin-right: -16px;
+    padding: 0 16px;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
+
+  .strip-tab {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .lb-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .lb-thead,
+  .lb-row {
+    min-width: 640px;
+  }
+
+  .lb-th,
+  .lb-row > * {
+    display: block !important;
+  }
+
+  .review-card-top,
+  .review-meta,
+  .student-card-footer,
+  .footer-bottom {
+    flex-wrap: wrap;
+  }
+
+  .modal,
+  .modal-box {
+    width: min(100%, 680px) !important;
+    max-height: calc(100dvh - 32px);
+  }
+
+  #toast {
+    left: 16px;
+    right: 16px;
+    width: auto;
+    max-width: none;
+    transform: translateY(80px);
+    white-space: normal;
+  }
+
+  #toast.show {
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid,
+  .feat-grid,
+  .why-grid,
+  .steps,
+  .stat-grid,
+  .quick-stats,
+  .profile-grid,
+  .doc-grid,
+  .simplify-layout,
+  .dash-grid2,
+  .signup-grid,
+  .doc-layout,
+  .auth-wrap,
+  .dash-pane [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  .btn-primary,
+  .btn-ghost,
+  .btn-nav {
+    max-width: 100%;
+  }
+}

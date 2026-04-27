@@ -61,9 +61,23 @@ async function callClaude(system, userMsg, history = []) {
   }
 }
 
+function normalizeStoredUser(user) {
+  if (!user) return null;
+  const profile = user.profile || {};
+  return {
+    ...user,
+    role: user.role || profile.role || 'user',
+    city: user.city || profile.city || '',
+    college: user.college || profile.college || '',
+    year: user.year || profile.year || profile.year_of_study || '',
+    area: user.area || profile.area || profile.area_of_interest || ''
+  };
+}
+
 function getStoredUser() {
   try {
-    return JSON.parse(localStorage.getItem('user') || localStorage.getItem('nyaysetu_user') || 'null');
+    const user = JSON.parse(localStorage.getItem('user') || localStorage.getItem('nyaysetu_user') || 'null');
+    return normalizeStoredUser(user);
   } catch (err) {
     return null;
   }
@@ -72,8 +86,9 @@ function getStoredUser() {
 function saveAuthSession(data) {
   if (data.token) localStorage.setItem('nyaysetu_token', data.token);
   if (data.user) {
-    localStorage.setItem('user', JSON.stringify(data.user));
-    localStorage.setItem('nyaysetu_user', JSON.stringify(data.user));
+    const user = normalizeStoredUser(data.user);
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('nyaysetu_user', JSON.stringify(user));
   }
 }
 
@@ -136,6 +151,42 @@ function updateAuthNav() {
 }
 
 // ── NAV ACTIVE STATE ──
+function initMobileNav() {
+  const nav = document.getElementById('nav');
+  const tabs = nav?.querySelector('.nav-tabs');
+  if (!nav || !tabs || nav.querySelector('.nav-menu-toggle')) return;
+
+  const btn = document.createElement('button');
+  btn.className = 'nav-menu-toggle';
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Toggle navigation menu');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.innerHTML = '<span></span><span></span><span></span>';
+
+  const closeMenu = () => {
+    tabs.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  };
+
+  btn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const isOpen = tabs.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    btn.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  tabs.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+  document.addEventListener('click', (event) => {
+    if (!nav.contains(event.target)) closeMenu();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMenu();
+  });
+
+  nav.appendChild(btn);
+}
+
 function setActiveNav() {
   const page = document.body.dataset.page;
   document.querySelectorAll('.nav-tab').forEach(t => {
@@ -195,6 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   setActiveNav();
   updateAuthNav();
+  initMobileNav();
+  setTimeout(initMobileNav, 0);
   initScrollAnim();
   if (typeof initI18n === 'function') initI18n();
 });

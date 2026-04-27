@@ -1,322 +1,725 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NyaySetu — AI-Powered Legal Access for India</title>
-<link rel="stylesheet" href="css/base.css">
-<style>
-body { data-page: home; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NyaySetu — AI-Powered Legal Access for India</title>
+  <link rel="stylesheet" href="css/base.css">
+  <style>
+    body {
+      data-page: home;
+    }
 
-/* ── HERO ── */
-.hero {
-  min-height: 100vh; display: flex; align-items: center;
-  position: relative; overflow: hidden; padding: 80px 0;
-}
-.hero-grid {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 54px 54px;
-  mask-image: radial-gradient(ellipse 72% 65% at 50% 35%, black 20%, transparent 75%);
-  opacity: .6;
-}
-.hero-glow {
-  position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
-  width: 700px; height: 360px;
-  background: radial-gradient(ellipse, rgba(201,169,110,.075) 0%, transparent 65%);
-  pointer-events: none;
-}
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 5px 14px 5px 9px; background: var(--adim);
-  border: 1px solid rgba(201,169,110,.22); border-radius: 100px;
-  font-size: 11px; font-weight: 600; color: var(--accent);
-  letter-spacing: .6px; text-transform: uppercase; margin-bottom: 26px;
-}
-.hero-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(46px, 7vw, 84px);
-  font-weight: 700; line-height: 1.04; letter-spacing: -2.5px;
-  color: var(--tp); margin-bottom: 22px;
-}
-.hero-title em { font-style: italic; color: var(--accent); }
-.hero-sub { font-size: 17px; color: var(--ts); line-height: 1.78; max-width: 500px; margin-bottom: 38px; }
-.hero-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-.hero-note { font-size: 12px; color: var(--tm); display: flex; align-items: center; gap: 6px; }
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 80px 0;
+    }
 
-/* ── METRICS ── */
-.metrics-bar { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--bg1); }
-.metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
-.metric {
-  padding: 28px 36px; border-right: 1px solid var(--border);
-  transition: background var(--t) var(--ease); cursor: default;
-}
-.metric:last-child { border-right: none; }
-.metric:hover { background: var(--bg2); }
-.metric-val { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 700; color: var(--tp); letter-spacing: -1.2px; line-height: 1; margin-bottom: 6px; }
-.metric-val span { color: var(--accent); font-size: 22px; }
-.metric-lbl { font-size: 12.5px; color: var(--ts); }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: radial-gradient(ellipse 72% 65% at 50% 35%, black 20%, transparent 75%);
+      opacity: .6;
+    }
 
-/* ── HOW IT WORKS ── */
-.how-section { padding: 96px 0; background: var(--bg1); border-bottom: 1px solid var(--border); }
-.steps { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 54px; position: relative; }
-.steps::before {
-  content: ''; position: absolute;
-  top: 27px; left: calc(12.5% + 17px); right: calc(12.5% + 17px);
-  height: 1px; background: linear-gradient(90deg, transparent, var(--border2) 20%, var(--border2) 80%, transparent);
-}
-.step { padding: 0 18px; text-align: center; }
-.step-num {
-  width: 54px; height: 54px; border-radius: 50%; border: 1px solid var(--border);
-  background: var(--bg); display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 22px; font-size: 22px; position: relative; z-index: 2;
-  transition: all var(--t) var(--ease);
-}
-.step:hover .step-num { border-color: var(--accent); background: var(--adim); }
-.step-title { font-size: 14px; font-weight: 600; color: var(--tp); margin-bottom: 8px; }
-.step-desc  { font-size: 12.5px; color: var(--ts); line-height: 1.65; }
-.step-tag   { display: inline-block; margin-top: 12px; padding: 2px 9px; border-radius: 100px; font-size: 10px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; }
-.tag-u { background: var(--bluedim);  border: 1px solid rgba(129,140,248,.2); color: var(--blue); }
-.tag-a { background: var(--adim);     border: 1px solid rgba(201,169,110,.2); color: var(--accent); }
-.tag-s { background: var(--greendim); border: 1px solid rgba(74,222,128,.15);  color: var(--green); }
-.tag-l { background: var(--reddim);   border: 1px solid rgba(248,113,113,.15); color: var(--red); }
+    .hero-glow {
+      position: absolute;
+      top: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 360px;
+      background: radial-gradient(ellipse, rgba(201, 169, 110, .075) 0%, transparent 65%);
+      pointer-events: none;
+    }
 
-/* ── FEATURES ── */
-.feat-section { padding: 96px 0; border-bottom: 1px solid var(--border); }
-.feat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border-radius: var(--rl); overflow: hidden; border: 1px solid var(--border); margin-top: 54px; }
-.feat-card {
-  background: var(--bg1); padding: 34px; cursor: pointer;
-  transition: background var(--t) var(--ease); position: relative; overflow: hidden; text-decoration: none; display: block;
-}
-.feat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 2px; height: 0; background: var(--accent); transition: height .3s ease; }
-.feat-card:hover { background: var(--bg2); }
-.feat-card:hover::before { height: 100%; }
-.feat-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--adim); border: 1px solid rgba(201,169,110,.15); display: flex; align-items: center; justify-content: center; font-size: 19px; margin-bottom: 18px; }
-.feat-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--tp); margin-bottom: 8px; }
-.feat-desc  { font-size: 13px; color: var(--ts); line-height: 1.7; margin-bottom: 14px; }
-.feat-arrow { font-size: 13px; color: var(--accent); display: flex; align-items: center; gap: 5px; font-weight: 500; transition: gap var(--t) var(--ease); }
-.feat-card:hover .feat-arrow { gap: 10px; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px 5px 9px;
+      background: var(--adim);
+      border: 1px solid rgba(201, 169, 110, .22);
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      margin-bottom: 26px;
+    }
 
-/* ── WHY SECTION ── */
-.why-section { padding: 96px 0; background: var(--bg1); border-bottom: 1px solid var(--border); }
-.why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 54px; }
-.why-card {
-  background: var(--bg); border: 1px solid var(--border); border-radius: var(--rl);
-  padding: 32px; transition: all var(--t) var(--ease);
-}
-.why-card:hover { border-color: rgba(201,169,110,.3); transform: translateY(-2px); box-shadow: var(--shadow); }
-.why-num { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 700; color: var(--tm); line-height: 1; margin-bottom: 20px; letter-spacing: -2px; opacity: .28; }
-.why-title { font-size: 16px; font-weight: 600; color: var(--tp); margin-bottom: 10px; }
-.why-desc  { font-size: 13.5px; color: var(--ts); line-height: 1.72; }
-.why-metric { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--accent); font-family: 'DM Mono', monospace; }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(46px, 7vw, 84px);
+      font-weight: 700;
+      line-height: 1.04;
+      letter-spacing: -2.5px;
+      color: var(--tp);
+      margin-bottom: 22px;
+    }
 
-/* ── CTA SECTION ── */
-.cta-section { padding: 110px 0; text-align: center; position: relative; overflow: hidden; }
-.cta-glow { position: absolute; inset: 0; background: radial-gradient(ellipse 55% 50% at 50% 50%, rgba(201,169,110,.055) 0%, transparent 70%); pointer-events: none; }
-.cta-inner { position: relative; z-index: 2; }
-.cta-actions { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-.cta-note { font-size: 12px; color: var(--tm); }
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
 
-/* ── FOOTER ── */
-footer { border-top: 1px solid var(--border); padding: 36px 0; }
-.footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-.footer-links { display: flex; gap: 22px; list-style: none; flex-wrap: wrap; }
-.footer-links a { font-size: 12.5px; color: var(--tm); transition: color var(--t) var(--ease); }
-.footer-links a:hover { color: var(--ts); }
-.footer-copy { font-size: 12px; color: var(--tm); font-family: 'DM Mono', monospace; }
+    .hero-sub {
+      font-size: 17px;
+      color: var(--ts);
+      line-height: 1.78;
+      max-width: 500px;
+      margin-bottom: 38px;
+    }
 
-@media (max-width: 860px) {
-  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-  .metric:nth-child(2) { border-right: none; }
-  .metric:nth-child(3) { border-right: 1px solid var(--border); border-top: 1px solid var(--border); }
-  .metric:nth-child(4) { border-top: 1px solid var(--border); }
-  .steps { grid-template-columns: repeat(2, 1fr); gap: 28px; }
-  .steps::before { display: none; }
-  .feat-grid { grid-template-columns: 1fr; }
-  .why-grid { grid-template-columns: 1fr; }
-}
-</style>
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .hero-note {
+      font-size: 12px;
+      color: var(--tm);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── METRICS ── */
+    .metrics-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg1);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .metric {
+      padding: 28px 36px;
+      border-right: 1px solid var(--border);
+      transition: background var(--t) var(--ease);
+      cursor: default;
+    }
+
+    .metric:last-child {
+      border-right: none;
+    }
+
+    .metric:hover {
+      background: var(--bg2);
+    }
+
+    .metric-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 38px;
+      font-weight: 700;
+      color: var(--tp);
+      letter-spacing: -1.2px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .metric-val span {
+      color: var(--accent);
+      font-size: 22px;
+    }
+
+    .metric-lbl {
+      font-size: 12.5px;
+      color: var(--ts);
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-section {
+      padding: 96px 0;
+      background: var(--bg1);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: 54px;
+      position: relative;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 27px;
+      left: calc(12.5% + 17px);
+      right: calc(12.5% + 17px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2) 20%, var(--border2) 80%, transparent);
+    }
+
+    .step {
+      padding: 0 18px;
+      text-align: center;
+    }
+
+    .step-num {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 22px;
+      font-size: 22px;
+      position: relative;
+      z-index: 2;
+      transition: all var(--t) var(--ease);
+    }
+
+    .step:hover .step-num {
+      border-color: var(--accent);
+      background: var(--adim);
+    }
+
+    .step-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--tp);
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 12.5px;
+      color: var(--ts);
+      line-height: 1.65;
+    }
+
+    .step-tag {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 2px 9px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+
+    .tag-u {
+      background: var(--bluedim);
+      border: 1px solid rgba(129, 140, 248, .2);
+      color: var(--blue);
+    }
+
+    .tag-a {
+      background: var(--adim);
+      border: 1px solid rgba(201, 169, 110, .2);
+      color: var(--accent);
+    }
+
+    .tag-s {
+      background: var(--greendim);
+      border: 1px solid rgba(74, 222, 128, .15);
+      color: var(--green);
+    }
+
+    .tag-l {
+      background: var(--reddim);
+      border: 1px solid rgba(248, 113, 113, .15);
+      color: var(--red);
+    }
+
+    /* ── FEATURES ── */
+    .feat-section {
+      padding: 96px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-radius: var(--rl);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin-top: 54px;
+    }
+
+    .feat-card {
+      background: var(--bg1);
+      padding: 34px;
+      cursor: pointer;
+      transition: background var(--t) var(--ease);
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: block;
+    }
+
+    .feat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 2px;
+      height: 0;
+      background: var(--accent);
+      transition: height .3s ease;
+    }
+
+    .feat-card:hover {
+      background: var(--bg2);
+    }
+
+    .feat-card:hover::before {
+      height: 100%;
+    }
+
+    .feat-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--adim);
+      border: 1px solid rgba(201, 169, 110, .15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      margin-bottom: 18px;
+    }
+
+    .feat-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--tp);
+      margin-bottom: 8px;
+    }
+
+    .feat-desc {
+      font-size: 13px;
+      color: var(--ts);
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    .feat-arrow {
+      font-size: 13px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+      transition: gap var(--t) var(--ease);
+    }
+
+    .feat-card:hover .feat-arrow {
+      gap: 10px;
+    }
+
+    /* ── WHY SECTION ── */
+    .why-section {
+      padding: 96px 0;
+      background: var(--bg1);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 54px;
+    }
+
+    .why-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      padding: 32px;
+      transition: all var(--t) var(--ease);
+    }
+
+    .why-card:hover {
+      border-color: rgba(201, 169, 110, .3);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .why-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--tm);
+      line-height: 1;
+      margin-bottom: 20px;
+      letter-spacing: -2px;
+      opacity: .28;
+    }
+
+    .why-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--tp);
+      margin-bottom: 10px;
+    }
+
+    .why-desc {
+      font-size: 13.5px;
+      color: var(--ts);
+      line-height: 1.72;
+    }
+
+    .why-metric {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      padding: 110px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 55% 50% at 50% 50%, rgba(201, 169, 110, .055) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    .cta-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .cta-note {
+      font-size: 12px;
+      color: var(--tm);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 22px;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: 12.5px;
+      color: var(--tm);
+      transition: color var(--t) var(--ease);
+    }
+
+    .footer-links a:hover {
+      color: var(--ts);
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--tm);
+      font-family: 'DM Mono', monospace;
+    }
+
+    @media (max-width: 860px) {
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .metric:nth-child(2) {
+        border-right: none;
+      }
+
+      .metric:nth-child(3) {
+        border-right: 1px solid var(--border);
+        border-top: 1px solid var(--border);
+      }
+
+      .metric:nth-child(4) {
+        border-top: 1px solid var(--border);
+      }
+
+      .steps {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 28px;
+      }
+
+      .steps::before {
+        display: none;
+      }
+
+      .feat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .why-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body data-page="home">
 
-<script src="js/utils.js"></script>
-<script src="js/i18n.js"></script>
-<script src="js/nav.js"></script>
-<script>injectNav();</script>
+  <script src="js/utils.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/nav.js"></script>
+  <script>injectNav();</script>
 
-<main style="padding-top:64px">
+  <main style="padding-top:64px">
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-grid"></div>
-    <div class="hero-glow"></div>
-    <div class="container">
-      <div style="max-width:760px">
-        <div class="hero-badge fi" data-i18n="hero_badge"><div class="pdot"></div> AI-Powered · Legal Access · India</div>
-        <h1 class="hero-title fi"><span data-i18n="hero_title" style="white-space:pre-line;display:block">Justice should not\ndepend on who\nyou know.</span></h1>
-        <p class="hero-sub fi" data-i18n="hero_sub">NyaySetu bridges the gap between people and the law. Ask legal questions in plain language — English, Hindi, Urdu, or any Indian language — powered by AI, reviewed by law students and professionals.</p>
-        <div class="hero-actions fi">
-          <a href="pages/chat.html" class="btn-primary" style="font-size:15px;padding:13px 30px" data-i18n="hero_start">Start for Free →</a>
-          <a href="#how" class="btn-ghost" style="font-size:15px;padding:13px 30px" data-i18n="hero_how">How It Works</a>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-grid"></div>
+      <div class="hero-glow"></div>
+      <div class="container">
+        <div style="max-width:760px">
+          <div class="hero-badge fi" data-i18n="hero_badge">
+            <div class="pdot"></div> AI-Powered · Legal Access · India
+          </div>
+          <h1 class="hero-title fi"><span data-i18n="hero_title" style="white-space:pre-line;display:block">Justice
+              should not\ndepend on who\nyou know.</span></h1>
+          <p class="hero-sub fi" data-i18n="hero_sub">NyaySetu bridges the gap between people and the law. Ask legal
+            questions in plain language — English, Hindi, Urdu, or any Indian language — powered by AI, reviewed by law
+            students and professionals.</p>
+          <div class="hero-actions fi">
+            <a href="pages/chat.html" class="btn-primary" style="font-size:15px;padding:13px 30px"
+              data-i18n="hero_start">Start for Free →</a>
+            <a href="#how" class="btn-ghost" style="font-size:15px;padding:13px 30px" data-i18n="hero_how">How It
+              Works</a>
+          </div>
+          <p class="hero-note fi" data-i18n="hero_note">🔒 No signup required &nbsp;·&nbsp; Hindi, Urdu & more Indian
+            languages &nbsp;·&nbsp; 12,400+ queries resolved</p>
         </div>
-        <p class="hero-note fi" data-i18n="hero_note">🔒 No signup required &nbsp;·&nbsp; Hindi, Urdu & more Indian languages &nbsp;·&nbsp; 12,400+ queries resolved</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- METRICS -->
-  <div class="metrics-bar">
-    <div class="container">
-      <div class="metrics-grid">
-        <div class="metric fi"><div class="metric-val">12,400<span>+</span></div><div class="metric-lbl" data-i18n="metric_queries">Legal queries resolved</div></div>
-        <div class="metric fi"><div class="metric-val">840<span>+</span></div><div class="metric-lbl" data-i18n="metric_students">Law students onboarded</div></div>
-        <div class="metric fi"><div class="metric-val">3,600<span>+</span></div><div class="metric-lbl" data-i18n="metric_docs">Documents generated</div></div>
-        <div class="metric fi"><div class="metric-val">98<span>%</span></div><div class="metric-lbl" data-i18n="metric_satisfaction">User satisfaction</div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HOW IT WORKS -->
-  <section class="how-section" id="how">
-    <div class="container">
-      <div class="eyebrow fi" data-i18n="process_title">Process</div>
-      <h2 class="sh2 fi" style="max-width:420px" data-i18n="process_header">A system built for clarity</h2>
-      <p class="sub fi" style="max-width:480px" data-i18n="process_sub">Every query passes through AI analysis and human review — fast and reliable.</p>
-      <div class="steps">
-        <div class="step fi">
-          <div class="step-num">🧑‍💼</div>
-          <div class="step-title" data-i18n="process_step1_title">You Ask</div>
-          <div class="step-desc" data-i18n="process_step1_desc">Submit your legal question in English, Hindi, Urdu, or any Indian language. No legal knowledge needed.</div>
-          <span class="step-tag tag-u" data-i18n="tag_citizen">Citizen</span>
-        </div>
-        <div class="step fi">
-          <div class="step-num">🤖</div>
-          <div class="step-title" data-i18n="process_step2_title">AI Analyses</div>
-          <div class="step-desc" data-i18n="process_step2_desc">Legal AI identifies applicable laws, IPC sections, and precedents instantly.</div>
-          <span class="step-tag tag-a" data-i18n="tag_ai">NyaySetu AI</span>
-        </div>
-        <div class="step fi">
-          <div class="step-num">🎓</div>
-          <div class="step-title" data-i18n="process_step3_title">Student Reviews</div>
-          <div class="step-desc" data-i18n="process_step3_desc">A verified law student reviews the output and adds professional context.</div>
-          <span class="step-tag tag-s" data-i18n="tag_law_student">Law Student</span>
-        </div>
-        <div class="step fi">
-          <div class="step-num">⚖️</div>
-          <div class="step-title" data-i18n="process_step4_title">Lawyer Escalates</div>
-          <div class="step-desc" data-i18n="process_step4_desc">Complex cases routed to licensed advocates — faster and affordable.</div>
-          <span class="step-tag tag-l" data-i18n="tag_advocate">Advocate</span>
+    <!-- METRICS -->
+    <div class="metrics-bar">
+      <div class="container">
+        <div class="metrics-grid">
+          <div class="metric fi">
+            <div class="metric-val">12,400<span>+</span></div>
+            <div class="metric-lbl" data-i18n="metric_queries">Legal queries resolved</div>
+          </div>
+          <div class="metric fi">
+            <div class="metric-val">840<span>+</span></div>
+            <div class="metric-lbl" data-i18n="metric_students">Law students onboarded</div>
+          </div>
+          <div class="metric fi">
+            <div class="metric-val">3,600<span>+</span></div>
+            <div class="metric-lbl" data-i18n="metric_docs">Documents generated</div>
+          </div>
+          <div class="metric fi">
+            <div class="metric-val">98<span>%</span></div>
+            <div class="metric-lbl" data-i18n="metric_satisfaction">User satisfaction</div>
+          </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- FEATURES -->
-  <section class="feat-section">
-    <div class="container">
-      <div class="eyebrow fi" data-i18n="features_title">Capabilities</div>
-      <h2 class="sh2 fi" data-i18n="features_sub">Every legal need, covered</h2>
-      <div class="feat-grid fi">
-        <a href="pages/chat.html" class="feat-card">
-          <div class="feat-icon">🤖</div>
-          <div class="feat-title" data-i18n="feat_ai_title">AI Legal Assistant</div>
-          <div class="feat-desc" data-i18n="feat_ai_desc">Ask anything in plain language — FIR procedures, property disputes, consumer rights. AI identifies applicable laws in seconds.</div>
-          <div class="feat-arrow"><span data-i18n="feat_ai_action">Open Chat</span> <span>→</span></div>
-        </a>
-        <a href="pages/documents.html" class="feat-card">
-          <div class="feat-icon">📄</div>
-          <div class="feat-title" data-i18n="feat_docs_title">Document Generator</div>
-          <div class="feat-desc" data-i18n="feat_docs_desc">Generate legally accurate documents in minutes — legal notices, affidavits, rent agreements, consumer complaints, RTI applications.</div>
-          <div class="feat-arrow"><span data-i18n="feat_docs_action">Generate Now</span> <span>→</span></div>
-        </a>
-        <a href="pages/simplifier.html" class="feat-card">
-          <div class="feat-icon">📚</div>
-          <div class="feat-title" data-i18n="feat_simplify_title">Law Simplifier</div>
-          <div class="feat-desc" data-i18n="feat_simplify_desc">Paste any legal text — court order, notice, contract, government circular — get a plain language breakdown with actionable steps.</div>
-          <div class="feat-arrow"><span data-i18n="feat_simplify_action">Try Simplifier</span> <span>→</span></div>
-        </a>
-        <a href="pages/students.html" class="feat-card">
-          <div class="feat-icon">🎓</div>
-          <div class="feat-title" data-i18n="feat_students_title">Student Ecosystem</div>
-          <div class="feat-desc" data-i18n="feat_students_desc">Law students earn credits reviewing queries, build real portfolios, and get ranked on India's legal AI professional leaderboard.</div>
-          <div class="feat-arrow"><span data-i18n="feat_students_action">Join as Student</span> <span>→</span></div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY NYAYSETU -->
-  <section class="why-section">
-    <div class="container">
-      <div class="eyebrow fi" data-i18n="advantage_label">Advantage</div>
-      <h2 class="sh2 fi" data-i18n="advantage_title">Why NyaySetu exists</h2>
-      <p class="sub fi" style="max-width:460px" data-i18n="advantage_sub">Traditional legal help is slow, expensive, and inaccessible. We built NyaySetu to change all three.</p>
-      <div class="why-grid">
-        <div class="why-card fi">
-          <div class="why-num">01</div>
-          <div class="why-title" data-i18n="why_fast_title">Fast — minutes, not weeks</div>
-          <div class="why-desc" data-i18n="why_fast_desc">Traditional legal consultation can take days to begin. NyaySetu provides an intelligent first response in under 30 seconds, with a reviewed answer within hours.</div>
-          <div class="why-metric" data-i18n="why_fast_metric">⟳ &lt; 30 second initial response</div>
-        </div>
-        <div class="why-card fi">
-          <div class="why-num">02</div>
-          <div class="why-title" data-i18n="why_affordable_title">Affordable — not ₹5,000/hour</div>
-          <div class="why-desc" data-i18n="why_affordable_desc">Legal help in India is prohibitively expensive. NyaySetu is free to start — and premium plans cost less than a single traditional consultation.</div>
-          <div class="why-metric" data-i18n="why_affordable_metric">₹ Fraction of traditional cost</div>
-        </div>
-        <div class="why-card fi">
-          <div class="why-num">03</div>
-          <div class="why-title" data-i18n="why_access_title">Accessible — anywhere, anyone</div>
-          <div class="why-desc" data-i18n="why_access_desc">Whether you're in Delhi or a small town in Bihar — if you have a phone, you have access to legal guidance. No office visits, no appointments.</div>
-          <div class="why-metric" data-i18n="why_access_metric">📱 Any device, any location</div>
+    <!-- HOW IT WORKS -->
+    <section class="how-section" id="how">
+      <div class="container">
+        <div class="eyebrow fi" data-i18n="process_title">Process</div>
+        <h2 class="sh2 fi" style="max-width:420px" data-i18n="process_header">A system built for clarity</h2>
+        <p class="sub fi" style="max-width:480px" data-i18n="process_sub">Every query passes through AI analysis and
+          human review — fast and reliable.</p>
+        <div class="steps">
+          <div class="step fi">
+            <div class="step-num">🧑‍💼</div>
+            <div class="step-title" data-i18n="process_step1_title">You Ask</div>
+            <div class="step-desc" data-i18n="process_step1_desc">Submit your legal question in English, Hindi, Urdu, or
+              any Indian language. No legal knowledge needed.</div>
+            <span class="step-tag tag-u" data-i18n="tag_citizen">Citizen</span>
+          </div>
+          <div class="step fi">
+            <div class="step-num">🤖</div>
+            <div class="step-title" data-i18n="process_step2_title">AI Analyses</div>
+            <div class="step-desc" data-i18n="process_step2_desc">Legal AI identifies applicable laws, IPC sections, and
+              precedents instantly.</div>
+            <span class="step-tag tag-a" data-i18n="tag_ai">NyaySetu AI</span>
+          </div>
+          <div class="step fi">
+            <div class="step-num">🎓</div>
+            <div class="step-title" data-i18n="process_step3_title">Student Reviews</div>
+            <div class="step-desc" data-i18n="process_step3_desc">A verified law student reviews the output and adds
+              professional context.</div>
+            <span class="step-tag tag-s" data-i18n="tag_law_student">Law Student</span>
+          </div>
+          <div class="step fi">
+            <div class="step-num">⚖️</div>
+            <div class="step-title" data-i18n="process_step4_title">Lawyer Escalates</div>
+            <div class="step-desc" data-i18n="process_step4_desc">Complex cases routed to licensed advocates — faster
+              and affordable.</div>
+            <span class="step-tag tag-l" data-i18n="tag_advocate">Advocate</span>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- CTA -->
-  <section class="cta-section">
-    <div class="cta-glow"></div>
-    <div class="container-sm cta-inner">
-      <div class="eyebrow fi" style="justify-content:center" data-i18n="cta_title">Get Started Today</div>
-      <h2 class="sh1 fi" data-i18n-html="cta_header">Your rights matter.<br>Know them.</h2>
-      <p class="sub fi" style="text-align:center;max-width:380px;margin:0 auto 36px" data-i18n="cta_sub">Ask your first legal question for free. No signup required to begin.</p>
-      <div class="cta-actions fi">
-        <a href="pages/chat.html"    class="btn-primary" style="font-size:15px;padding:14px 32px" data-i18n="cta_button">Start for Free →</a>
-        <a href="pages/students.html" class="btn-ghost"  style="font-size:15px;padding:14px 32px" data-i18n="feat_students_action">Join as Student</a>
-      </div>
-      <p class="cta-note" data-i18n="cta_note">No credit card required &nbsp;·&nbsp; Hindi & English &nbsp;·&nbsp; 12,400+ queries resolved</p>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="container">
-      <div class="footer-inner">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="nav-logo-box" style="width:28px;height:28px;font-size:13px">N</div>
-          <span class="nav-logo-name" style="font-size:15px">NyaySetu</span>
+    <!-- FEATURES -->
+    <section class="feat-section">
+      <div class="container">
+        <div class="eyebrow fi" data-i18n="features_title">Capabilities</div>
+        <h2 class="sh2 fi" data-i18n="features_sub">Every legal need, covered</h2>
+        <div class="feat-grid fi">
+          <a href="pages/chat.html" class="feat-card">
+            <div class="feat-icon">🤖</div>
+            <div class="feat-title" data-i18n="feat_ai_title">AI Legal Assistant</div>
+            <div class="feat-desc" data-i18n="feat_ai_desc">Ask anything in plain language — FIR procedures, property
+              disputes, consumer rights. AI identifies applicable laws in seconds.</div>
+            <div class="feat-arrow"><span data-i18n="feat_ai_action">Open Chat</span> <span>→</span></div>
+          </a>
+          <a href="pages/documents.html" class="feat-card">
+            <div class="feat-icon">📄</div>
+            <div class="feat-title" data-i18n="feat_docs_title">Document Generator</div>
+            <div class="feat-desc" data-i18n="feat_docs_desc">Generate legally accurate documents in minutes — legal
+              notices, affidavits, rent agreements, consumer complaints, RTI applications.</div>
+            <div class="feat-arrow"><span data-i18n="feat_docs_action">Generate Now</span> <span>→</span></div>
+          </a>
+          <a href="pages/simplifier.html" class="feat-card">
+            <div class="feat-icon">📚</div>
+            <div class="feat-title" data-i18n="feat_simplify_title">Law Simplifier</div>
+            <div class="feat-desc" data-i18n="feat_simplify_desc">Paste any legal text — court order, notice, contract,
+              government circular — get a plain language breakdown with actionable steps.</div>
+            <div class="feat-arrow"><span data-i18n="feat_simplify_action">Try Simplifier</span> <span>→</span></div>
+          </a>
+          <a href="pages/students.html" class="feat-card">
+            <div class="feat-icon">🎓</div>
+            <div class="feat-title" data-i18n="feat_students_title">Student Ecosystem</div>
+            <div class="feat-desc" data-i18n="feat_students_desc">Law students earn credits reviewing queries, build
+              real portfolios, and get ranked on India's legal AI professional leaderboard.</div>
+            <div class="feat-arrow"><span data-i18n="feat_students_action">Join as Student</span> <span>→</span></div>
+          </a>
         </div>
-        <ul class="footer-links">
-          <li><a href="#" data-i18n="footer_privacy">Privacy Policy</a></li>
-          <li><a href="#" data-i18n="footer_terms">Terms of Use</a></li>
-          <li><a href="#" data-i18n="footer_disclaimer">Legal Disclaimer</a></li>
-          <li><a href="#" data-i18n="footer_contact">Contact Us</a></li>
-        </ul>
-        <span class="footer-copy" data-i18n="footer_copy">© 2025 NyaySetu &nbsp;·&nbsp; Not a substitute for legal advice</span>
       </div>
-    </div>
-  </footer>
+    </section>
 
-</main>
+    <!-- WHY NYAYSETU -->
+    <section class="why-section">
+      <div class="container">
+        <div class="eyebrow fi" data-i18n="advantage_label">Advantage</div>
+        <h2 class="sh2 fi" data-i18n="advantage_title">Why NyaySetu exists</h2>
+        <p class="sub fi" style="max-width:460px" data-i18n="advantage_sub">Traditional legal help is slow, expensive,
+          and inaccessible. We built NyaySetu to change all three.</p>
+        <div class="why-grid">
+          <div class="why-card fi">
+            <div class="why-num">01</div>
+            <div class="why-title" data-i18n="why_fast_title">Fast — minutes, not weeks</div>
+            <div class="why-desc" data-i18n="why_fast_desc">Traditional legal consultation can take days to begin.
+              NyaySetu provides an intelligent first response in under 30 seconds, with a reviewed answer within hours.
+            </div>
+            <div class="why-metric" data-i18n="why_fast_metric">⟳ &lt; 30 second initial response</div>
+          </div>
+          <div class="why-card fi">
+            <div class="why-num">02</div>
+            <div class="why-title" data-i18n="why_affordable_title">Affordable — not ₹5,000/hour</div>
+            <div class="why-desc" data-i18n="why_affordable_desc">Legal help in India is prohibitively expensive.
+              NyaySetu is free to start — and premium plans cost less than a single traditional consultation.</div>
+            <div class="why-metric" data-i18n="why_affordable_metric">₹ Fraction of traditional cost</div>
+          </div>
+          <div class="why-card fi">
+            <div class="why-num">03</div>
+            <div class="why-title" data-i18n="why_access_title">Accessible — anywhere, anyone</div>
+            <div class="why-desc" data-i18n="why_access_desc">Whether you're in Delhi or a small town in Bihar — if you
+              have a phone, you have access to legal guidance. No office visits, no appointments.</div>
+            <div class="why-metric" data-i18n="why_access_metric">📱 Any device, any location</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<script>
-// Stagger metrics
-document.querySelectorAll('.metrics-grid .metric').forEach((el,i) => {
-  el.style.transitionDelay = `${i*80}ms`;
-});
-</script>
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="cta-glow"></div>
+      <div class="container-sm cta-inner">
+        <div class="eyebrow fi" style="justify-content:center" data-i18n="cta_title">Get Started Today</div>
+        <h2 class="sh1 fi" data-i18n-html="cta_header">Your rights matter.<br>Know them.</h2>
+        <p class="sub fi" style="text-align:center;max-width:380px;margin:0 auto 36px" data-i18n="cta_sub">Ask your
+          first legal question for free. No signup required to begin.</p>
+        <div class="cta-actions fi">
+          <a href="pages/chat.html" class="btn-primary" style="font-size:15px;padding:14px 32px"
+            data-i18n="cta_button">Start for Free →</a>
+          <a href="pages/students.html" class="btn-ghost" style="font-size:15px;padding:14px 32px"
+            data-i18n="feat_students_action">Join as Student</a>
+        </div>
+        <p class="cta-note" data-i18n="cta_note">No credit card required &nbsp;·&nbsp; Hindi & English &nbsp;·&nbsp;
+          12,400+ queries resolved</p>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="nav-logo-box" style="width:28px;height:28px;font-size:13px">N</div>
+            <span class="nav-logo-name" style="font-size:15px">NyaySetu</span>
+          </div>
+          <ul class="footer-links">
+            <li><a href="#" data-i18n="footer_privacy">Privacy Policy</a></li>
+            <li><a href="#" data-i18n="footer_terms">Terms of Use</a></li>
+            <li><a href="#" data-i18n="footer_disclaimer">Legal Disclaimer</a></li>
+            <li><a href="#" data-i18n="footer_contact">Contact Us</a></li>
+          </ul>
+          <span class="footer-copy" data-i18n="footer_copy">© 2025 NyaySetu &nbsp;·&nbsp; Not a substitute for legal
+            advice</span>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    // Stagger metrics
+    document.querySelectorAll('.metrics-grid .metric').forEach((el, i) => {
+      el.style.transitionDelay = `${i * 80}ms`;
+    });
+  </script>
 </body>
-</html>
+
+</html> 

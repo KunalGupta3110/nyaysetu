@@ -171,7 +171,7 @@ function injectNav() {
     <div class="nav-right">
       <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
       <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()">☀</button>
-      <a href="pages/chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
+      <a href="chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
       <span id="auth-nav-slot"></span>
     </div>
   </nav>
@@ -203,6 +203,9 @@ injectNav();
 
       <!-- ── DASHBOARD ── -->
       <div class="section-pane active" id="pane-dashboard">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+          <button class="btn-primary btn-sm" type="button" onclick="openMyDashboard()">Open My Dashboard</button>
+        </div>
         <div class="stat-grid">
           <div class="stat-card fi"><div class="stat-val">47<span> cases</span></div><div class="stat-lbl">Cases Reviewed</div><div class="stat-change">↑ +12 this week</div></div>
           <div class="stat-card fi"><div class="stat-val">94<span>%</span></div><div class="stat-lbl">Accuracy Rate</div><div class="stat-change">↑ +2% this month</div></div>
@@ -366,7 +369,44 @@ function showTab(name, btn) {
   btn.classList.add('active');
 }
 
+function getStudentUser() {
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    if (!user) return null;
+    const profile = user.profile || {};
+    return {
+      ...user,
+      role: String(user.role || profile.role || 'user').toLowerCase(),
+      college: user.college || profile.college || '',
+      year: user.year || profile.year || profile.year_of_study || '',
+      area: user.area || profile.area || profile.area_of_interest || ''
+    };
+  } catch (err) {
+    return null;
+  }
+}
+
 // ── REVIEW QUEUE DATA ──
+function openMyDashboard() {
+  const user = getStudentUser();
+
+  if (!user) {
+    window.location.href = 'auth.html';
+    return;
+  }
+
+  if (user.role !== 'student') {
+    if (typeof showToast === 'function') {
+      showToast('Only logged-in students can open the dashboard', '!');
+    } else {
+      alert('Only logged-in students can open the dashboard');
+    }
+    return;
+  }
+
+  window.location.href = 'dashboard.html';
+}
+
 const REVIEW_ITEMS = [
   {
     id: 'r1', cat: 'property', catLabel: 'Property', catCls: 'rcat-p', pts: '+15 pts',
@@ -497,24 +537,57 @@ const LB_DATA = [
   { rank: 4, cls: '',  emoji: '😊', name: 'Rohit Verma',     college: 'Faculty of Law, DU',  pts: 187, pct: 60,  acc: '93%', you: false },
   { rank: 5, cls: '',  emoji: '🙂', name: 'Sneha Patel',     college: 'GLC, Mumbai',         pts: 165, pct: 53,  acc: '92%', you: false },
   { rank: 6, cls: '',  emoji: '😄', name: 'Akash Rao',       college: 'NUJS, Kolkata',       pts: 143, pct: 46,  acc: '90%', you: false },
-  { rank: 7, cls: '',  emoji: '🎓', name: 'You',             college: 'Your College',         pts: 138, pct: 44,  acc: '94%', you: true  },
-  { rank: 8, cls: '',  emoji: '😊', name: 'Divya Singh',     college: 'RMLNLU, Lucknow',     pts: 121, pct: 39,  acc: '91%', you: false },
-  { rank: 9, cls: '',  emoji: '🙂', name: 'Kiran Sharma',    college: 'Symbiosis Law, Pune',  pts: 104, pct: 33,  acc: '89%', you: false },
-  { rank:10, cls: '',  emoji: '😊', name: 'Tarun Malhotra',  college: 'Army Law, Noida',     pts: 89,  pct: 28,  acc: '88%', you: false },
+  { rank: 7, cls: '',  emoji: '😊', name: 'Divya Singh',     college: 'RMLNLU, Lucknow',     pts: 121, pct: 39,  acc: '91%', you: false },
+  { rank: 8, cls: '',  emoji: '🙂', name: 'Kiran Sharma',    college: 'Symbiosis Law, Pune',  pts: 104, pct: 33,  acc: '89%', you: false },
+  { rank: 9, cls: '',  emoji: '😊', name: 'Tarun Malhotra',  college: 'Army Law, Noida',     pts: 89,  pct: 28,  acc: '88%', you: false },
 ];
 
+function getLoggedInStudentLeaderboardRow() {
+  const user = getStudentUser();
+  if (!user || user.role !== 'student') return null;
+
+  const points = Number(user.points ?? user.reviewPoints ?? user.studentPoints ?? 0);
+  const rank = Number(user.rank ?? user.studentRank ?? 0);
+  const accuracy = user.accuracy ?? user.reviewAccuracy ?? '';
+  const details = [user.email, user.role, user.college].filter(Boolean).join(' | ');
+
+  return {
+    rank: rank || 7,
+    rankLabel: rank ? `#${rank}` : 'New',
+    cls: '',
+    emoji: '🎓',
+    name: user.name || user.full_name || user.email || 'Student',
+    college: details || 'Student profile',
+    pts: points,
+    pct: Math.min(100, Math.max(0, Math.round((points / 312) * 100))),
+    acc: accuracy ? String(accuracy).replace(/%$/, '') + '%' : '-',
+    you: true
+  };
+}
+
+function getLeaderboardRows() {
+  const userRow = getLoggedInStudentLeaderboardRow();
+  if (!userRow) return LB_DATA;
+
+  return [
+    ...LB_DATA.filter(r => r.rank < userRow.rank),
+    userRow,
+    ...LB_DATA.filter(r => r.rank >= userRow.rank).map(r => ({ ...r, rank: r.rank + 1 }))
+  ];
+}
+
 function renderLeaderboard() {
-  document.getElementById('lb-body').innerHTML = LB_DATA.map(r => `
+  document.getElementById('lb-body').innerHTML = getLeaderboardRows().map(r => `
     <div class="lb-row ${r.you ? 'you' : ''}">
-      <div class="lb-rank ${r.cls}">#${r.rank}</div>
+      <div class="lb-rank ${r.cls}">${esc(r.rankLabel || `#${r.rank}`)}</div>
       <div class="lb-avatar">${r.emoji}</div>
       <div class="lb-name-wrap">
-        <div class="lb-name" style="${r.you ? 'color:var(--accent)' : ''}">${r.name}${r.you ? ' (You)' : ''}</div>
-        <div class="lb-college">${r.college}</div>
+        <div class="lb-name" style="${r.you ? 'color:var(--accent)' : ''}">${esc(r.name)}${r.you ? ' (You)' : ''}</div>
+        <div class="lb-college">${esc(r.college)}</div>
       </div>
       <div class="lb-bar-wrap"><div class="lb-bar" style="width:${r.pct}%"></div></div>
       <div class="lb-pts">${r.pts} pts</div>
-      <div class="lb-acc">${r.acc}</div>
+      <div class="lb-acc">${esc(r.acc)}</div>
     </div>`).join('');
 }
 
