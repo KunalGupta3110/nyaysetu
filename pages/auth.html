@@ -38,6 +38,12 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .auth-footer-link{font-size:12px;color:var(--ts);text-align:center;margin-top:16px}
 .auth-footer-link a{color:var(--accent)}
+.btn-google{width:100%;height:46px;display:flex;align-items:center;justify-content:center;gap:12px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));color:var(--tp);font-size:13.5px;font-weight:600;letter-spacing:.1px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 28px rgba(0,0,0,.2);backdrop-filter:blur(10px);transition:transform var(--t) var(--ease),border-color var(--t) var(--ease),background var(--t) var(--ease),box-shadow var(--t) var(--ease)}
+.btn-google:hover{transform:translateY(-1px);border-color:rgba(201,169,110,.32);background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04));box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 14px 34px rgba(0,0,0,.28)}
+.btn-google:active{transform:translateY(0)}
+.btn-google:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.google-mark{width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+.google-mark svg{width:14px;height:14px;display:block}
 .role-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
 .role-card{padding:12px;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all var(--t) var(--ease);text-align:center}
 .role-card:hover,.role-card.on{border-color:rgba(201,169,110,.35);background:var(--adim)}
@@ -63,36 +69,6 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 }
 </style>
 </head>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<script>
-window.addEventListener("load", () => {
-  // Initialize Google
-  google.accounts.id.initialize({
-    client_id: "YOUR_CLIENT_ID_HERE",
-    callback: handleGoogleLogin
-  });
-});
-
-
-// Handle response
-function handleGoogleLogin(response) {
-  const data = JSON.parse(atob(response.credential.split('.')[1]));
-
-  const user = {
-    name: data.name,
-    email: data.email,
-    picture: data.picture,
-    role: "user"
-  };
-
-  localStorage.setItem("user", JSON.stringify(user));
-
-  alert("Login successful 🚀");
-
-  redirectAfterAuth(user);
-}
-</script>
 <body data-page="auth">
 <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
 
@@ -128,8 +104,10 @@ function handleGoogleLogin(response) {
   <!-- RIGHT -->
   <div class="auth-right">
     <!-- Google -->
-    <button class="btn-google" id="google-btn" onclick="signInGoogle()">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+    <button class="btn-google" id="google-btn" type="button" onclick="signInGoogle()" aria-label="Continue with Google">
+      <span class="google-mark" aria-hidden="true">
+        <svg viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      </span>
       <span data-i18n="auth_google">Continue with Google</span>
     </button>
     <div class="auth-divider" data-i18n="auth_email_continue">or continue with email</div>
@@ -262,217 +240,281 @@ function handleGoogleLogin(response) {
 </div>
 <script src="../js/utils.js"></script>
 <script src="../js/i18n.js"></script>
-
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
+const GOOGLE_CLIENT_ID = '147158442170-tqsuuoefn4oi2uvemtrcth6976254u66.apps.googleusercontent.com';
+const USERS_KEY = 'nyaysetu_users';
+let selectedRole = 'user';
+let authBusy = false;
+let googleReady = false;
+
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
-  const user = getStoredUser();
+  selectedRole = document.querySelector('.role-card.on')?.dataset.role || 'user';
+  const user = getCurrentUser();
   if (user) redirectAfterAuth(user);
+  initGoogleAuth();
 });
 
-let selectedRole = 'user'
+function normalizeUser(user) {
+  if (!user) return null;
+  const profile = user.profile || {};
+  return {
+    ...user,
+    role: String(user.role || profile.role || 'user').toLowerCase(),
+    city: user.city || profile.city || '',
+    college: user.college || profile.college || '',
+    year: user.year || profile.year || profile.year_of_study || '',
+    area: user.area || profile.area || profile.area_of_interest || ''
+  };
+}
 
-function redirectAfterAuth(user = getStoredUser()) {
+function getCurrentUser() {
+  try {
+    return normalizeUser(JSON.parse(localStorage.getItem('user') || 'null'));
+  } catch (err) {
+    return null;
+  }
+}
+
+function saveCurrentUser(user) {
+  localStorage.setItem('user', JSON.stringify(normalizeUser(user)));
+}
+
+function getSavedUsers() {
+  try {
+    const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+    return Array.isArray(users) ? users.map(normalizeUser).filter(Boolean) : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function saveSavedUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users.map(normalizeUser)));
+}
+
+function upsertSavedUser(user) {
+  const users = getSavedUsers();
+  const email = user.email.toLowerCase();
+  const existingIndex = users.findIndex(saved => saved.email.toLowerCase() === email);
+  if (existingIndex >= 0) users[existingIndex] = normalizeUser(user);
+  else users.push(normalizeUser(user));
+  saveSavedUsers(users);
+}
+
+function redirectAfterAuth(user = getCurrentUser()) {
   window.location.href = user && user.role === 'student' ? 'dashboard.html' : '../index.html';
 }
 
-window.selectRole = (el, role) => {
-  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('on'))
-  el.classList.add('on')
-  selectedRole = role
-  document.getElementById('student-fields').style.display = role === 'student' ? 'block' : 'none'
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function setAuthLoading(mode, loading) {
+  authBusy = loading;
+  document.getElementById('auth-loading')?.classList.toggle('show', loading);
+
+  const signInBtn = document.getElementById('signin-btn');
+  const signUpBtn = document.getElementById('signup-btn');
+  const googleBtn = document.getElementById('google-btn');
+  const googleLabel = googleBtn?.querySelector('[data-i18n="auth_google"]');
+
+  if (signInBtn) {
+    signInBtn.disabled = loading;
+    signInBtn.textContent = loading && mode === 'signin' ? 'Signing in...' : 'Sign In ->';
+  }
+  if (signUpBtn) {
+    signUpBtn.disabled = loading;
+    signUpBtn.textContent = loading && mode === 'signup' ? 'Creating account...' : 'Create Account ->';
+  }
+  if (googleBtn) {
+    googleBtn.disabled = loading;
+    if (googleLabel) googleLabel.textContent = loading && mode === 'google' ? 'Opening Google...' : 'Continue with Google';
+  }
+}
+
+window.selectRole = (el, role) => {
+  const nextRole = role === 'student' ? 'student' : 'user';
+  document.querySelectorAll('.role-card').forEach(card => card.classList.remove('on'));
+  el.classList.add('on');
+  selectedRole = nextRole;
+  document.getElementById('student-fields').style.display = nextRole === 'student' ? 'block' : 'none';
+};
 
 window.switchTab = (tab) => {
   document.querySelectorAll('.auth-tab').forEach((t, i) => {
-    t.classList.toggle('active', ['signin','signup','reset'][i] === tab)
-  })
-  document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'))
-  document.getElementById('panel-' + tab).classList.add('active')
-}
+    t.classList.toggle('active', ['signin', 'signup', 'reset'][i] === tab);
+  });
+  document.querySelectorAll('.auth-panel').forEach(panel => panel.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+};
 
 window.checkPwStrength = (pw) => {
-  const fill = document.getElementById('pw-fill')
-  if (pw.length < 1) { fill.className = 'pw-fill'; return }
-  const strong = pw.length >= 10 && /[A-Z]/.test(pw) && /[0-9]/.test(pw) && /[^a-zA-Z0-9]/.test(pw)
-  const fair   = pw.length >= 8
-  fill.className = 'pw-fill ' + (strong ? 'pw-strong' : fair ? 'pw-fair' : 'pw-weak')
-}
-
-window.signIn = async () => {
-  const email = document.getElementById('si-email').value.trim()
-  const pass  = document.getElementById('si-pass').value
-  if (!email || !pass) { showToast('Please fill in all fields', '⚠', 'error'); return }
-
-  const btn = document.getElementById('signin-btn')
-  btn.disabled = true; btn.textContent = 'Signing in…'
-  document.getElementById('auth-loading').classList.add('show')
-
-  const { data, error } = { data: null, error: new Error('Legacy handler disabled') }
-  if (error) {
-    showToast(error.message === 'Invalid login credentials' ? 'Wrong email or password' : error.message, '✕', 'error')
-    btn.disabled = false; btn.textContent = 'Sign In →'
-    document.getElementById('auth-loading').classList.remove('show')
-  } else {
-    redirectAfterAuth()
-  }
-}
-
-window.signUp = async () => {
-  const name   = document.getElementById('su-name').value.trim()
-  const city   = document.getElementById('su-city').value.trim()
-  const email  = document.getElementById('su-email').value.trim()
-  const pass   = document.getElementById('su-pass').value
-
-  if (!name || !email || !pass) { showToast('Please fill required fields', '⚠', 'error'); return }
-  if (pass.length < 8) { showToast('Password must be at least 8 characters', '⚠', 'error'); return }
-
-  const btn = document.getElementById('signup-btn')
-  btn.disabled = true; btn.textContent = 'Creating account…'
-  document.getElementById('auth-loading').classList.add('show')
-
-  const { data, error } = { data: null, error: new Error('Legacy handler disabled') }
-
-  if (error) {
-    showToast(error.message, '✕', 'error')
-    btn.disabled = false; btn.textContent = 'Create Account →'
-    document.getElementById('auth-loading').classList.remove('show')
-    return
-  }
-
-  // If student, create student profile after email confirmation
-  if (selectedRole === 'student' && data.user) {
-    const college = document.getElementById('su-college').value.trim()
-    const year    = document.getElementById('su-year').value
-    const area    = document.getElementById('su-area').value
-    await Promise.resolve({
-      id: data.user.id, college, year_of_study: year, area_of_interest: area
-    })
-    await Promise.resolve()
-  } else if (data.user) {
-    await Promise.resolve()
-  }
-
-  // Show verify email message
-  document.getElementById('auth-loading').classList.remove('show')
-  document.querySelector('.auth-right').innerHTML = `
-    <div style="text-align:center;padding:20px">
-      <div style="font-size:48px;margin-bottom:16px">📬</div>
-      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--tp);margin-bottom:8px">Check your email</div>
-      <div style="font-size:14px;color:var(--ts);line-height:1.7;max-width:300px;margin:0 auto 20px">
-        We sent a verification link to <strong style="color:var(--tp)">${esc(email)}</strong>.<br>Click it to activate your account.
-      </div>
-      <a href="auth.html" class="btn-ghost">← Back to Sign In</a>
-    </div>`
-}
-
-window.resetPass = async () => {
-  const email = document.getElementById('rst-email').value.trim()
-  if (!email) { showToast('Please enter your email', '⚠', 'error'); return }
-  const btn = document.getElementById('reset-btn')
-  btn.disabled = true; btn.textContent = 'Sending…'
-  const { error } = { error: new Error('Password reset is not enabled yet.') }
-  void ({
-    redirectTo: window.location.origin + window.location.pathname + '?mode=reset'
-  })
-  if (error) { showToast(error.message, '✕', 'error'); btn.disabled = false; btn.textContent = 'Send Reset Link' }
-  else { showToast('Reset link sent! Check your inbox.', '📬', 'success'); btn.textContent = 'Sent ✓' }
-}
-
-
-function esc(s) { return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;') }
-</script>
-<script>
-window.signIn = async () => {
-  const email = document.getElementById('si-email').value.trim();
-  const password = document.getElementById('si-pass').value;
-  if (!email || !password) { showToast('Please fill in all fields', '⚠'); return; }
-
-  const btn = document.getElementById('signin-btn');
-  btn.disabled = true;
-  btn.textContent = 'Signing in...';
-  document.getElementById('auth-loading').classList.add('show');
-
-  try {
-    await loginUser({ email, password });
-    showToast('Signed in successfully', '✓');
-    redirectAfterAuth();
-  } catch (err) {
-    showToast(err.message || 'Wrong email or password', '✕');
-    btn.disabled = false;
-    btn.textContent = 'Sign In ->';
-    document.getElementById('auth-loading').classList.remove('show');
-  }
+  const fill = document.getElementById('pw-fill');
+  if (pw.length < 1) { fill.className = 'pw-fill'; return; }
+  const strong = pw.length >= 10 && /[A-Z]/.test(pw) && /[0-9]/.test(pw) && /[^a-zA-Z0-9]/.test(pw);
+  const fair = pw.length >= 8;
+  fill.className = 'pw-fill ' + (strong ? 'pw-strong' : fair ? 'pw-fair' : 'pw-weak');
 };
 
 window.signUp = async () => {
-  const name = document.getElementById('su-name').value.trim();
-  const city = document.getElementById('su-city').value.trim();
-  const email = document.getElementById('su-email').value.trim();
-  const password = document.getElementById('su-pass').value;
+  if (authBusy) return;
 
-  if (!name || !email || !password) { showToast('Please fill required fields', '⚠'); return; }
-  if (password.length < 8) { showToast('Password must be at least 8 characters', '⚠'); return; }
+  const role = selectedRole === 'student' ? 'student' : 'user';
+  const user = {
+    name: document.getElementById('su-name').value.trim(),
+    email: document.getElementById('su-email').value.trim().toLowerCase(),
+    password: document.getElementById('su-pass').value,
+    role,
+    city: document.getElementById('su-city').value.trim(),
+    college: role === 'student' ? document.getElementById('su-college').value.trim() : '',
+    year: role === 'student' ? document.getElementById('su-year').value : '',
+    area: role === 'student' ? document.getElementById('su-area').value : ''
+  };
 
-  const profile = { city, role: selectedRole };
-  if (selectedRole === 'student') {
-    profile.college = document.getElementById('su-college').value.trim();
-    profile.year = document.getElementById('su-year').value;
-    profile.area = document.getElementById('su-area').value;
+  if (!user.name || !user.email || !user.password || !user.city) {
+    showToast('Please fill all required fields', '!');
+    return;
+  }
+  if (!isValidEmail(user.email)) {
+    showToast('Please enter a valid email address', '!');
+    return;
+  }
+  if (user.password.length < 8) {
+    showToast('Password must be at least 8 characters', '!');
+    return;
+  }
+  if (role === 'student' && (!user.college || !user.year || !user.area)) {
+    showToast('Please complete your student details', '!');
+    return;
+  }
+  if (getSavedUsers().some(saved => saved.email.toLowerCase() === user.email)) {
+    showToast('An account with this email already exists', '!');
+    return;
   }
 
-  const btn = document.getElementById('signup-btn');
-  btn.disabled = true;
-  btn.textContent = 'Creating account...';
-  document.getElementById('auth-loading').classList.add('show');
+  setAuthLoading('signup', true);
+  await wait(300);
+  upsertSavedUser(user);
+  saveCurrentUser(user);
+  showToast('Account created successfully', 'OK');
+  setTimeout(() => redirectAfterAuth(user), 450);
+};
 
-  try {
-    await signupUser({ name, email, password, profile });
-    showToast('Account created successfully', '✓');
-    redirectAfterAuth();
-  } catch (err) {
-    showToast(err.message || 'Signup failed. Please try again.', '✕');
-    btn.disabled = false;
-    btn.textContent = 'Create Account ->';
-    document.getElementById('auth-loading').classList.remove('show');
+window.signIn = async () => {
+  if (authBusy) return;
+
+  const email = document.getElementById('si-email').value.trim().toLowerCase();
+  const password = document.getElementById('si-pass').value;
+
+  if (!email || !password) {
+    showToast('Please fill in all fields', '!');
+    return;
   }
+  if (!isValidEmail(email)) {
+    showToast('Please enter a valid email address', '!');
+    return;
+  }
+
+  setAuthLoading('signin', true);
+  await wait(250);
+
+  const user = getSavedUsers().find(saved => saved.email.toLowerCase() === email && saved.password === password);
+  if (!user) {
+    setAuthLoading('signin', false);
+    showToast('Email or password is incorrect', '!');
+    return;
+  }
+
+  saveCurrentUser(user);
+  showToast('Signed in successfully', 'OK');
+  setTimeout(() => redirectAfterAuth(user), 450);
 };
 
 window.resetPass = () => {
-  showToast('Password reset is not enabled yet. Please contact support.', '⚠');
+  showToast('Password reset is not available for local accounts yet', '!');
 };
 
+function initGoogleAuth(attempt = 0) {
+  if (!window.google?.accounts?.id) {
+    if (attempt < 40) setTimeout(() => initGoogleAuth(attempt + 1), 100);
+    return;
+  }
 
-</script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<script>
-window.addEventListener("load", () => {
   google.accounts.id.initialize({
-    client_id: "147158442170-tqsuuoefn4oi2uvemtrcth6976254u66.apps.googleusercontent.com",
-    callback: handleGoogleLogin
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleLogin,
+    auto_select: false,
+    cancel_on_tap_outside: true
   });
-});
+  googleReady = true;
+}
 
-function signInGoogle() {
-  google.accounts.id.prompt();
+window.signInGoogle = () => {
+  if (authBusy) return;
+  if (!googleReady) {
+    initGoogleAuth();
+    showToast('Google sign-in is still loading. Try again in a moment.', '!');
+    return;
+  }
+
+  setAuthLoading('google', true);
+  try {
+    google.accounts.id.prompt(notification => {
+      if (notification.isDisplayMoment?.()) {
+        setAuthLoading('google', false);
+      }
+      if (notification.isNotDisplayed?.() || notification.isSkippedMoment?.()) {
+        setAuthLoading('google', false);
+        showToast('Google sign-in is not available right now', '!');
+      }
+      if (notification.isDismissedMoment?.()) {
+        const reason = notification.getDismissedReason?.() || '';
+        if (reason !== 'credential_returned') {
+          setAuthLoading('google', false);
+          showToast('Google sign-in cancelled', '!');
+        }
+      }
+    });
+  } catch (err) {
+    setAuthLoading('google', false);
+    showToast('Unable to start Google sign-in', '!');
+  }
+};
+
+function decodeJwtPayload(token) {
+  const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  const json = decodeURIComponent(atob(payload).split('').map(char => {
+    return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+  return JSON.parse(json);
 }
 
 function handleGoogleLogin(response) {
-  const data = JSON.parse(atob(response.credential.split('.')[1]));
+  setAuthLoading('google', true);
+  try {
+    const data = decodeJwtPayload(response.credential);
+    const user = {
+      name: data.name || data.given_name || data.email,
+      email: data.email,
+      picture: data.picture || '',
+      role: 'user'
+    };
 
-  const user = {
-    name: data.name,
-    email: data.email,
-    picture: data.picture,
-    role: "user"
-  };
+    if (!user.email) throw new Error('Google did not return an email address');
 
-  localStorage.setItem("user", JSON.stringify(user));
-
-  alert("Login successful 🚀");
-
-  redirectAfterAuth(user);
+    saveCurrentUser(user);
+    showToast('Signed in with Google', 'OK');
+    setTimeout(() => { window.location.href = '../index.html'; }, 450);
+  } catch (err) {
+    setAuthLoading('google', false);
+    showToast(err.message || 'Google sign-in failed', '!');
+  }
 }
 </script>
 </body>
