@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy - NyaySetu</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+.legal-hero{padding:116px 0 36px;border-bottom:1px solid var(--border)}
+.legal-wrap{padding:34px 0 80px}
+.legal-layout{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
+.legal-side{position:sticky;top:88px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.legal-side a{display:block;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--ts)}
+.legal-side a:hover{background:var(--bg2);color:var(--tp)}
+.legal-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);padding:30px}
+.legal-card section{padding:24px 0;border-bottom:1px solid var(--border)}
+.legal-card section:first-child{padding-top:0}
+.legal-card section:last-child{border-bottom:0;padding-bottom:0}
+.legal-card h2{font-family:'Playfair Display',serif;font-size:24px;line-height:1.2;margin-bottom:10px;color:var(--tp)}
+.legal-card p,.legal-card li{font-size:14.5px;color:var(--ts);line-height:1.75}
+.legal-card ul{padding-left:20px;margin-top:10px}
+.legal-note{margin-top:22px;padding:16px 18px;border:1px solid rgba(201,169,110,.2);background:var(--adim);border-radius:var(--r);color:var(--tp);font-size:14px;line-height:1.65}
+.last-updated{font-size:12px;color:var(--tm);font-family:'DM Mono',monospace;margin-top:8px}
+@media(max-width:800px){.legal-layout{grid-template-columns:1fr}.legal-side{position:static}.legal-card{padding:22px}}
+</style>
+</head>
+<body data-page="privacy">
+<script src="../js/utils.js"></script>
+<script src="../js/i18n.js"></script>
+<script src="../js/nav.js"></script>
+<script>injectNav();</script>
+
+<main>
+  <section class="legal-hero">
+    <div class="container-sm">
+      <div class="eyebrow">Privacy Policy</div>
+      <h1 class="sh2">How NyaySetu handles your information</h1>
+      <p class="sub">This policy explains what we collect, why we use it, and the choices you have when using NyaySetu.</p>
+      <div class="last-updated">Last updated: April 28, 2026</div>
+    </div>
+  </section>
+
+  <section class="legal-wrap">
+    <div class="container">
+      <div class="legal-layout">
+        <aside class="legal-side" aria-label="Privacy sections">
+          <a href="#intro">Introduction</a>
+          <a href="#collection">Data Collection</a>
+          <a href="#usage">Data Usage</a>
+          <a href="#sharing">Sharing</a>
+          <a href="#rights">User Rights</a>
+          <a href="#security">Security</a>
+          <a href="#disclaimer">Disclaimer</a>
+        </aside>
+
+        <article class="legal-card">
+          <section id="intro">
+            <h2>Introduction</h2>
+            <p>NyaySetu is an AI-powered legal information platform. We aim to make legal guidance easier to understand, while respecting your privacy and keeping our data practices simple.</p>
+          </section>
+
+          <section id="collection">
+            <h2>Data Collection</h2>
+            <p>We may collect information you provide directly or through login features, including:</p>
+            <ul>
+              <li>Name, email address, password, city, and selected role when you create an account.</li>
+              <li>Student details such as college, year of study, and area of interest if you join as a law student.</li>
+              <li>Google login details such as your name, email address, and profile picture when you choose Google sign-in.</li>
+              <li>Legal questions, document inputs, or text you submit to use AI features.</li>
+              <li>Basic usage data needed to improve reliability, performance, and safety.</li>
+            </ul>
+            <p>In the current browser-based version, some account/session details may be stored in your browser using localStorage.</p>
+          </section>
+
+          <section id="usage">
+            <h2>Data Usage</h2>
+            <p>We use your information to provide the platform, personalize your dashboard, process AI requests, improve features, protect against misuse, and communicate important updates.</p>
+            <p>We do not sell your personal information.</p>
+          </section>
+
+          <section id="sharing">
+            <h2>Sharing</h2>
+            <p>We may use trusted tools or service providers for authentication, hosting, translation, analytics, or AI processing. We only share what is needed for those services to work.</p>
+            <p>If a query is reviewed by a student or professional workflow, relevant query content may be visible to reviewers for quality and safety purposes.</p>
+          </section>
+
+          <section id="rights">
+            <h2>User Rights</h2>
+            <p>You may request access, correction, or deletion of your account information where technically possible. You can also clear locally stored browser data at any time from your browser settings.</p>
+          </section>
+
+          <section id="security">
+            <h2>Security</h2>
+            <p>We take reasonable steps to protect information, but no online system is completely secure. Please avoid submitting highly sensitive personal, financial, medical, or case-confidential details unless necessary.</p>
+          </section>
+
+          <section id="disclaimer">
+            <h2>No Legal Advice Disclaimer</h2>
+            <p>NyaySetu provides legal information and AI-generated assistance. It is not a law firm and does not replace advice from a qualified advocate. You are responsible for how you use information from the platform.</p>
+            <div class="legal-note">For urgent, complex, or high-risk matters, consult a licensed legal professional before taking action.</div>
+          </section>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -169,7 +169,7 @@ const BASE_TEXT = {
   auth_feature_docs: 'Generate legal documents in minutes',
   auth_feature_simplify: 'Simplify any legal text instantly',
   auth_feature_private: 'Your data is private and secure',
-  auth_terms: 'By signing in, you agree to our Terms of Service. NyaySetu is not a law firm. AI guidance is not legal advice.',
+  auth_terms: 'By signing in, you agree to our <a href="terms.html" style="color:var(--accent)">Terms of Service</a>. NyaySetu is not a law firm. AI guidance is not legal advice.',
   auth_google: 'Continue with Google',
   auth_email_continue: 'or continue with email',
   auth_tab_signin: 'Sign In',

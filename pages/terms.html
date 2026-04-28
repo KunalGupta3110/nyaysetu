@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms and Conditions - NyaySetu</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+.legal-hero{padding:116px 0 36px;border-bottom:1px solid var(--border)}
+.legal-wrap{padding:34px 0 80px}
+.legal-layout{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
+.legal-side{position:sticky;top:88px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.legal-side a{display:block;padding:8px 10px;border-radius:8px;font-size:13px;color:var(--ts)}
+.legal-side a:hover{background:var(--bg2);color:var(--tp)}
+.legal-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);padding:30px}
+.legal-card section{padding:24px 0;border-bottom:1px solid var(--border)}
+.legal-card section:first-child{padding-top:0}
+.legal-card section:last-child{border-bottom:0;padding-bottom:0}
+.legal-card h2{font-family:'Playfair Display',serif;font-size:24px;line-height:1.2;margin-bottom:10px;color:var(--tp)}
+.legal-card p,.legal-card li{font-size:14.5px;color:var(--ts);line-height:1.75}
+.legal-card ul{padding-left:20px;margin-top:10px}
+.legal-note{margin-top:22px;padding:16px 18px;border:1px solid rgba(201,169,110,.2);background:var(--adim);border-radius:var(--r);color:var(--tp);font-size:14px;line-height:1.65}
+.last-updated{font-size:12px;color:var(--tm);font-family:'DM Mono',monospace;margin-top:8px}
+@media(max-width:800px){.legal-layout{grid-template-columns:1fr}.legal-side{position:static}.legal-card{padding:22px}}
+</style>
+</head>
+<body data-page="terms">
+<script src="../js/utils.js"></script>
+<script src="../js/i18n.js"></script>
+<script src="../js/nav.js"></script>
+<script>injectNav();</script>
+
+<main>
+  <section class="legal-hero">
+    <div class="container-sm">
+      <div class="eyebrow">Terms and Conditions</div>
+      <h1 class="sh2">Simple rules for using NyaySetu</h1>
+      <p class="sub">These terms explain what you can expect from NyaySetu and what we expect from users of the platform.</p>
+      <div class="last-updated">Last updated: April 28, 2026</div>
+    </div>
+  </section>
+
+  <section class="legal-wrap">
+    <div class="container">
+      <div class="legal-layout">
+        <aside class="legal-side" aria-label="Terms sections">
+          <a href="#intro">Introduction</a>
+          <a href="#service">Our Service</a>
+          <a href="#accounts">Accounts</a>
+          <a href="#responsibility">User Responsibility</a>
+          <a href="#disclaimer">No Legal Advice</a>
+          <a href="#limitations">Limitations</a>
+          <a href="#changes">Changes</a>
+        </aside>
+
+        <article class="legal-card">
+          <section id="intro">
+            <h2>Introduction</h2>
+            <p>By using NyaySetu, you agree to these Terms and Conditions. If you do not agree, please do not use the platform.</p>
+          </section>
+
+          <section id="service">
+            <h2>Our Service</h2>
+            <p>NyaySetu provides AI-powered legal information, document assistance, law simplification, and student review workflows. The platform is designed to help users understand legal topics more clearly.</p>
+          </section>
+
+          <section id="accounts">
+            <h2>Accounts and Login</h2>
+            <p>You may create an account using email/password or Google login. You are responsible for keeping your login details secure and for all activity under your account.</p>
+            <ul>
+              <li>Provide accurate information when signing up.</li>
+              <li>Do not impersonate another person.</li>
+              <li>Do not use another user's account without permission.</li>
+            </ul>
+          </section>
+
+          <section id="responsibility">
+            <h2>User Responsibility</h2>
+            <p>You are responsible for checking information before relying on it. You should not submit illegal, harmful, abusive, misleading, or confidential third-party information without proper authority.</p>
+            <p>Students or reviewers using NyaySetu must act honestly, avoid conflicts of interest, and clearly escalate matters that require professional legal judgment.</p>
+          </section>
+
+          <section id="disclaimer">
+            <h2>No Legal Advice</h2>
+            <p>NyaySetu is not a law firm. AI responses, generated documents, simplified explanations, and student reviews are for general legal information only. They are not a substitute for advice from a qualified advocate.</p>
+            <div class="legal-note">For court matters, deadlines, arrests, notices, contracts, property disputes, or other serious issues, speak to a licensed lawyer before taking action.</div>
+          </section>
+
+          <section id="limitations">
+            <h2>Platform Limitations</h2>
+            <p>AI systems can make mistakes, miss facts, or provide incomplete information. Laws may change, and legal outcomes depend on facts, documents, jurisdiction, and procedure.</p>
+            <ul>
+              <li>We do not guarantee that every answer is complete, current, or suitable for your specific case.</li>
+              <li>Generated documents may need review by a legal professional before use.</li>
+              <li>The platform may be unavailable, delayed, or changed from time to time.</li>
+            </ul>
+          </section>
+
+          <section id="privacy">
+            <h2>Privacy</h2>
+            <p>Your use of NyaySetu is also covered by our <a href="privacy.html" style="color:var(--accent)">Privacy Policy</a>, which explains what data we collect and how we use it.</p>
+          </section>
+
+          <section id="changes">
+            <h2>Changes to Terms</h2>
+            <p>We may update these terms as NyaySetu evolves. Continued use of the platform after changes means you accept the updated terms.</p>
+          </section>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
