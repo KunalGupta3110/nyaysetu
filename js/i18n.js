@@ -68,8 +68,10 @@ function readCachedTranslation(lang, text) {
   try {
     const cached = localStorage.getItem(cacheKey);
     if (cached !== null) {
-      memoryTranslationCache.set(cacheKey, cached);
-      return cached;
+      const cleaned = cleanTranslationText(cached);
+      memoryTranslationCache.set(cacheKey, cleaned);
+      if (cleaned !== cached) localStorage.setItem(cacheKey, cleaned);
+      return cleaned;
     }
   } catch (err) {
     // localStorage can fail in private mode or when quota is full. Fall back cleanly.
@@ -80,10 +82,11 @@ function readCachedTranslation(lang, text) {
 
 function writeCachedTranslation(lang, text, translatedText) {
   const cacheKey = getTranslationCacheKey(lang, text);
-  memoryTranslationCache.set(cacheKey, translatedText);
+  const cleaned = cleanTranslationText(translatedText);
+  memoryTranslationCache.set(cacheKey, cleaned);
 
   try {
-    localStorage.setItem(cacheKey, translatedText);
+    localStorage.setItem(cacheKey, cleaned);
   } catch (err) {
     // Keep the in-memory cache even if persistent storage is unavailable.
   }
@@ -111,15 +114,39 @@ function getElementOriginalText(el) {
   return originalText || '';
 }
 
+function cleanTranslationText(value) {
+  return String(value ?? '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\n')
+    .replace(/\\t/g, ' ')
+    .replace(/\\"/g, '"')
+    .replace(/\\'/g, "'")
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    .trim();
+}
+
+function escapeI18nHTML(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function setElementText(el, value) {
+  const cleaned = cleanTranslationText(value);
+
   if (el.hasAttribute('data-i18n-placeholder')) {
-    el.placeholder = value;
+    el.placeholder = cleaned.replace(/\n+/g, ' ');
   } else if (el.hasAttribute('data-i18n-html')) {
-    el.innerHTML = value;
+    el.innerHTML = cleaned.replace(/\n/g, '<br>');
   } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-    el.placeholder = value;
+    el.placeholder = cleaned.replace(/\n+/g, ' ');
   } else {
-    el.textContent = value;
+    el.innerHTML = escapeI18nHTML(cleaned).replace(/\n/g, '<br>');
   }
 }
 
@@ -159,8 +186,9 @@ async function translateText(text, lang) {
         ? data[0].map(part => part?.[0] || '').join('')
         : sourceText;
 
-      writeCachedTranslation(targetLang, sourceText, translatedText || sourceText);
-      return translatedText || sourceText;
+      const cleaned = cleanTranslationText(translatedText || sourceText);
+      writeCachedTranslation(targetLang, sourceText, cleaned);
+      return cleaned;
     } catch (error) {
       console.warn(`Translation failed for "${sourceText}"`, error);
       return sourceText;
