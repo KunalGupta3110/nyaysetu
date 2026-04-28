@@ -53,6 +53,81 @@ const TRANSLATION_API_URL = 'https://translate.googleapis.com/translate_a/single
 // Store original English text for elements so we can fall back easily
 // and avoid re-translating translated text on subsequent language changes.
 const originalTextMap = new WeakMap();
+const memoryTranslationCache = new Map();
+const pendingTranslationRequests = new Map();
+let activeTranslationRun = 0;
+
+function getTranslationCacheKey(lang, text) {
+  return `${lang}_${text}`;
+}
+
+function readCachedTranslation(lang, text) {
+  const cacheKey = getTranslationCacheKey(lang, text);
+  if (memoryTranslationCache.has(cacheKey)) return memoryTranslationCache.get(cacheKey);
+
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached !== null) {
+      memoryTranslationCache.set(cacheKey, cached);
+      return cached;
+    }
+  } catch (err) {
+    // localStorage can fail in private mode or when quota is full. Fall back cleanly.
+  }
+
+  return null;
+}
+
+function writeCachedTranslation(lang, text, translatedText) {
+  const cacheKey = getTranslationCacheKey(lang, text);
+  memoryTranslationCache.set(cacheKey, translatedText);
+
+  try {
+    localStorage.setItem(cacheKey, translatedText);
+  } catch (err) {
+    // Keep the in-memory cache even if persistent storage is unavailable.
+  }
+}
+
+function getRequestedLanguage(lang) {
+  return typeof lang === 'string' && LANGUAGE_NAMES[lang] ? lang : getSavedLanguage();
+}
+
+function getElementOriginalText(el) {
+  let originalText = originalTextMap.get(el);
+  if (originalText) return originalText;
+
+  if (el.hasAttribute('data-i18n-placeholder')) {
+    originalText = el.placeholder;
+  } else if (el.hasAttribute('data-i18n-html')) {
+    originalText = el.innerHTML.trim();
+  } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+    originalText = el.placeholder;
+  } else {
+    originalText = el.textContent.trim();
+  }
+
+  if (originalText) originalTextMap.set(el, originalText);
+  return originalText || '';
+}
+
+function setElementText(el, value) {
+  if (el.hasAttribute('data-i18n-placeholder')) {
+    el.placeholder = value;
+  } else if (el.hasAttribute('data-i18n-html')) {
+    el.innerHTML = value;
+  } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+    el.placeholder = value;
+  } else {
+    el.textContent = value;
+  }
+}
+
+function setTranslationLoading(isLoading) {
+  if (!document.body) return;
+  document.body.style.transition = 'opacity 0.2s ease';
+  document.body.style.opacity = isLoading ? '0.65' : '1';
+}
 
 /**
  * 1. CORE TRANSLATION & CACHING FUNCTION
@@ -61,33 +136,41 @@ const originalTextMap = new WeakMap();
  * - Saves result to cache
  */
 async function translateText(text, lang) {
-  if (!text || !text.trim() || lang === DEFAULT_LOCALE) return text;
-  
-  // Format: lang_text
-  const cacheKey = `${lang}_${text}`;
-  const cached = localStorage.getItem(cacheKey);
-  
-  if (cached) {
-    return cached; // Use immediately if exists
+  const targetLang = getRequestedLanguage(lang);
+  const sourceText = String(text || '').trim();
+  if (!sourceText || targetLang === DEFAULT_LOCALE) return text;
+
+  const cached = readCachedTranslation(targetLang, sourceText);
+  if (cached !== null) return cached;
+
+  const requestKey = getTranslationCacheKey(targetLang, sourceText);
+  if (pendingTranslationRequests.has(requestKey)) {
+    return pendingTranslationRequests.get(requestKey);
   }
-  
-  try {
-    const url = `${TRANSLATION_API_URL}?client=gtx&sl=en&tl=${encodeURIComponent(lang)}&dt=t&q=${encodeURIComponent(text)}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('API failed');
-    
-    const data = await response.json();
-    const translatedText = Array.isArray(data?.[0])
-      ? data[0].map(part => part?.[0] || '').join('')
-      : text;
-      
-    // Save to cache
-    localStorage.setItem(cacheKey, translatedText);
-    return translatedText;
-  } catch (error) {
-    console.error(`Translation error for "${text}":`, error);
-    return text; // Fallback safety: return original English text
-  }
+
+  const request = (async () => {
+    try {
+      const url = `${TRANSLATION_API_URL}?client=gtx&sl=en&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(sourceText)}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Translation API failed');
+
+      const data = await response.json();
+      const translatedText = Array.isArray(data?.[0])
+        ? data[0].map(part => part?.[0] || '').join('')
+        : sourceText;
+
+      writeCachedTranslation(targetLang, sourceText, translatedText || sourceText);
+      return translatedText || sourceText;
+    } catch (error) {
+      console.warn(`Translation failed for "${sourceText}"`, error);
+      return sourceText;
+    } finally {
+      pendingTranslationRequests.delete(requestKey);
+    }
+  })();
+
+  pendingTranslationRequests.set(requestKey, request);
+  return request;
 }
 
 /**
@@ -97,99 +180,55 @@ async function translateText(text, lang) {
  * - Updates DOM in one go
  */
 async function applyTranslations(lang) {
-  // Show loading UX (reduce opacity)
-  document.body.style.transition = 'opacity 0.3s ease';
-  document.body.style.opacity = '0.5';
-
-  const elements = document.querySelectorAll('[data-i18n], [data-i18n-html], [data-i18n-placeholder]');
-  
-  // Extract texts and remove duplicates
+  const targetLang = getRequestedLanguage(lang);
+  const runId = ++activeTranslationRun;
+  const elements = Array.from(document.querySelectorAll('[data-i18n], [data-i18n-html], [data-i18n-placeholder]'));
   const uniqueTexts = new Set();
-  
-  // First pass: extract originals safely
+
   elements.forEach(el => {
-    let originalText = originalTextMap.get(el);
-    
-    if (!originalText) {
-      if (el.hasAttribute('data-i18n-placeholder')) {
-        originalText = el.placeholder;
-      } else if (el.hasAttribute('data-i18n-html')) {
-        originalText = el.innerHTML.trim();
-      } else {
-        originalText = (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') 
-          ? el.placeholder 
-          : el.textContent.trim();
-      }
-      
-      if (originalText) {
-        originalTextMap.set(el, originalText);
-      }
-    }
-    
-    if (originalText && lang !== DEFAULT_LOCALE) {
-      uniqueTexts.add(originalText);
-    }
+    const originalText = getElementOriginalText(el);
+    if (originalText && targetLang !== DEFAULT_LOCALE) uniqueTexts.add(originalText);
   });
 
-  // If defaulting to English, just restore and exit early
-  if (lang === DEFAULT_LOCALE) {
+  document.documentElement.lang = targetLang;
+  document.documentElement.dir = ['ur', 'sd', 'ks'].includes(targetLang) ? 'rtl' : 'ltr';
+
+  if (targetLang === DEFAULT_LOCALE) {
     elements.forEach(el => {
-      const originalText = originalTextMap.get(el);
-      if (!originalText) return;
-      
-      if (el.hasAttribute('data-i18n-placeholder')) {
-        el.placeholder = originalText;
-      } else if (el.hasAttribute('data-i18n-html')) {
-        el.innerHTML = originalText;
-      } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-        el.placeholder = originalText;
-      } else {
-        el.textContent = originalText;
-      }
+      const originalText = getElementOriginalText(el);
+      if (originalText) setElementText(el, originalText);
     });
-    
-    document.body.style.opacity = '1';
-    document.documentElement.lang = lang;
-    document.documentElement.dir = 'ltr';
+    setTranslationLoading(false);
     return;
   }
 
-  // Pre-translate all unique texts in parallel
   const translationMap = new Map();
-  const textArray = Array.from(uniqueTexts);
-  
-  // Wait for all unique strings to be translated (using cache where possible)
-  const translationPromises = textArray.map(async text => {
-    const translated = await translateText(text, lang);
-    translationMap.set(text, translated);
-  });
-  
-  await Promise.all(translationPromises);
+  const missingTexts = [];
 
-  // Apply to UI
-  elements.forEach(el => {
-    const originalText = originalTextMap.get(el);
-    if (!originalText) return;
-    
-    const newText = translationMap.get(originalText) || originalText;
-    
-    if (el.hasAttribute('data-i18n-placeholder')) {
-      el.placeholder = newText;
-    } else if (el.hasAttribute('data-i18n-html')) {
-      el.innerHTML = newText;
-    } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-      el.placeholder = newText;
-    } else {
-      el.textContent = newText;
-    }
+  uniqueTexts.forEach(text => {
+    const cached = readCachedTranslation(targetLang, text);
+    if (cached !== null) translationMap.set(text, cached);
+    else missingTexts.push(text);
   });
 
-  // Restore UI loading state
-  document.body.style.opacity = '1';
-  
-  // Setup document meta
-  document.documentElement.lang = lang;
-  document.documentElement.dir = ['ur', 'sd', 'ks'].includes(lang) ? 'rtl' : 'ltr';
+  if (missingTexts.length > 0) setTranslationLoading(true);
+
+  try {
+    await Promise.all(missingTexts.map(async text => {
+      const translated = await translateText(text, targetLang);
+      translationMap.set(text, translated || text);
+    }));
+
+    if (runId !== activeTranslationRun) return;
+
+    elements.forEach(el => {
+      const originalText = getElementOriginalText(el);
+      if (!originalText) return;
+      setElementText(el, translationMap.get(originalText) || originalText);
+    });
+  } finally {
+    if (runId === activeTranslationRun) setTranslationLoading(false);
+  }
 }
 
 /**
@@ -211,16 +250,19 @@ function getLangSelectHTML() {
 }
 
 async function changeLanguage(lang) {
+  const targetLang = getRequestedLanguage(lang);
+
   // Save selected language
-  localStorage.setItem('lang', lang);
+  localStorage.setItem('lang', targetLang);
+  if (typeof window.onLanguageChange === 'function') window.onLanguageChange(targetLang);
   
   // Update dropdowns if multiple exist
   document.querySelectorAll('.lang-select').forEach(select => {
-    select.value = lang;
+    select.value = targetLang;
   });
   
   // Apply translation
-  await applyTranslations(lang);
+  await applyTranslations(targetLang);
 }
 
 function initI18n() {
