@@ -58,12 +58,16 @@ const pendingTranslationRequests = new Map();
 let activeTranslationRun = 0;
 
 function getTranslationCacheKey(lang, text) {
-  return `${lang}_${text}`;
+  return `${lang}_${cleanTranslationText(text)}`;
 }
 
 function readCachedTranslation(lang, text) {
   const cacheKey = getTranslationCacheKey(lang, text);
-  if (memoryTranslationCache.has(cacheKey)) return memoryTranslationCache.get(cacheKey);
+  if (memoryTranslationCache.has(cacheKey)) {
+    const cleaned = cleanTranslationText(memoryTranslationCache.get(cacheKey));
+    memoryTranslationCache.set(cacheKey, cleaned);
+    return cleaned;
+  }
 
   try {
     const cached = localStorage.getItem(cacheKey);
@@ -98,33 +102,38 @@ function getRequestedLanguage(lang) {
 
 function getElementOriginalText(el) {
   let originalText = originalTextMap.get(el);
-  if (originalText) return originalText;
+  if (originalText) {
+    const cleaned = cleanTranslationText(originalText);
+    if (cleaned !== originalText) originalTextMap.set(el, cleaned);
+    return cleaned;
+  }
 
   if (el.hasAttribute('data-i18n-placeholder')) {
     originalText = el.placeholder;
-  } else if (el.hasAttribute('data-i18n-html')) {
-    originalText = el.innerHTML.trim();
   } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
     originalText = el.placeholder;
   } else {
-    originalText = el.textContent.trim();
+    const text = el.innerText || el.textContent || '';
+    originalText = text.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
+  originalText = cleanTranslationText(originalText);
   if (originalText) originalTextMap.set(el, originalText);
   return originalText || '';
 }
 
 function cleanTranslationText(value) {
   return String(value ?? '')
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
-    .replace(/\\n/g, '\n')
-    .replace(/\\r/g, '\n')
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/\r\n/g, ' ')
+    .replace(/\r/g, ' ')
+    .replace(/\n/g, ' ')
+    .replace(/\\n/g, ' ')
+    .replace(/\\r/g, ' ')
     .replace(/\\t/g, ' ')
     .replace(/\\"/g, '"')
     .replace(/\\'/g, "'")
-    .replace(/[ \t]+\n/g, '\n')
-    .replace(/\n[ \t]+/g, '\n')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
@@ -140,13 +149,13 @@ function setElementText(el, value) {
   const cleaned = cleanTranslationText(value);
 
   if (el.hasAttribute('data-i18n-placeholder')) {
-    el.placeholder = cleaned.replace(/\n+/g, ' ');
+    el.placeholder = cleaned;
   } else if (el.hasAttribute('data-i18n-html')) {
-    el.innerHTML = cleaned.replace(/\n/g, '<br>');
+    el.innerHTML = escapeI18nHTML(cleaned);
   } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-    el.placeholder = cleaned.replace(/\n+/g, ' ');
+    el.placeholder = cleaned;
   } else {
-    el.innerHTML = escapeI18nHTML(cleaned).replace(/\n/g, '<br>');
+    el.textContent = cleaned;
   }
 }
 
@@ -164,8 +173,8 @@ function setTranslationLoading(isLoading) {
  */
 async function translateText(text, lang) {
   const targetLang = getRequestedLanguage(lang);
-  const sourceText = String(text || '').trim();
-  if (!sourceText || targetLang === DEFAULT_LOCALE) return text;
+  const sourceText = cleanTranslationText(text);
+  if (!sourceText || targetLang === DEFAULT_LOCALE) return sourceText;
 
   const cached = readCachedTranslation(targetLang, sourceText);
   if (cached !== null) return cached;
