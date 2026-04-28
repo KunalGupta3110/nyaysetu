@@ -49,10 +49,194 @@ window.LANGUAGE_NAMES = {
 
 const DEFAULT_LOCALE = 'en';
 const TRANSLATION_API_URL = 'https://translate.googleapis.com/translate_a/single';
+const BASE_TEXT = {
+  page_title: 'NyaySetu - AI-Powered Legal Access for India',
+  home_page_title: 'NyaySetu - AI-Powered Legal Access for India',
+  chat_page_title: 'AI Chat - NyaySetu',
+  docs_page_title: 'Document Generator - NyaySetu',
+  simplify_page_title: 'Law Simplifier - NyaySetu',
+  students_page_title: 'Student Ecosystem - NyaySetu',
+  auth_page_title: 'Sign In - NyaySetu',
+  dash_page_title: 'Dashboard - NyaySetu',
+  nav_home: 'Home',
+  nav_chat: 'AI Chat',
+  nav_docs: 'Documents',
+  nav_simplify: 'Simplifier',
+  nav_students: 'Students',
+  nav_dashboard: 'Dashboard',
+  nav_ask: 'Ask a Question',
+  hero_badge: 'AI-Powered - Legal Access - India',
+  hero_title: 'Justice should not depend on who you know.',
+  hero_sub: 'NyaySetu bridges the gap between people and the law. Ask legal questions in plain language - English, Hindi, Urdu, or any Indian language - powered by AI, reviewed by law students and professionals.',
+  hero_start: 'Start for Free ->',
+  hero_how: 'How It Works',
+  hero_note: 'No signup required - Hindi, Urdu and more Indian languages - 12,400+ queries resolved',
+  metric_queries: 'Legal queries resolved',
+  metric_students: 'Law students onboarded',
+  metric_docs: 'Documents generated',
+  metric_satisfaction: 'User satisfaction',
+  process_title: 'Process',
+  process_header: 'A system built for clarity',
+  process_sub: 'Every query passes through AI analysis and human review - fast and reliable.',
+  process_step1_title: 'You Ask',
+  process_step1_desc: 'Submit your legal question in English, Hindi, Urdu, or any Indian language. No legal knowledge needed.',
+  process_step2_title: 'AI Analyses',
+  process_step2_desc: 'Legal AI identifies applicable laws, IPC sections, and precedents instantly.',
+  process_step3_title: 'Student Reviews',
+  process_step3_desc: 'A verified law student reviews the output and adds professional context.',
+  process_step4_title: 'Lawyer Escalates',
+  process_step4_desc: 'Complex cases routed to licensed advocates - faster and affordable.',
+  tag_citizen: 'Citizen',
+  tag_ai: 'NyaySetu AI',
+  tag_law_student: 'Law Student',
+  tag_advocate: 'Advocate',
+  features_title: 'Capabilities',
+  features_sub: 'Every legal need, covered',
+  feat_ai_title: 'AI Legal Assistant',
+  feat_ai_desc: 'Ask anything in plain language - FIR procedures, property disputes, consumer rights. AI identifies applicable laws in seconds.',
+  feat_ai_action: 'Open Chat',
+  feat_docs_title: 'Document Generator',
+  feat_docs_desc: 'Generate legally accurate documents in minutes - legal notices, affidavits, rent agreements, consumer complaints, RTI applications.',
+  feat_docs_action: 'Generate Now',
+  feat_simplify_title: 'Law Simplifier',
+  feat_simplify_desc: 'Paste any legal text - court order, notice, contract, government circular - get a plain language breakdown with actionable steps.',
+  feat_simplify_action: 'Try Simplifier',
+  feat_students_title: 'Student Ecosystem',
+  feat_students_desc: "Law students earn credits reviewing queries, build real portfolios, and get ranked on India's legal AI professional leaderboard.",
+  feat_students_action: 'Join as Student',
+  advantage_label: 'Advantage',
+  advantage_title: 'Why NyaySetu exists',
+  advantage_sub: 'Traditional legal help is slow, expensive, and inaccessible. We built NyaySetu to change all three.',
+  why_fast_title: 'Fast - minutes, not weeks',
+  why_fast_desc: 'Traditional legal consultation can take days to begin. NyaySetu provides an intelligent first response in under 30 seconds, with a reviewed answer within hours.',
+  why_fast_metric: '< 30 second initial response',
+  why_affordable_title: 'Affordable - not Rs.5,000/hour',
+  why_affordable_desc: 'Legal help in India is prohibitively expensive. NyaySetu is free to start - and premium plans cost less than a single traditional consultation.',
+  why_affordable_metric: 'Fraction of traditional cost',
+  why_access_title: 'Accessible - anywhere, anyone',
+  why_access_desc: "Whether you're in Delhi or a small town in Bihar - if you have a phone, you have access to legal guidance. No office visits, no appointments.",
+  why_access_metric: 'Any device, any location',
+  cta_title: 'Get Started Today',
+  cta_header: 'Your rights matter. Know them.',
+  cta_sub: 'Ask your first legal question for free. No signup required to begin.',
+  cta_button: 'Start for Free ->',
+  cta_note: 'No credit card required - Hindi and English - 12,400+ queries resolved',
+  footer_privacy: 'Privacy Policy',
+  footer_terms: 'Terms of Use',
+  footer_disclaimer: 'Legal Disclaimer',
+  footer_contact: 'Contact Us',
+  footer_copy: '(c) 2025 NyaySetu - Not a substitute for legal advice',
+  chat_welcome_heading: 'How can NyaySetu help?',
+  chat_welcome_sub: 'Ask any legal question in English, Hindi, Urdu, or any Indian language. Our AI will analyse your situation, identify relevant laws, and provide actionable guidance.',
+  chat_placeholder: 'Ask your legal question here...',
+  chat_new: 'New Chat',
+  chat_doc_link: 'Generate Document',
+  chat_simplify_link: 'Simplify a Law',
+  chat_disclaimer: 'NyaySetu provides legal guidance, not professional legal advice. For serious matters, consult a qualified advocate.',
+  chat_name: 'NyaySetu Legal AI',
+  chat_online: 'Online - Reviewed by law professionals',
+  chat_hint: 'Enter to send - Shift+Enter for new line',
+  sidebar_topics: 'Topics',
+  docs_title: 'Document Generator',
+  docs_header: 'Generate legal documents in minutes',
+  docs_sub: 'AI-powered, legally accurate templates for every common Indian legal need. Fill in your details - ready to use in under 60 seconds.',
+  docs_gen_button: 'Generate Document',
+  docs_preview_title: 'Document Preview',
+  docs_preview_placeholder: 'Fill in the form on the left and click <strong style="color:var(--accent)">"Generate Document"</strong>',
+  docs_copy: 'Copy',
+  docs_download: 'Download PDF',
+  simplifier_title: 'Law Simplifier',
+  simplifier_header: 'Understand any legal text instantly',
+  simplifier_sub: 'Paste a court order, legal notice, contract clause, IPC section, or government circular - get a plain-language breakdown with actionable steps in seconds.',
+  simplifier_try_sample: 'Try a sample:',
+  simplify_input_label: 'Legal Text Input',
+  simplify_input_badge: 'Paste Here',
+  simplify_clear: 'Clear',
+  simplify_button: 'Simplify ->',
+  simplify_output_label: 'Plain English',
+  simplify_output_badge: 'Simplified',
+  simplifier_output_placeholder: 'Your plain-language explanation will appear here',
+  students_title: 'Student Ecosystem',
+  students_header: 'Learn by doing. Earn while practicing.',
+  students_sub: "Review real legal queries, build a professional portfolio, and get ranked on India's premier legal AI platform.",
+  students_tab_dashboard: 'Dashboard',
+  students_tab_review: 'Review Queue',
+  students_tab_leaderboard: 'Leaderboard',
+  students_tab_signup: 'Join as Student',
+  auth_brand_title: 'Your legal rights, one login away.',
+  auth_brand_sub: 'Access AI-powered legal guidance, generate documents, and get answers reviewed by law professionals.',
+  auth_feature_chat: 'AI legal chat with real law references',
+  auth_feature_docs: 'Generate legal documents in minutes',
+  auth_feature_simplify: 'Simplify any legal text instantly',
+  auth_feature_private: 'Your data is private and secure',
+  auth_terms: 'By signing in, you agree to our Terms of Service. NyaySetu is not a law firm. AI guidance is not legal advice.',
+  auth_google: 'Continue with Google',
+  auth_email_continue: 'or continue with email',
+  auth_tab_signin: 'Sign In',
+  auth_tab_signup: 'Create Account',
+  auth_signin_title: 'Welcome back',
+  auth_signin_sub: 'Sign in to your NyaySetu account.',
+  auth_email_label: 'Email Address',
+  auth_email_placeholder: 'Enter your email',
+  auth_password_label: 'Password',
+  auth_password_placeholder: 'Enter your password',
+  auth_forgot_password: 'Forgot password?',
+  auth_signin_button: 'Sign In ->',
+  auth_no_account: 'Don\'t have an account? <a href="#" onclick="switchTab(\'signup\')">Create one free</a>',
+  auth_signup_title: 'Create your account',
+  auth_signup_sub: 'Free forever. No credit card required.',
+  auth_role_label: 'I am a',
+  auth_role_citizen: 'Citizen',
+  auth_role_citizen_desc: 'Seeking legal help',
+  auth_role_student: 'Law Student',
+  auth_role_student_desc: 'Want to review and earn',
+  auth_fullname_placeholder: 'Your full name',
+  auth_city_placeholder: 'Your city',
+  auth_password_hint: 'Create a password',
+  auth_college_placeholder: 'Your law college',
+  auth_area_label: 'Area of Interest',
+  auth_select_area: 'Select area',
+  auth_area_criminal: 'Criminal Law',
+  auth_area_civil: 'Civil / Property Law',
+  auth_area_family: 'Family Law',
+  auth_area_consumer: 'Consumer Law',
+  auth_area_constitutional: 'Constitutional Law',
+  auth_area_all: 'All Areas',
+  auth_create_button: 'Create Account ->',
+  auth_already_account: 'Already have an account? <a href="#" onclick="switchTab(\'signin\')">Sign in</a>',
+  auth_reset_title: 'Reset password',
+  auth_reset_sub: 'Enter your email and we will send a reset link.',
+  auth_send_reset: 'Send Reset Link',
+  auth_back_to_signin: 'Back to sign in',
+  dash_menu_profile: 'Profile Settings',
+  dash_menu_docs: 'My Documents',
+  dash_menu_students: 'Student Dashboard',
+  dash_menu_signout: 'Sign Out',
+  dash_no_chats_title: 'No conversations yet',
+  dash_no_chats_sub: 'Your AI chat history will appear here',
+  dash_start_chatting: 'Start Chatting ->',
+  dash_no_docs_title: 'No documents yet',
+  dash_no_docs_sub: 'Generate your first legal document',
+  dash_generate_doc: 'Generate Document ->',
+  dash_snav_main: 'Main',
+  dash_snav_overview: 'Overview',
+  dash_snav_chats: 'Chat History',
+  dash_snav_docs: 'My Documents',
+  dash_snav_simplify: 'Simplify History',
+  dash_snav_account: 'Account',
+  dash_snav_profile: 'Profile',
+  dash_snav_signout: 'Sign Out',
+  dash_welcome_title: 'Good day, <span id="wb-name">there</span>',
+  dash_welcome_sub: 'Here is a summary of your NyaySetu activity.',
+  dash_btn_ask: 'Ask a Legal Question',
+  dash_btn_generate: 'Generate Document',
+  dash_stat_chats: 'Chat Sessions',
+  dash_stat_docs: 'Documents Saved',
+  dash_stat_simplified: 'Laws Simplified',
+  dash_stat_resolution: 'Query Resolution',
+  dash_recent_convos: 'Recent Conversations'
+};
 
-// Store original English text for elements so we can fall back easily
-// and avoid re-translating translated text on subsequent language changes.
-const originalTextMap = new WeakMap();
 const memoryTranslationCache = new Map();
 const pendingTranslationRequests = new Map();
 let activeTranslationRun = 0;
@@ -100,26 +284,24 @@ function getRequestedLanguage(lang) {
   return typeof lang === 'string' && LANGUAGE_NAMES[lang] ? lang : getSavedLanguage();
 }
 
+function getElementI18nKey(el) {
+  return el.getAttribute('data-i18n-placeholder') ||
+    el.getAttribute('data-i18n-html') ||
+    el.getAttribute('data-i18n') ||
+    '';
+}
+
 function getElementOriginalText(el) {
-  let originalText = originalTextMap.get(el);
-  if (originalText) {
-    const cleaned = cleanTranslationText(originalText);
-    if (cleaned !== originalText) originalTextMap.set(el, cleaned);
-    return cleaned;
+  const key = getElementI18nKey(el);
+  if (!key) return '';
+
+  const originalText = BASE_TEXT[key];
+  if (originalText === undefined) {
+    console.warn(`Missing BASE_TEXT entry for i18n key "${key}"`);
+    return cleanTranslationText(key);
   }
 
-  if (el.hasAttribute('data-i18n-placeholder')) {
-    originalText = el.placeholder;
-  } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-    originalText = el.placeholder;
-  } else {
-    const text = el.innerText || el.textContent || '';
-    originalText = text.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-  }
-
-  originalText = cleanTranslationText(originalText);
-  if (originalText) originalTextMap.set(el, originalText);
-  return originalText || '';
+  return cleanTranslationText(originalText);
 }
 
 function cleanTranslationText(value) {
@@ -151,7 +333,7 @@ function setElementText(el, value) {
   if (el.hasAttribute('data-i18n-placeholder')) {
     el.placeholder = cleaned;
   } else if (el.hasAttribute('data-i18n-html')) {
-    el.innerHTML = escapeI18nHTML(cleaned);
+    el.innerHTML = cleaned;
   } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
     el.placeholder = cleaned;
   } else {
