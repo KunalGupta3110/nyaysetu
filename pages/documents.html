@@ -601,7 +601,7 @@ async function generateDocument() {
 
 <script>
 function downloadPDF() {
-  if (!generatedText) {
+  if (!currentDocumentData || !currentDocumentData.blocks) {
     showToast('No document to download. Generate one first.', '⚠');
     return;
   }
@@ -618,74 +618,67 @@ function downloadPDF() {
   const pageHeight = doc.internal.pageSize.getHeight();
   const contentWidth = pageWidth - margin.left - margin.right;
   const usableBottom = pageHeight - margin.bottom;
-  const lineHeight = 6.8;
-  const paragraphGap = 3.4;
 
   let y = margin.top;
-  const text = generatedText;
-  const paragraphs = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
-  const title = text.split('\n')[0].trim();
+  const blocks = currentDocumentData.blocks;
 
-  doc.setFont('Times', 'normal');
-  doc.setFontSize(12);
-  doc.setTextColor(20, 20, 20);
-
-  function addPageIfNeeded(requiredHeight = lineHeight) {
-    if (y + requiredHeight <= usableBottom) return;
-    doc.addPage();
-    y = margin.top;
-    doc.setFont('Times', 'normal');
-    doc.setFontSize(12);
-    doc.setTextColor(20, 20, 20);
+  function addPageIfNeeded(requiredHeight) {
+    if (y + requiredHeight > usableBottom) {
+      doc.addPage();
+      y = margin.top;
+    }
   }
 
-  function addTitle(line) {
-    addPageIfNeeded(10);
-    doc.setFont('Times', 'bold');
-    doc.setFontSize(15);
-    doc.text(line, pageWidth / 2, y, { align: 'center' });
-    y += 10;
-    doc.setFont('Times', 'normal');
-    doc.setFontSize(12);
-  }
+  blocks.forEach(block => {
+    let fontSize = 11;
+    let fontStyle = 'normal';
+    let lineHeight = 5.5;
+    let align = 'left';
 
-  function addParagraph(paragraph) {
-    const isTitle = title && paragraph.toUpperCase() === title.toUpperCase();
-    const isHeading = !isTitle && paragraph.length <= 90 && (
-      /^[A-Z][A-Z\s(),./0-9-]+$/.test(paragraph) ||
-      /^(Subject|Date|To,|Complainant|Opposite Party|VERIFICATION|DEPONENT|IN WITNESS WHEREOF)/i.test(paragraph)
-    );
-
-    if (isTitle) {
-      addTitle(paragraph);
-      return;
+    if (block.type === 'title') {
+      fontSize = 16;
+      fontStyle = 'bold';
+      align = 'center';
+      lineHeight = 8;
+    } else if (block.type === 'heading') {
+      fontSize = 12;
+      fontStyle = 'bold';
+      lineHeight = 6.5;
+    } else if (block.type === 'signature') {
+      fontSize = 11;
+      fontStyle = 'normal';
     }
 
-    doc.setFont('Times', isHeading ? 'bold' : 'normal');
-    doc.setFontSize(isHeading ? 12 : 12);
+    doc.setFont('Times', fontStyle);
+    doc.setFontSize(fontSize);
 
     const lines = [];
-    paragraph.split('\n').forEach(line => {
-      const wrapped = doc.splitTextToSize(line.trim() || ' ', contentWidth);
+    block.text.split('\n').forEach(line => {
+      const wrapped = doc.splitTextToSize(line, contentWidth);
       lines.push(...wrapped);
     });
 
-    lines.forEach((line, index) => {
+    if (block.type === 'title') y += 4;
+    else if (block.type === 'heading') y += 6;
+    else if (block.type === 'signature') y += 12;
+    else y += 2;
+
+    lines.forEach(line => {
       addPageIfNeeded(lineHeight);
-      const isLastLine = index === lines.length - 1;
-      if (!isHeading && !isLastLine && line.trim().includes(' ')) {
-        drawJustifiedLine(doc, line, margin.left, y, contentWidth);
-      } else {
-        doc.text(line, margin.left, y);
+      
+      let x = margin.left;
+      if (align === 'center') {
+        x = pageWidth / 2;
       }
+      
+      doc.text(line, x, y, { align: align });
       y += lineHeight;
     });
 
-    y += paragraphGap;
-    doc.setFont('Times', 'normal');
-  }
-
-  paragraphs.forEach(addParagraph);
+    if (block.type === 'title') y += 6;
+    else if (block.type === 'heading') y += 2;
+    else y += 2;
+  });
 
   const pageCount = doc.internal.getNumberOfPages();
   for (let page = 1; page <= pageCount; page += 1) {
@@ -699,23 +692,6 @@ function downloadPDF() {
 
   const prefix = selectedType.replace('-', '_');
   doc.save(`${prefix}_${Date.now()}.pdf`);
-}
-
-function drawJustifiedLine(doc, line, x, y, width) {
-  const words = line.trim().split(/\s+/);
-  if (words.length <= 1) {
-    doc.text(line, x, y);
-    return;
-  }
-
-  const wordsWidth = words.reduce((total, word) => total + doc.getTextWidth(word), 0);
-  const gap = Math.max((width - wordsWidth) / (words.length - 1), 1.2);
-  let cursorX = x;
-
-  words.forEach((word, index) => {
-    doc.text(word, cursorX, y);
-    cursorX += doc.getTextWidth(word) + (index < words.length - 1 ? gap : 0);
-  });
 }
 </script>
 </body>
