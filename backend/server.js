@@ -161,29 +161,72 @@ app.post("/chat", async (req, res) => {
 
 
 app.post("/generate-doc", async (req, res) => {
-  const { formData, type } = req.body;
+  const { formData = "", type = "legal-notice", mode = "body-only", fields = {}, documentTitle = "", date = "" } = req.body || {};
 
-  let systemPrompt = "";
+  const docProfiles = {
+    "legal-notice": {
+      label: "legal notice",
+      instructions: "Draft numbered body paragraphs covering facts, cause of action, statutory/legal basis where appropriate, demand, time for compliance, and consequences of non-compliance."
+    },
+    affidavit: {
+      label: "affidavit",
+      instructions: "Draft only the numbered statements of fact. Do not draft the title, deponent introduction, verification, notary block, or signature block."
+    },
+    "rent-agreement": {
+      label: "rent agreement",
+      instructions: "Draft only the operative clauses: term, rent, security deposit, utilities, maintenance, use, inspection, subletting, termination, handover, damages, dispute resolution, and jurisdiction."
+    },
+    "consumer-complaint": {
+      label: "consumer complaint",
+      instructions: "Draft body paragraphs covering facts, deficiency in service/defect, cause of action, jurisdiction, limitation, evidence, and prayer for relief under the Consumer Protection Act, 2019."
+    },
+    rti: {
+      label: "RTI application",
+      instructions: "Draft only the request body, listing the information sought clearly and referencing Section 6(1) and transfer under Section 6(3) where relevant."
+    },
+    "bail-application": {
+      label: "bail application",
+      instructions: "Draft body paragraphs covering brief facts, custody status if provided, grounds for bail, undertakings, and prayer under the applicable criminal procedure provisions."
+    }
+  };
 
-  switch (type) {
-    case "affidavit":
-      systemPrompt = "Generate a formal affidavit under Indian law.";
-      break;
-    case "rent":
-      systemPrompt = "Generate a detailed rent agreement between landlord and tenant.";
-      break;
-    case "consumer":
-      systemPrompt = "Generate a consumer complaint.";
-      break;
-    case "rti":
-      systemPrompt = "Generate an RTI application.";
-      break;
-    case "bail":
-      systemPrompt = "Generate a bail application.";
-      break;
-    default:
-      systemPrompt = "Generate a legal notice.";
-  }
+  const typeAliases = {
+    rent: "rent-agreement",
+    consumer: "consumer-complaint",
+    bail: "bail-application",
+    legal_notice: "legal-notice",
+    rent_agreement: "rent-agreement",
+    consumer_complaint: "consumer-complaint",
+    bail_application: "bail-application"
+  };
+
+  const normalizedType = typeAliases[String(type).toLowerCase()] || String(type).toLowerCase();
+  const profile = docProfiles[normalizedType] || docProfiles["legal-notice"];
+  const fieldsText = String(formData || "").trim() || Object.entries(fields || {})
+    .filter(([, value]) => String(value || "").trim())
+    .map(([key, value]) => `${key}: ${value}`)
+    .join("\n");
+
+  const bodyOnly = mode === "body-only";
+  const systemPrompt = `
+You are a professional Indian legal document drafter.
+
+Task: Draft a ${profile.label}.
+
+STRICT RULES:
+- Do not mention NyaySetu, any website, any logo, or that a platform generated this document.
+- No markdown, asterisks, hash headings, tables, or decorative separators.
+- Use clean formal legal paragraphs with readable spacing.
+- Use only details supplied by the user. Do not write undefined, null, [not provided], or placeholder values.
+- If an optional detail is missing, omit that clause or phrase naturally.
+- Keep the tone professional, realistic, and suitable for review by an advocate or court filing clerk.
+${bodyOnly ? "- Return ONLY the body clauses/paragraphs. Do not include title, date, party/address block, subject line, salutation, footer, disclaimer, or signature block." : "- Return the complete document in plain text with title, date, party blocks, subject, body, and signature block."}
+
+Document-specific instructions:
+${profile.instructions}
+
+Output only the final document text.
+`;
 
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -197,24 +240,15 @@ app.post("/generate-doc", async (req, res) => {
         messages: [
           {
             role: "system",
-            content: `
-You are a professional Indian legal document writer.
-
-${systemPrompt}
-
-STRICT RULES:
-- No markdown
-- No repetition
-- Use clean paragraphs
-- Proper headings
-- Formal legal tone
-
-Output only final document.
-`
+            content: systemPrompt
           },
           {
             role: "user",
-            content: formData
+            content: `Document title: ${documentTitle || profile.label}
+Date: ${date || new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+
+User-provided details:
+${fieldsText}`
           }
         ]
       })
@@ -222,8 +256,15 @@ Output only final document.
 
     const data = await response.json();
 
+    const documentText = String(data.choices?.[0]?.message?.content || "No response")
+      .replace(/\r\n?/g, "\n")
+      .split("\n")
+      .filter(line => !/\b(NyaySetu|nyaysetu\.in|AI Legal Assistant|Generated by)\b/i.test(line))
+      .join("\n")
+      .trim();
+
     res.json({
-      document: data.choices?.[0]?.message?.content || "No response"
+      document: documentText || "No response"
     });
 
   } catch (err) {

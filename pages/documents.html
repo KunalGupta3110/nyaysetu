@@ -51,7 +51,19 @@
   line-height: 1.85; white-space: pre-wrap; word-break: break-word;
   color: var(--ts); max-height: 560px;
 }
-.preview-body.ready { color: var(--tp); }
+.preview-body.ready {
+  color: var(--tp);
+  background: #fff;
+  color: #111;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  text-align: justify;
+  padding: 28px;
+}
 .preview-placeholder {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   height: 280px; color: var(--tm); gap: 12px; font-size: 13px; text-align: center;
@@ -297,6 +309,146 @@ const DOCS = {
 
 let selectedType = 'legal-notice';
 let generatedText = '';
+let currentDocumentData = null;
+
+const DOCUMENT_OUTPUTS = {
+  'legal-notice': {
+    title: 'LEGAL NOTICE',
+    filePrefix: 'Legal_Notice',
+    subject: data => value(data, 'subject', 'Legal Notice'),
+    header: data => ['To,', value(data, 'recipient_name'), multilineValue(data, 'recipient_addr')],
+    signature: data => ['Sincerely,', '', 'Signature: __________________________', value(data, 'sender_name'), multilineValue(data, 'sender_addr')],
+    fallbackBody: data => [
+      `Under instructions from ${value(data, 'sender_name', 'the sender')}, resident of ${singleLineValue(data, 'sender_addr', 'the address stated above')}, this legal notice is issued to you as follows:`,
+      `1. That the facts giving rise to this notice are: ${value(data, 'facts')}.`,
+      value(data, 'amount') ? `2. That the amount/property involved is ${value(data, 'amount')}.` : '',
+      `3. You are hereby called upon to ${value(data, 'demand')}${value(data, 'time_limit') ? ` within ${value(data, 'time_limit')}` : ''}.`,
+      '4. If you fail to comply within the stated time, the sender shall be constrained to initiate appropriate legal proceedings before the competent court or authority, entirely at your risk as to cost and consequences.'
+    ]
+  },
+  'affidavit': {
+    title: 'AFFIDAVIT',
+    filePrefix: 'Affidavit',
+    subject: data => value(data, 'purpose', 'Affidavit'),
+    header: data => [`I, ${value(data, 'deponent_name')}, aged about ${value(data, 'deponent_age')}, residing at ${singleLineValue(data, 'deponent_addr')}, do hereby solemnly affirm and state as under:`],
+    signature: data => [
+      'VERIFICATION',
+      '',
+      `Verified at ${value(data, 'state', '__________')} on ${data.date} that the contents of this affidavit are true and correct to the best of my knowledge and belief, and nothing material has been concealed therefrom.`,
+      '',
+      'DEPONENT',
+      '',
+      'Signature: __________________________',
+      value(data, 'deponent_name')
+    ],
+    fallbackBody: data => numberLines(value(data, 'statement')).join('\n')
+  },
+  'rent-agreement': {
+    title: 'RENT AGREEMENT',
+    filePrefix: 'Rent_Agreement',
+    subject: data => `Lease of ${singleLineValue(data, 'property_addr', 'the rented premises')}`,
+    header: data => [
+      `This Rent Agreement is made on ${data.date} between:`,
+      '',
+      `1. ${value(data, 'landlord_name')}, residing at ${singleLineValue(data, 'landlord_addr')}, hereinafter called the "Landlord";`,
+      '',
+      'AND',
+      '',
+      `2. ${value(data, 'tenant_name')}, residing at ${singleLineValue(data, 'tenant_addr')}, hereinafter called the "Tenant".`,
+      '',
+      `The premises covered by this Agreement are situated at ${singleLineValue(data, 'property_addr')}.`
+    ],
+    signature: data => [
+      'IN WITNESS WHEREOF, the parties have signed this Agreement on the date mentioned above.',
+      '',
+      'Landlord Signature: __________________________',
+      value(data, 'landlord_name'),
+      '',
+      'Tenant Signature: __________________________',
+      value(data, 'tenant_name'),
+      '',
+      'Witness 1: __________________________',
+      'Witness 2: __________________________'
+    ],
+    fallbackBody: data => [
+      `1. Term: The tenancy shall commence from ${value(data, 'start_date')} and shall continue for ${value(data, 'duration')}.`,
+      `2. Rent: The Tenant shall pay monthly rent of ${value(data, 'rent')} on or before the agreed date every month.`,
+      `3. Security Deposit: The Tenant has paid/refundably agrees to pay ${value(data, 'deposit')} as security deposit, subject to adjustment for lawful dues and damages beyond normal wear and tear.`,
+      value(data, 'lock_in') ? `4. Lock-in Period: The parties agree to a lock-in period of ${value(data, 'lock_in')}.` : '',
+      `5. Use: The premises shall be used only for ${value(data, 'purpose_use', 'lawful residential purposes')}.`,
+      '6. Maintenance and Utilities: The Tenant shall keep the premises in good condition and pay regular utility charges unless otherwise agreed in writing.',
+      '7. Sub-letting: The Tenant shall not sub-let, assign, or part with possession of the premises without the prior written consent of the Landlord.',
+      '8. Termination: Either party may terminate the tenancy by serving written notice as agreed between the parties.',
+      '9. Jurisdiction: Disputes shall be subject to the jurisdiction of the competent courts where the premises are situated.'
+    ]
+  },
+  'consumer-complaint': {
+    title: 'CONSUMER COMPLAINT',
+    filePrefix: 'Consumer_Complaint',
+    subject: data => `Complaint under the Consumer Protection Act, 2019 regarding ${value(data, 'product', 'deficiency in goods/services')}`,
+    header: data => [
+      'Before the District Consumer Disputes Redressal Commission having jurisdiction',
+      '',
+      'Complainant:',
+      value(data, 'complainant'),
+      multilineValue(data, 'complainant_addr'),
+      value(data, 'complainant_phone'),
+      '',
+      'Opposite Party:',
+      value(data, 'company'),
+      multilineValue(data, 'company_addr')
+    ],
+    signature: data => ['Complainant', '', 'Signature: __________________________', value(data, 'complainant')],
+    fallbackBody: data => [
+      `1. The Complainant purchased/availed ${value(data, 'product')} ${value(data, 'purchase_date') ? `on ${value(data, 'purchase_date')}` : ''} after paying ${value(data, 'amount_paid')}.`,
+      `2. The Opposite Party committed deficiency in service/defect in goods as follows: ${value(data, 'complaint')}.`,
+      '3. The conduct of the Opposite Party amounts to deficiency in service, unfair trade practice, and failure to honour consumer rights under the Consumer Protection Act, 2019.',
+      `4. The Complainant therefore seeks the following relief: ${value(data, 'relief')}.`,
+      '5. The Complainant prays that the Honorable Commission may allow this complaint with costs and pass such other orders as may be just and proper.'
+    ]
+  },
+  'rti': {
+    title: 'APPLICATION UNDER THE RIGHT TO INFORMATION ACT, 2005',
+    filePrefix: 'RTI_Application',
+    subject: () => 'Request for information under Section 6(1) of the Right to Information Act, 2005',
+    header: data => ['To,', value(data, 'pio_name', 'The Public Information Officer'), value(data, 'department'), multilineValue(data, 'department_addr')],
+    signature: data => ['Yours faithfully,', '', 'Signature: __________________________', value(data, 'applicant'), multilineValue(data, 'applicant_addr'), value(data, 'applicant_phone')],
+    fallbackBody: data => [
+      'Sir/Madam,',
+      '',
+      'Kindly provide the following information/documents under the Right to Information Act, 2005:',
+      '',
+      numberLines(value(data, 'info_sought')).join('\n'),
+      value(data, 'time_period') ? `\nThe information sought relates to the period: ${value(data, 'time_period')}.` : '',
+      value(data, 'fee_mode') ? `\nThe prescribed application fee is being paid through ${value(data, 'fee_mode')}.` : '',
+      '\nIf the requested information is held by another public authority, kindly transfer this application under Section 6(3) of the Act and intimate the applicant.'
+    ]
+  },
+  'bail-application': {
+    title: 'APPLICATION FOR BAIL',
+    filePrefix: 'Bail_Application',
+    subject: data => `${value(data, 'bail_type', 'Bail Application')} in ${value(data, 'fir_no', 'the case')}`,
+    header: data => [
+      `IN THE COURT OF ${value(data, 'court', 'THE COMPETENT COURT').toUpperCase()}`,
+      '',
+      'In the matter of:',
+      `${value(data, 'accused_name')}, aged about ${value(data, 'accused_age')}, resident of ${singleLineValue(data, 'accused_addr')}`,
+      '',
+      `FIR/Case No.: ${value(data, 'fir_no')}`,
+      `Police Station: ${value(data, 'police_station')}`,
+      `Sections: ${value(data, 'sections')}`,
+      value(data, 'custody_since') ? `In custody since: ${value(data, 'custody_since')}` : ''
+    ],
+    signature: data => ['Applicant/Accused', '', 'Signature: __________________________', value(data, 'accused_name'), '', value(data, 'surety') ? `Proposed surety: ${value(data, 'surety')}` : ''],
+    fallbackBody: data => [
+      `1. The Applicant seeks ${value(data, 'bail_type', 'bail')} in the above-mentioned matter.`,
+      `2. The Applicant is implicated in ${value(data, 'fir_no')} registered at ${value(data, 'police_station')} under ${value(data, 'sections')}.`,
+      `3. The grounds for bail are as follows: ${value(data, 'grounds')}.`,
+      '4. The Applicant undertakes to cooperate with the investigation/trial, appear before the court as directed, not tamper with evidence, and not influence any witness.',
+      '5. It is therefore prayed that this Honorable Court may kindly release the Applicant on bail on such terms and conditions as deemed fit.'
+    ]
+  }
+};
 
 function selectType(type) {
   document.querySelectorAll('.doc-type').forEach(d => d.classList.remove('on'));
@@ -314,106 +466,37 @@ function renderForm() {
   let html = '';
   cfg.fields.forEach(f => {
     html += `<div class="form-group">
-      <label class="form-label">${f.label}${f.req ? ' <span style="color:var(--accent)">*</span>' : ''}</label>`;
+      <label class="form-label">${escapeDocHtml(f.label)}${f.req ? ' <span style="color:var(--accent)">*</span>' : ''}</label>`;
     if (f.ta) {
-      html += `<textarea class="form-textarea" id="ff-${f.id}" placeholder="${f.ph}" rows="3"></textarea>`;
+      html += `<textarea class="form-textarea" id="ff-${f.id}" placeholder="${escapeDocAttr(f.ph)}" rows="3"></textarea>`;
     } else {
-      html += `<input class="form-input" id="ff-${f.id}" placeholder="${f.ph}" type="text">`;
+      html += `<input class="form-input" id="ff-${f.id}" placeholder="${escapeDocAttr(f.ph)}" type="text">`;
     }
     html += `</div>`;
   });
   document.getElementById('f-fields').innerHTML = html;
 }
 
+function escapeDocHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function escapeDocAttr(text) {
+  return escapeDocHtml(text).replace(/\n/g, '&#10;');
+}
+
 function resetPreview() {
   document.getElementById('preview-body').className = 'preview-body';
   document.getElementById('preview-body').innerHTML = `<div class="preview-placeholder"><span style="font-size:36px">📄</span><span data-i18n-html="docs_preview_placeholder">Fill in the form on the left<br>and click <strong style="color:var(--accent)">"Generate Document"</strong></span></div>`;
-  applyTranslations?.(currentStrings);
+  if (typeof applyTranslations === 'function') applyTranslations();
   document.getElementById('preview-actions').style.display = 'none';
   generatedText = '';
-}
-
-async function generate() {
-  const cfg = DOCS[selectedType];
-  const btn = document.getElementById('gen-btn');
-
-  // Collect fields
-  let fields = {};
-  let missingRequired = [];
-  cfg.fields.forEach(f => {
-    const el = document.getElementById('ff-' + f.id);
-    if (!el) return;
-    fields[f.label] = el.value.trim();
-    if (f.req && !el.value.trim()) missingRequired.push(f.label);
-  });
-
-  if (missingRequired.length > 2) {
-    showToast('Please fill in the required fields (*)', '⚠');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Generating…';
-
-  const pb = document.getElementById('preview-body');
-  pb.className = 'preview-body';
-  pb.innerHTML = `<div class="generating">
-    <div class="spinner"></div>
-    <div style="font-size:13px;color:var(--ts)">AI is drafting your document…</div>
-    <div class="gen-steps">
-      <div class="gen-step active" id="gs1">→ Analysing inputs</div>
-      <div class="gen-step" id="gs2">→ Applying relevant laws</div>
-      <div class="gen-step" id="gs3">→ Formatting document</div>
-    </div>
-  </div>`;
-
-  // Animate steps
-  setTimeout(() => { document.getElementById('gs1').className = 'gen-step done'; document.getElementById('gs2').className = 'gen-step active'; }, 600);
-  setTimeout(() => { document.getElementById('gs2').className = 'gen-step done'; document.getElementById('gs3').className = 'gen-step active'; }, 1400);
-
-  const fieldsText = Object.entries(fields)
-    .map(([k, v]) => `${k}: ${v || '[Not provided]'}`)
-    .join('\n');
-
-  const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-
-  const prompt = `Generate a formal, complete, court-ready ${cfg.type} using these details:
-
-${fieldsText}
-
-Date: ${today}
-
-Requirements:
-- Use proper Indian legal document formatting
-- Include all standard legal clauses and recitals appropriate for this document type
-- Cite specific relevant Indian laws, acts, and section numbers
-- For Legal Notices: Start with "WITHOUT PREJUDICE", include proper cause of action, consequence of non-compliance
-- For Affidavits: Include proper verification clause at end, deponent details
-- For Rent Agreements: Include all standard clauses — maintenance, notice period, sub-letting prohibition, etc.
-- For Consumer Complaints: Reference Consumer Protection Act 2019, include prayer for relief
-- For RTI: Reference RTI Act 2005, proper format with fee details
-- For Bail: Reference relevant CrPC sections, grounds clearly stated
-- Include proper signature block and date
-- Use capital letters for party names in formal sections
-- Output ONLY the document text — no explanations or commentary before or after`;
-
-  try {
-    const doc = await callClaude(
-      'You are a professional Indian legal document drafter with 20 years of experience. Generate complete, formal, accurate legal documents for Indian courts and authorities. Output ONLY the document text — no preamble, no explanation, no markdown formatting. Use plain text with proper spacing and legal formatting conventions.',
-      prompt
-    );
-
-    generatedText = doc;
-    pb.className = 'preview-body ready';
-    pb.textContent = doc;
-    document.getElementById('preview-actions').style.display = 'flex';
-    showToast('Document generated successfully', '✦');
-  } catch (err) {
-    pb.innerHTML = `<div class="generating" style="color:var(--red)"><span style="font-size:28px">⚠</span><span>Generation failed. Please try again.</span></div>`;
-  }
-
-  btn.disabled = false;
-  btn.textContent = '✦ Generate Document';
+  currentDocumentData = null;
 }
 
 function copyDoc() {
@@ -422,7 +505,8 @@ function copyDoc() {
 
 function downloadDoc() {
   if (!generatedText) return;
-  const name = `NyaySetu_${selectedType.replace('-','_')}_${Date.now()}.txt`;
+  const prefix = DOCUMENT_OUTPUTS[selectedType]?.filePrefix || 'Legal_Document';
+  const name = `${prefix}_${Date.now()}.txt`;
   downloadText(generatedText, name);
   showToast('Document downloaded', '⬇');
 }
@@ -432,114 +516,306 @@ renderForm();
 initScrollAnim();
 </script>
 <script>
+function collectDocumentData() {
+  const cfg = DOCS[selectedType];
+  const output = DOCUMENT_OUTPUTS[selectedType];
+  const fields = {};
+  const labelFields = {};
+  const missingRequired = [];
+
+  cfg.fields.forEach(f => {
+    const el = document.getElementById('ff-' + f.id);
+    if (!el) return;
+    const val = String(el.value || '').trim();
+    fields[f.id] = val;
+    labelFields[f.label] = val;
+    if (f.req && !val) missingRequired.push(f.label);
+  });
+
+  return {
+    cfg,
+    output,
+    fields,
+    labelFields,
+    missingRequired,
+    date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+  };
+}
+
+function serializeFields(data) {
+  return Object.entries(data.labelFields)
+    .filter(([, val]) => val)
+    .map(([label, val]) => `${label}: ${val}`)
+    .join('\n');
+}
+
 async function generateDocument() {
-  window.currentDocType = selectedType;
-  const inputs = document.querySelectorAll("input, textarea");
-  let formData = "";
+  const data = collectDocumentData();
+  const btn = document.getElementById('gen-btn');
 
-  inputs.forEach(input => {
-    if (input.value.trim() !== "") {
-      const label = input.previousElementSibling?.innerText || "Field";
-      formData += label + ": " + input.value + "\n";
-    }
+  if (data.missingRequired.length) {
+    const shown = data.missingRequired.slice(0, 2).join(', ');
+    const suffix = data.missingRequired.length > 2 ? '...' : '';
+    showToast(`Please fill required fields: ${shown}${suffix}`, '⚠');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  const pb = document.getElementById('preview-body');
+  pb.className = 'preview-body';
+  pb.innerHTML = `<div class="generating">
+    <div class="spinner"></div>
+    <div style="font-size:13px;color:var(--ts)">Drafting and formatting your document...</div>
+  </div>`;
+
+  try {
+    const bodyDraft = await requestDocumentBody(data);
+    generatedText = buildDocumentTemplate(data, bodyDraft);
+    currentDocumentData = data;
+    pb.className = 'preview-body ready';
+    pb.textContent = generatedText;
+    document.getElementById('preview-actions').style.display = 'flex';
+    showToast('Document generated successfully', '✦');
+  } catch (err) {
+    pb.innerHTML = `<div class="generating" style="color:var(--red)"><span style="font-size:28px">⚠</span><span>Generation failed. Please try again.</span></div>`;
+    showToast('Generation failed. Please try again.', '⚠');
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✦ Generate Document';
+}
+
+async function requestDocumentBody(data) {
+  const baseUrl = typeof API_BASE_URL === 'string' ? API_BASE_URL : 'https://nyaysetu-a5vj.onrender.com';
+  const res = await fetch(`${baseUrl}/generate-doc`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: selectedType,
+      mode: 'body-only',
+      documentTitle: data.output.title,
+      date: data.date,
+      fields: data.fields,
+      formData: serializeFields(data)
+    })
   });
 
-  document.getElementById("preview-body").innerText = "Generating document...";
+  if (!res.ok) throw new Error('Document server unavailable');
+  const payload = await res.json();
+  const draft = sanitizeDocumentText(payload.document || '');
+  if (!draft || /server error|no response/i.test(draft)) throw new Error(draft || 'Empty document');
+  return draft;
+}
 
-  const res = await fetch("https://nyaysetu-a5vj.onrender.com/generate-doc", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ formData })
-  });
+function buildDocumentTemplate(data, bodyDraft) {
+  const output = data.output;
+  const fallback = output.fallbackBody(data);
+  const fallbackBody = Array.isArray(fallback) ? fallback.filter(Boolean).join('\n\n') : String(fallback || '');
+  const body = stripGeneratedOuterSections(sanitizeDocumentText(bodyDraft), output.title) || fallbackBody;
+  const blocks = [
+    output.title,
+    `Date: ${data.date}`,
+    output.header(data).filter(Boolean).join('\n'),
+    `Subject: ${output.subject(data)}`,
+    body,
+    output.signature(data).filter(Boolean).join('\n')
+  ];
 
-  const data = await res.json();
+  return blocks
+    .map(block => String(block || '').trim())
+    .filter(Boolean)
+    .join('\n\n')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
 
-  document.getElementById("preview-body").innerText = data.document;
+function sanitizeDocumentText(text) {
+  return String(text || '')
+    .replace(/\r\n?/g, '\n')
+    .replace(/\*\*/g, '')
+    .replace(/^#{1,6}\s*/gm, '')
+    .replace(/---+/g, '')
+    .split('\n')
+    .map(line => line.trimEnd())
+    .filter(line => !/\b(NyaySetu|nyaysetu\.in|AI Legal Assistant|Generated by NyaySetu|Generated by)\b/i.test(line))
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
 
-  // ✅ SHOW BUTTONS
-  document.getElementById("preview-actions").style.display = "flex";
+function stripGeneratedOuterSections(text, title) {
+  const titlePattern = new RegExp(`^${escapeRegExp(title)}$`, 'i');
+  const boilerplate = [
+    titlePattern,
+    /^without prejudice$/i,
+    /^date\s*:/i,
+    /^to,?$/i,
+    /^subject\s*:/i,
+    /^sincerely,?$/i,
+    /^yours faithfully,?$/i,
+    /^signature\b/i,
+    /^authorized signature$/i
+  ];
+
+  return text
+    .split('\n')
+    .filter(line => !boilerplate.some(pattern => pattern.test(line.trim())))
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function value(data, id, fallback = '') {
+  const val = data?.fields?.[id];
+  return String(val || fallback || '').trim();
+}
+
+function multilineValue(data, id, fallback = '') {
+  return value(data, id, fallback)
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean)
+    .join('\n');
+}
+
+function singleLineValue(data, id, fallback = '') {
+  return multilineValue(data, id, fallback).replace(/\s*\n\s*/g, ', ');
+}
+
+function numberLines(text) {
+  const lines = String(text || '')
+    .split(/\n+/)
+    .map(line => line.replace(/^\s*\d+[\).:-]?\s*/, '').trim())
+    .filter(Boolean);
+  return (lines.length ? lines : ['__________']).map((line, index) => `${index + 1}. ${line}`);
+}
+
+function escapeRegExp(str) {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 function downloadPDF() {
+  if (!generatedText) {
+    showToast('No document to download. Generate one first.', '⚠');
+    return;
+  }
+
+  if (!window.jspdf) {
+    showToast('PDF library is still loading. Please try again.', '⚠');
+    return;
+  }
+
   const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const margin = { top: 24, right: 22, bottom: 22, left: 22 };
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const contentWidth = pageWidth - margin.left - margin.right;
+  const usableBottom = pageHeight - margin.bottom;
+  const lineHeight = 6.8;
+  const paragraphGap = 3.4;
 
-  const doc = new jsPDF({
-    unit: "mm",
-    format: "a4"
-  });
+  let y = margin.top;
+  const text = sanitizeDocumentText(generatedText);
+  const paragraphs = text.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+  const title = currentDocumentData?.output?.title || DOCUMENT_OUTPUTS[selectedType]?.title || '';
 
-  const margin = 20;
-  const maxWidth = 170;
-
-  let text = document.getElementById("preview-body").innerText;
-
-  // 🔥 CLEAN TEXT (BUT KEEP LINE BREAKS)
-  text = text.replace(/\*\*/g, "");
-  text = text.replace(/---/g, "");
-
-  // 🔥 SPLIT INTO PARAGRAPHS (IMPORTANT)
-  const paragraphs = text.split("\n");
-
-  let y = 50;
-
-  // 🔥 HEADER
-  doc.setFont("Times", "Bold");
-  doc.setFontSize(18);
-  doc.text("NyaySetu", margin, 20);
-
-  doc.setFont("Times", "Normal");
-  doc.setFontSize(10);
-  doc.text("AI Legal Assistant", margin, 25);
-
-  doc.line(margin, 30, 190, 30);
-
-  // 🔥 TITLE
-  doc.setFont("Times", "Bold");
-  doc.setFontSize(14);
-  doc.text("LEGAL NOTICE", 105, 40, { align: "center" });
-
-  // 🔥 BODY
-  doc.setFont("Times", "Normal");
+  doc.setFont('Times', 'normal');
   doc.setFontSize(12);
+  doc.setTextColor(20, 20, 20);
 
-  paragraphs.forEach(p => {
-    p = p.trim();
+  function addPageIfNeeded(requiredHeight = lineHeight) {
+    if (y + requiredHeight <= usableBottom) return;
+    doc.addPage();
+    y = margin.top;
+    doc.setFont('Times', 'normal');
+    doc.setFontSize(12);
+    doc.setTextColor(20, 20, 20);
+  }
 
-    if (!p) {
-      y += 6;
+  function addTitle(line) {
+    addPageIfNeeded(10);
+    doc.setFont('Times', 'bold');
+    doc.setFontSize(15);
+    doc.text(line, pageWidth / 2, y, { align: 'center' });
+    y += 10;
+    doc.setFont('Times', 'normal');
+    doc.setFontSize(12);
+  }
+
+  function addParagraph(paragraph) {
+    const isTitle = title && paragraph.toUpperCase() === title.toUpperCase();
+    const isHeading = !isTitle && paragraph.length <= 90 && (
+      /^[A-Z][A-Z\s(),./0-9-]+$/.test(paragraph) ||
+      /^(Subject|Date|To,|Complainant|Opposite Party|VERIFICATION|DEPONENT|IN WITNESS WHEREOF)/i.test(paragraph)
+    );
+
+    if (isTitle) {
+      addTitle(paragraph);
       return;
     }
 
-    if (y > 270) {
-      doc.addPage();
-      y = 20;
-    }
+    doc.setFont('Times', isHeading ? 'bold' : 'normal');
+    doc.setFontSize(isHeading ? 12 : 12);
 
-    const lines = doc.splitTextToSize(p, maxWidth);
-
-    doc.text(lines, margin, y, {
-      lineHeightFactor: 1.5
+    const lines = [];
+    paragraph.split('\n').forEach(line => {
+      const wrapped = doc.splitTextToSize(line.trim() || ' ', contentWidth);
+      lines.push(...wrapped);
     });
 
-    y += lines.length * 6 + 4; // spacing between paragraphs
+    lines.forEach((line, index) => {
+      addPageIfNeeded(lineHeight);
+      const isLastLine = index === lines.length - 1;
+      if (!isHeading && !isLastLine && line.trim().includes(' ')) {
+        drawJustifiedLine(doc, line, margin.left, y, contentWidth);
+      } else {
+        doc.text(line, margin.left, y);
+      }
+      y += lineHeight;
+    });
+
+    y += paragraphGap;
+    doc.setFont('Times', 'normal');
+  }
+
+  paragraphs.forEach(addParagraph);
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let page = 1; page <= pageCount; page += 1) {
+    doc.setPage(page);
+    doc.setFont('Times', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Page ${page} of ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+    doc.setTextColor(20, 20, 20);
+  }
+
+  const prefix = currentDocumentData?.output?.filePrefix || DOCUMENT_OUTPUTS[selectedType]?.filePrefix || 'Legal_Document';
+  doc.save(`${prefix}_${Date.now()}.pdf`);
+}
+
+function drawJustifiedLine(doc, line, x, y, width) {
+  const words = line.trim().split(/\s+/);
+  if (words.length <= 1) {
+    doc.text(line, x, y);
+    return;
+  }
+
+  const wordsWidth = words.reduce((total, word) => total + doc.getTextWidth(word), 0);
+  const gap = Math.max((width - wordsWidth) / (words.length - 1), 1.2);
+  let cursorX = x;
+
+  words.forEach((word, index) => {
+    doc.text(word, cursorX, y);
+    cursorX += doc.getTextWidth(word) + (index < words.length - 1 ? gap : 0);
   });
-
-  // 🔥 SIGNATURE
-  y += 10;
-  doc.text("__________________________", 130, y);
-  doc.text("Authorized Signature", 135, y + 6);
-
-  // 🔥 FOOTER
-  doc.setFontSize(9);
-  doc.setTextColor(120);
-  doc.text("Generated by NyaySetu", 105, 290, { align: "center" });
-
-  doc.save("NyaySetu_Legal_Document.pdf");
 }
 </script>
 </body>
