@@ -54,12 +54,12 @@ body { display: flex; flex-direction: column; }
 .chat-main { display: flex; flex-direction: column; overflow: hidden; }
 .chat-topbar {
   padding: 13px 24px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: center; position: relative;
   background: var(--bg1); flex-shrink: 0;
 }
-.chat-name { font-size: 14px; font-weight: 600; color: var(--tp); margin-bottom: 2px; }
-.chat-online { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--green); font-family: 'DM Mono', monospace; }
-.online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pdot 2s ease-in-out infinite; }
+.chat-name { font-size: 16px; font-weight: 600; color: var(--tp); margin-bottom: 0; }
+.chat-online { display: none; }
+.online-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pdot 2s ease-in-out infinite; margin-top: 1px; }
 
 .chat-messages { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
 .chat-messages::-webkit-scrollbar { width: 3px; }
@@ -71,25 +71,25 @@ body { display: flex; flex-direction: column; }
 }
 .welcome-ico  { font-size: 52px; margin-bottom: 6px; }
 .welcome-h    { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--tp); margin-bottom: 8px; letter-spacing: -.4px; }
-.welcome-sub  { font-size: 14px; color: var(--ts); max-width: 380px; line-height: 1.7; }
-.pill-grid    { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 520px; }
+.welcome-sub  { font-size: 15px; color: var(--ts); max-width: 380px; line-height: 1.6; }
+.pill-grid    { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 520px; }
 .pill {
-  padding: 9px 15px; border-radius: 9px; border: 1px solid var(--border);
-  background: var(--bg1); font-size: 12.5px; color: var(--ts); cursor: pointer;
-  transition: all var(--t) var(--ease); text-align: left; line-height: 1.4;
+  padding: 12px 18px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--bg1); font-size: 14px; color: var(--tp); cursor: pointer;
+  transition: all var(--t) var(--ease); text-align: center; font-weight: 500;
 }
-.pill:hover { border-color: rgba(201,169,110,.3); color: var(--tp); background: var(--adim); }
+.pill:hover { border-color: rgba(201,169,110,.4); background: var(--adim); }
 
 /* ── MESSAGES ── */
-.msg-row { display: flex; flex-direction: column; max-width: 78%; }
+.msg-row { display: flex; flex-direction: column; max-width: 80%; }
 .msg-row.u { align-self: flex-end; align-items: flex-end; }
 .msg-row.a { align-self: flex-start; align-items: flex-start; }
-.msg-from { font-size: 10.5px; color: var(--tm); font-family: 'DM Mono', monospace; margin-bottom: 5px; padding: 0 4px; }
+.msg-from { display: none; }
 .msg-bubble {
-  padding: 12px 16px; border-radius: 14px;
-  font-size: 13.5px; line-height: 1.65; color: var(--tp);
+  padding: 12px 16px; border-radius: 18px;
+  font-size: 15px; line-height: 1.5; color: var(--tp);
 }
-.msg-row.u .msg-bubble { background: var(--adim); border: 1px solid rgba(201,169,110,.15); border-bottom-right-radius: 4px; }
+.msg-row.u .msg-bubble { background: var(--accent); color: #0A0A0A; border: none; border-bottom-right-radius: 4px; }
 .msg-row.a .msg-bubble { background: var(--bg1); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
 .msg-bubble .mb8 { margin-bottom: 8px; }
 .msg-bubble .mb0 { margin-bottom: 0; }
@@ -99,20 +99,37 @@ body { display: flex; flex-direction: column; }
   border-radius: 4px; font-size: 11px; color: var(--accent);
   font-family: 'DM Mono', monospace; font-weight: 500; white-space: nowrap;
 }
-.msg-actions { display: flex; gap: 6px; margin-top: 8px; padding: 0 4px; flex-wrap: wrap; }
+.msg-actions { display: flex; gap: 6px; margin-top: 8px; padding: 0 4px; width: 100%; justify-content: space-between; align-items: center; }
 .msg-act {
-  padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border);
-  background: transparent; font-size: 11px; color: var(--ts);
-  transition: all var(--t) var(--ease);
+  padding: 6px 14px; border-radius: 20px; border: none;
+  background: var(--bg2); font-size: 13px; color: var(--tp); font-weight: 500;
+  transition: all var(--t) var(--ease); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
 }
-.msg-act:hover { border-color: var(--border2); color: var(--tp); background: var(--bg2); }
+.msg-act.primary { background: var(--accent); color: #0A0A0A; }
+.msg-act:hover { filter: brightness(1.1); }
+
+/* Dropdown */
+.msg-dropdown { position: relative; display: inline-block; }
+.msg-dropdown-content {
+  display: none; position: absolute; bottom: 100%; right: 0; 
+  background: var(--bg1); border: 1px solid var(--border); border-radius: 12px;
+  min-width: 140px; z-index: 10; padding: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  margin-bottom: 8px;
+}
+.msg-dropdown:hover .msg-dropdown-content { display: flex; flex-direction: column; }
+.msg-dropdown-item {
+  padding: 10px 14px; font-size: 13px; color: var(--tp); text-decoration: none;
+  border-radius: 8px; cursor: pointer; display: block; text-align: left;
+  background: transparent; border: none; width: 100%; transition: background 0.2s; font-weight: 500;
+}
+.msg-dropdown-item:hover { background: var(--bg2); }
 
 /* ── TYPING ── */
 .typing-wrap { align-self: flex-start; }
 .typing {
   display: flex; align-items: center; gap: 4px;
   padding: 13px 16px; background: var(--bg1); border: 1px solid var(--border);
-  border-radius: 14px; border-bottom-left-radius: 4px;
+  border-radius: 18px; border-bottom-left-radius: 4px;
 }
 .typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--ts); animation: bounce 1.3s ease-in-out infinite; }
 .typing span:nth-child(2) { animation-delay: .18s; }
@@ -120,48 +137,58 @@ body { display: flex; flex-direction: column; }
 @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px);} }
 
 /* ── INPUT ── */
-.chat-input-zone { padding: 16px 24px; border-top: 1px solid var(--border); background: var(--bg1); flex-shrink: 0; }
+.chat-input-zone { padding: 12px 24px; border-top: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
 .input-wrap {
-  display: flex; align-items: flex-end; gap: 10px;
-  background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px;
+  display: flex; align-items: flex-end; gap: 8px;
+  background: var(--bg1); border: 1px solid var(--border); border-radius: 24px; padding: 6px 10px;
   transition: border-color var(--t) var(--ease);
 }
 .input-wrap:focus-within { border-color: var(--border2); }
-.chat-ta { flex: 1; background: transparent; border: none; outline: none; font-size: 14px; color: var(--tp); resize: none; line-height: 1.5; max-height: 130px; min-height: 24px; }
+.chat-ta { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; color: var(--tp); resize: none; line-height: 1.5; max-height: 130px; min-height: 24px; padding: 8px 4px; }
 .chat-ta::placeholder { color: var(--tm); }
 .send-btn {
-  width: 38px; height: 38px; border-radius: 8px; background: var(--accent); border: none;
+  width: 40px; height: 40px; border-radius: 50%; background: var(--accent); border: none;
   color: #0A0A0A; font-size: 18px; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: all var(--t) var(--ease);
+  flex-shrink: 0; transition: all var(--t) var(--ease); cursor: pointer; margin-bottom: 2px;
 }
-.send-btn:hover:not(:disabled)  { background: var(--accent2); transform: scale(1.06); }
+.send-btn:hover:not(:disabled)  { background: var(--accent2); transform: scale(1.05); }
 .send-btn:disabled { opacity: .4; cursor: not-allowed; }
-.chat-hint { font-size: 11px; color: var(--tm); text-align: center; margin-top: 8px; }
+.chat-hint { font-size: 11px; color: var(--tm); text-align: center; margin-top: 8px; display: none; }
 
 /* ── VOICE ── */
 .mic-btn {
-  width: 38px; height: 38px; border-radius: 8px; background: transparent; border: 1px solid var(--border);
-  color: var(--ts); font-size: 16px; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: all var(--t) var(--ease); cursor: pointer;
+  width: 40px; height: 40px; border-radius: 50%; background: transparent; border: 1px solid transparent;
+  color: var(--ts); font-size: 18px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all var(--t) var(--ease); cursor: pointer; margin-bottom: 2px;
 }
-.mic-btn:hover { border-color: var(--border2); color: var(--tp); background: var(--bg2); }
+.mic-btn:hover { color: var(--tp); background: var(--bg2); }
 .mic-btn.listening {
-  color: #ef4444; border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444; background: rgba(239, 68, 68, 0.1);
   animation: pulse-red 1.5s infinite;
 }
 .mic-btn.speaking {
-  color: var(--accent); border-color: rgba(201, 169, 110, 0.4);
+  color: var(--accent); background: rgba(201, 169, 110, 0.1);
   animation: pulse-accent 1.5s infinite;
 }
-@keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-@keyframes pulse-accent { 0% { box-shadow: 0 0 0 0 rgba(201, 169, 110, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(201, 169, 110, 0); } 100% { box-shadow: 0 0 0 0 rgba(201, 169, 110, 0); } }
+@keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+@keyframes pulse-accent { 0% { box-shadow: 0 0 0 0 rgba(201, 169, 110, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(201, 169, 110, 0); } 100% { box-shadow: 0 0 0 0 rgba(201, 169, 110, 0); } }
 
 /* ── DISCLAIMER BADGE ── */
-.disclaimer { display: flex; align-items: flex-start; gap: 8px; padding: 10px 14px; background: var(--adim); border: 1px solid rgba(201,169,110,.15); border-radius: 8px; font-size: 11.5px; color: var(--ts); line-height: 1.5; margin-bottom: 6px; }
+.disclaimer { display: flex; align-items: flex-start; gap: 8px; padding: 10px 14px; background: var(--bg1); border-radius: 8px; font-size: 11.5px; color: var(--ts); line-height: 1.5; margin-bottom: 8px; justify-content: center; text-align: center; border: 1px solid var(--border); }
+
+.desktop-only { display: flex; }
 
 @media (max-width: 860px) {
   .sidebar { display: none; }
   .chat-layout { grid-template-columns: 1fr; }
+  .chat-messages { padding: 16px 12px; gap: 16px; }
+  .msg-row { max-width: 90%; }
+  .msg-bubble { font-size: 15px; padding: 12px 16px; }
+  .desktop-only { display: none !important; }
+  .pill-grid { flex-direction: column; width: 100%; max-width: 100%; }
+  .pill { text-align: center; font-size: 15px; padding: 14px; border-radius: 16px; }
+  .chat-input-zone { padding: 12px 12px; }
+  .chat-topbar { padding: 12px 16px; }
 }
 </style>
 </head>
@@ -235,13 +262,12 @@ injectNav();
     <!-- CHAT MAIN -->
     <main class="chat-main">
       <div class="chat-topbar">
-        <div>
-          <div class="chat-name" data-i18n="chat_name">⚖ NyaySetu Legal AI</div>
-          <div class="chat-online"><div class="online-dot"></div><span data-i18n="chat_online">Online · Reviewed by law professionals</span></div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="chat-name" data-i18n="chat_name">NyaySetu AI</div>
+          <div class="online-dot"></div>
         </div>
-        <div style="display:flex;gap:8px">
+        <div class="desktop-only" style="position: absolute; right: 24px; display: flex; gap: 8px;">
           <button class="btn-ghost btn-sm" onclick="clearChat()" data-i18n="chat_new">New Chat</button>
-          <a href="documents.html" class="btn-ghost btn-sm"><span data-i18n="chat_doc_link">📄 Generate Document</span></a>
         </div>
       </div>
 
@@ -249,32 +275,27 @@ injectNav();
         <div class="welcome" id="welcome">
           <div>
             <div class="welcome-ico">⚖️</div>
-            <div class="welcome-h" data-i18n="chat_welcome_heading">How can NyaySetu help?</div>
-            <div class="welcome-sub" data-i18n="chat_welcome_sub">Ask any legal question in English, Hindi, Urdu, or any Indian language. Our AI will analyse your situation, identify relevant laws, and provide actionable guidance.</div>
+            <div class="welcome-h" data-i18n="chat_welcome_heading">NyaySetu AI</div>
+            <div class="welcome-sub" data-i18n="chat_welcome_sub">Your personal legal assistant. Simple, fast, and reliable.</div>
           </div>
           <div class="pill-grid">
-            <div class="pill" onclick="prefill('My landlord is not returning my security deposit. What can I do?')">🏠 Security deposit problem</div>
-            <div class="pill" onclick="prefill('What are my rights if police arrest me without a warrant?')">🚔 Police arrested me</div>
-            <div class="pill" onclick="prefill('How do I file a consumer complaint against a company?')">🛒 Company cheated me</div>
-            <div class="pill" onclick="prefill('What is Section 498A IPC and what are its penalties?')">📖 Explain Section 498A</div>
-            <div class="pill" onclick="prefill('My employer has not paid my salary for 2 months. What should I do?')">💼 Unpaid salary</div>
-            <div class="pill" onclick="prefill('How to apply for anticipatory bail and what is the process?')">⚖️ Anticipatory bail</div>
+            <div class="pill" onclick="prefill('Generate a Legal Notice for me')">📄 Generate Legal Notice</div>
+            <div class="pill" onclick="prefill('What are my rights in this situation?')">🛡️ Check My Rights</div>
+            <div class="pill" onclick="prefill('How do I file a formal complaint?')">⚖️ File Complaint</div>
           </div>
         </div>
       </div>
 
       <div class="chat-input-zone">
         <div class="disclaimer">
-          <span>⚠</span>
-          <span data-i18n="chat_disclaimer">NyaySetu provides legal guidance, not professional legal advice. For serious matters, consult a qualified advocate.</span>
+          <span data-i18n="chat_disclaimer">Guidance only. Consult a lawyer for serious matters.</span>
         </div>
         <div class="input-wrap">
-          <textarea class="chat-ta" id="chat-input" data-i18n-placeholder="chat_placeholder" placeholder="Ask your legal question here..." rows="1"
+          <textarea class="chat-ta" id="chat-input" data-i18n-placeholder="chat_placeholder" placeholder="Ask your legal question or tap mic..." rows="1"
             onkeydown="onKey(event)" oninput="autoGrow(this)"></textarea>
           <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Voice Input">🎤</button>
           <button class="send-btn" id="send-btn" onclick="send()">→</button>
         </div>
-        <div class="chat-hint" data-i18n="chat_hint">Enter to send · Shift+Enter for new line</div>
       </div>
     </main>
   </div>
@@ -343,16 +364,13 @@ function welcomeHTML() {
   return `<div class="welcome" id="welcome">
     <div>
       <div class="welcome-ico">⚖️</div>
-      <div class="welcome-h" data-i18n="chat_welcome_heading">How can NyaySetu help?</div>
-      <div class="welcome-sub" data-i18n="chat_welcome_sub">Ask any legal question in English, Hindi, Urdu, or any Indian language. Our AI will analyse your situation, identify relevant laws, and provide actionable guidance.</div>
+      <div class="welcome-h" data-i18n="chat_welcome_heading">NyaySetu AI</div>
+      <div class="welcome-sub" data-i18n="chat_welcome_sub">Your personal legal assistant. Simple, fast, and reliable.</div>
     </div>
     <div class="pill-grid">
-      <div class="pill" onclick="prefill('My landlord is not returning my security deposit. What can I do?')">🏠 Security deposit problem</div>
-      <div class="pill" onclick="prefill('What are my rights if police arrest me?')">🚔 Police arrested me</div>
-      <div class="pill" onclick="prefill('How do I file a consumer complaint?')">🛒 Company cheated me</div>
-      <div class="pill" onclick="prefill('Explain Section 498A IPC simply.')">📖 Section 498A</div>
-      <div class="pill" onclick="prefill('My employer has not paid salary for 2 months.')">💼 Unpaid salary</div>
-      <div class="pill" onclick="prefill('How to apply for anticipatory bail?')">⚖️ Anticipatory bail</div>
+      <div class="pill" onclick="prefill('Generate a Legal Notice for me')">📄 Generate Legal Notice</div>
+      <div class="pill" onclick="prefill('What are my rights in this situation?')">🛡️ Check My Rights</div>
+      <div class="pill" onclick="prefill('How do I file a formal complaint?')">⚖️ File Complaint</div>
     </div>
   </div>`;
 }
@@ -377,7 +395,6 @@ async function send() {
   // User bubble
   msgs.insertAdjacentHTML('beforeend', `
     <div class="msg-row u">
-      <div class="msg-from">You</div>
       <div class="msg-bubble">${esc(text)}</div>
     </div>`);
   scrollDown();
@@ -386,7 +403,6 @@ async function send() {
   const tid = 'ty' + Date.now();
   msgs.insertAdjacentHTML('beforeend', `
     <div class="typing-wrap" id="${tid}">
-      <div class="msg-from">⚖ NyaySetu AI</div>
       <div class="typing"><span></span><span></span><span></span></div>
     </div>`);
   scrollDown();
@@ -397,18 +413,17 @@ async function send() {
 
   const systemPrompt = `You are NyaySetu, an expert Indian legal AI assistant helping Indian citizens understand their legal rights and options. ${langInstr}
 
-Structure every response clearly:
-1. **Plain Summary** — What is the legal situation in simple language (2-3 sentences)
-2. **Relevant Laws** — Cite specific sections (IPC, CrPC, CPC, Consumer Protection Act, Transfer of Property Act, Hindu Marriage Act, etc.) with section numbers
-3. **Practical Steps** — Numbered list of concrete actions the person can take immediately
-4. **When to Get a Lawyer** — Brief note on when professional legal help is essential
+Structure every response clearly in these simple sections:
+1. **Steps** — Numbered list of concrete actions the person can take immediately.
+2. **Rights** — Explain the user's legal rights simply (2-3 sentences).
+3. **Suggestions** — Helpful advice and when to get a lawyer.
 
 Rules:
-- Use **bold** for section names and key legal terms
-- Be accurate and empathetic
-- Reference Indian laws only
-- Always end with a brief disclaimer that this is guidance, not legal advice
-- Keep responses concise but complete`;
+- Keep it extremely simple, like a WhatsApp message.
+- Use **bold** for key terms.
+- No long paragraphs or complex jargon.
+- Be accurate and empathetic.
+- Always end with a brief disclaimer that this is guidance, not legal advice.`;
 
   try {
     history.push({ role: 'user', content: text });
@@ -420,12 +435,16 @@ Rules:
     const mid = 'msg' + Date.now();
     msgs.insertAdjacentHTML('beforeend', `
       <div class="msg-row a" id="${mid}">
-        <div class="msg-from">⚖ NyaySetu AI &nbsp;·&nbsp; Reviewed by law professionals</div>
         <div class="msg-bubble">${formatMarkdown(reply)}</div>
         <div class="msg-actions">
-          <button class="msg-act" onclick="copyText(document.getElementById('${mid}').querySelector('.msg-bubble').innerText)">📋 Copy</button>
-          <a href="documents.html" class="msg-act" style="text-decoration:none">📄 Generate Document</a>
-          <a href="simplifier.html" class="msg-act" style="text-decoration:none">📚 Simplify a Law</a>
+          <a href="documents.html" class="msg-act primary" style="text-decoration:none">Create Legal Document</a>
+          <div class="msg-dropdown">
+            <button class="msg-act" style="background:transparent; padding: 6px;">⋮</button>
+            <div class="msg-dropdown-content">
+              <button class="msg-dropdown-item" onclick="copyText(document.getElementById('${mid}').querySelector('.msg-bubble').innerText)">📋 Copy Text</button>
+              <a href="simplifier.html" class="msg-dropdown-item">📚 Simplify</a>
+            </div>
+          </div>
         </div>
       </div>`);
     scrollDown();
@@ -571,7 +590,7 @@ function stopListening() {
   
   const inp = document.getElementById('chat-input');
   if(inp) {
-    const originalPlaceholder = document.documentElement.lang === 'hi' ? 'अपना कानूनी प्रश्न यहां पूछें...' : 'Ask your legal question here...'; // Fallback if translation is missed momentarily
+    const originalPlaceholder = document.documentElement.lang === 'hi' ? 'अपना कानूनी प्रश्न या माइक टैप करें...' : 'Ask your legal question or tap mic...'; // Fallback if translation is missed momentarily
     inp.placeholder = originalPlaceholder; 
     if (typeof applyTranslations === 'function' && typeof currentStrings !== 'undefined') {
         applyTranslations(currentStrings);
