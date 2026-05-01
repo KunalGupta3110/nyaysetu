@@ -138,6 +138,24 @@ body { display: flex; flex-direction: column; }
 .send-btn:disabled { opacity: .4; cursor: not-allowed; }
 .chat-hint { font-size: 11px; color: var(--tm); text-align: center; margin-top: 8px; }
 
+/* ── VOICE ── */
+.mic-btn {
+  width: 38px; height: 38px; border-radius: 8px; background: transparent; border: 1px solid var(--border);
+  color: var(--ts); font-size: 16px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all var(--t) var(--ease); cursor: pointer;
+}
+.mic-btn:hover { border-color: var(--border2); color: var(--tp); background: var(--bg2); }
+.mic-btn.listening {
+  color: #ef4444; border-color: rgba(239, 68, 68, 0.4);
+  animation: pulse-red 1.5s infinite;
+}
+.mic-btn.speaking {
+  color: var(--accent); border-color: rgba(201, 169, 110, 0.4);
+  animation: pulse-accent 1.5s infinite;
+}
+@keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+@keyframes pulse-accent { 0% { box-shadow: 0 0 0 0 rgba(201, 169, 110, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(201, 169, 110, 0); } 100% { box-shadow: 0 0 0 0 rgba(201, 169, 110, 0); } }
+
 /* ── DISCLAIMER BADGE ── */
 .disclaimer { display: flex; align-items: flex-start; gap: 8px; padding: 10px 14px; background: var(--adim); border: 1px solid rgba(201,169,110,.15); border-radius: 8px; font-size: 11.5px; color: var(--ts); line-height: 1.5; margin-bottom: 6px; }
 
@@ -253,6 +271,7 @@ injectNav();
         <div class="input-wrap">
           <textarea class="chat-ta" id="chat-input" data-i18n-placeholder="chat_placeholder" placeholder="Ask your legal question here..." rows="1"
             onkeydown="onKey(event)" oninput="autoGrow(this)"></textarea>
+          <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Voice Input">🎤</button>
           <button class="send-btn" id="send-btn" onclick="send()">→</button>
         </div>
         <div class="chat-hint" data-i18n="chat_hint">Enter to send · Shift+Enter for new line</div>
@@ -344,6 +363,8 @@ async function send() {
   const text = inp.value.trim();
   if (!text) return;
 
+  if (typeof stopSpeaking === 'function') stopSpeaking();
+
   // Remove welcome
   document.getElementById('welcome')?.remove();
 
@@ -408,6 +429,10 @@ Rules:
         </div>
       </div>`);
     scrollDown();
+    
+    if (typeof speakResponse === 'function') {
+      speakResponse(reply, lang);
+    }
   } catch (err) {
     document.getElementById(tid)?.remove();
     msgs.insertAdjacentHTML('beforeend', `
@@ -429,6 +454,185 @@ function scrollDown() {
   const m = document.getElementById('messages');
   m.scrollTop = m.scrollHeight;
 }
+
+// ── VOICE SYSTEM ──
+const VOICE_LANGS = {
+  en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN',
+  ta: 'ta-IN', ur: 'ur-IN', gu: 'gu-IN', kn: 'kn-IN', ml: 'ml-IN',
+  or: 'or-IN', pa: 'pa-IN', as: 'as-IN', ne: 'ne-NP'
+};
+
+let recognition = null;
+let isListening = false;
+let isSpeaking = false;
+
+function initVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    document.getElementById('mic-btn').onclick = () => {
+      if (typeof showToast === 'function') {
+        showToast('Voice not supported in this browser.', true);
+      } else {
+        alert('Voice not supported in this browser.');
+      }
+    };
+    return;
+  }
+  
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  
+  recognition.onstart = () => {
+    isListening = true;
+    const mic = document.getElementById('mic-btn');
+    mic.classList.add('listening');
+    mic.title = 'Stop listening';
+    document.getElementById('chat-input').placeholder = 'Listening...';
+  };
+  
+  recognition.onresult = (event) => {
+    let interimTranscript = '';
+    let finalTranscript = '';
+    
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        finalTranscript += event.results[i][0].transcript;
+      } else {
+        interimTranscript += event.results[i][0].transcript;
+      }
+    }
+    
+    const inp = document.getElementById('chat-input');
+    if (finalTranscript) {
+        inp.value = finalTranscript;
+        autoGrow(inp);
+    } else if (interimTranscript) {
+        inp.value = interimTranscript;
+        autoGrow(inp);
+    }
+  };
+  
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error', event.error);
+    if (event.error === 'not-allowed') {
+      if (typeof showToast === 'function') {
+        showToast('Microphone permission denied.', true);
+      } else {
+        alert('Microphone permission denied.');
+      }
+    }
+    stopListening();
+  };
+  
+  recognition.onend = () => {
+    stopListening();
+    const inp = document.getElementById('chat-input');
+    if (inp.value.trim()) {
+      send();
+    }
+  };
+}
+
+function toggleMic() {
+  if (isSpeaking) {
+    stopSpeaking();
+  }
+  if (isListening) {
+    stopListening();
+  } else {
+    startListening();
+  }
+}
+
+function startListening() {
+  if (!recognition) return;
+  const vLang = VOICE_LANGS[lang] || 'en-IN';
+  recognition.lang = vLang;
+  try {
+    recognition.start();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function stopListening() {
+  if (!recognition) return;
+  isListening = false;
+  try {
+    recognition.stop();
+  } catch(e){}
+  
+  const mic = document.getElementById('mic-btn');
+  if(mic) {
+    mic.classList.remove('listening');
+    mic.title = 'Voice Input';
+  }
+  
+  const inp = document.getElementById('chat-input');
+  if(inp) {
+    const originalPlaceholder = document.documentElement.lang === 'hi' ? 'अपना कानूनी प्रश्न यहां पूछें...' : 'Ask your legal question here...'; // Fallback if translation is missed momentarily
+    inp.placeholder = originalPlaceholder; 
+    if (typeof applyTranslations === 'function' && typeof currentStrings !== 'undefined') {
+        applyTranslations(currentStrings);
+    }
+  }
+}
+
+function stripMarkdown(text) {
+  return text.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
+}
+
+function speakResponse(text, currentLang) {
+  if (!('speechSynthesis' in window)) return;
+  
+  stopSpeaking(); // Stop any current speech
+  
+  const plainText = stripMarkdown(text);
+  const utterance = new SpeechSynthesisUtterance(plainText);
+  const vLang = VOICE_LANGS[currentLang] || 'en-IN';
+  
+  utterance.lang = vLang;
+  utterance.rate = 1.0;
+  
+  const voices = speechSynthesis.getVoices();
+  const voice = voices.find(v => v.lang.startsWith(vLang) || v.lang.startsWith(currentLang)) 
+             || voices.find(v => v.lang.startsWith('en'));
+  if (voice) {
+    utterance.voice = voice;
+  }
+  
+  utterance.onstart = () => {
+    isSpeaking = true;
+    document.getElementById('mic-btn')?.classList.add('speaking');
+  };
+  
+  utterance.onend = () => {
+    isSpeaking = false;
+    document.getElementById('mic-btn')?.classList.remove('speaking');
+  };
+  
+  utterance.onerror = () => {
+    isSpeaking = false;
+    document.getElementById('mic-btn')?.classList.remove('speaking');
+  };
+  
+  speechSynthesis.speak(utterance);
+}
+
+function stopSpeaking() {
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+  }
+  isSpeaking = false;
+  document.getElementById('mic-btn')?.classList.remove('speaking');
+}
+
+if ('speechSynthesis' in window) {
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+}
+
+initVoice();
 </script>
 </body>
 </html>
