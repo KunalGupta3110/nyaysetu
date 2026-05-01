@@ -287,11 +287,14 @@ iframe {
   transform: translateY(-7px) rotate(-45deg);
 }
 
+.mobile-only-nav-item { display: none; }
+
 @media (max-width: 860px) {
   #nav {
     height: 64px;
     padding: 0 16px;
     gap: 10px;
+    justify-content: space-between;
   }
 
   .nav-logo {
@@ -305,58 +308,76 @@ iframe {
   .nav-tabs {
     display: flex !important;
     position: fixed;
-    top: 72px;
-    left: 12px;
-    right: 12px;
+    top: 64px;
+    right: 0;
+    left: auto;
+    bottom: 0;
+    width: 260px;
+    max-width: 80%;
+    max-height: calc(100vh - 64px);
     margin-left: 0;
-    padding: 10px;
+    padding: 16px 12px;
     flex-direction: column;
     align-items: stretch;
-    gap: 4px;
-    max-height: calc(100dvh - 88px);
-    overflow-y: auto;
-    background: rgba(10, 10, 10, .96);
-    border: 1px solid var(--border2);
-    border-radius: 14px;
-    box-shadow: var(--shadowlg);
+    gap: 8px;
+    background: var(--bg1);
+    border: none;
+    border-left: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.5);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(-8px);
+    transform: translateX(100%);
     transition: opacity var(--t) var(--ease), transform var(--t) var(--ease), visibility var(--t) var(--ease);
+    z-index: 1000;
   }
 
   [data-theme="light"] .nav-tabs {
-    background: rgba(244, 242, 239, .98);
+    background: #FAFAFA;
   }
 
   .nav-tabs.open {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transform: translateY(0);
+    transform: translateX(0);
   }
 
   .nav-tab {
     width: 100%;
     justify-content: flex-start;
-    padding: 12px 14px;
-    border-radius: 10px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 15px;
     white-space: normal;
+  }
+
+  .mobile-only-nav-item {
+    display: flex;
   }
 
   .nav-right {
     min-width: 0;
+    margin-left: auto;
     gap: 8px;
   }
 
-  .nav-lang,
-  .nav-right > a.btn-nav {
-    display: none !important;
+  .nav-lang {
+    display: flex !important;
   }
 
-  .nav-user-name {
-    display: none;
+  .lang-select {
+    width: auto;
+    min-width: unset;
+    padding: 6px 8px 6px 6px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  /* Keep nav minimal: Hide everything in nav-right EXCEPT nav-lang on mobile */
+  .nav-right > :not(.nav-lang) {
+    display: none !important;
   }
 
   .nav-icon-btn,
@@ -367,6 +388,7 @@ iframe {
 
   .nav-menu-toggle {
     display: flex;
+    margin-left: 4px;
   }
 }
 

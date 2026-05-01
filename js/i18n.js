@@ -463,7 +463,7 @@ function getSavedLanguage() {
 function getLangSelectHTML() {
   return `<select class="lang-select" id="lang-select" aria-label="Select language" onchange="changeLanguage(this.value)">` +
     Object.entries(LANGUAGE_NAMES).map(([code, label]) =>
-      `<option value="${code}">${label}</option>`
+      `<option value="${code}">🌐 ${label}</option>`
     ).join('') +
     `</select>`;
 }
