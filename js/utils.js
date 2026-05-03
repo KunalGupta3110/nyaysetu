@@ -135,21 +135,19 @@ async function loginUser(payload) {
 }
 
 function updateAuthNav() {
-  const slots = document.querySelectorAll('#auth-nav-slot, #auth-nav-slot-mobile');
-  if (!slots.length) return;
+  const slot = document.getElementById('auth-nav-slot');
+  if (!slot) return;
 
   const user = getStoredUser();
-  slots.forEach(slot => {
-    if (user) {
-      const displayName = user.name || user.full_name || user.email || 'User';
-      slot.innerHTML = `
-        <span class="nav-user-name" style="margin-bottom: 4px;">${esc(displayName)}</span>
-        <button class="btn-nav" type="button" onclick="logoutUser()">Logout</button>
-      `;
-    } else {
-      slot.innerHTML = `<a href="${getAuthHref()}" class="btn-nav">Login / Signup</a>`;
-    }
-  });
+  if (user) {
+    const displayName = user.name || user.full_name || user.email || 'User';
+    slot.innerHTML = `
+      <span class="nav-user-name" style="margin-right: 8px;">${esc(displayName)}</span>
+      <button class="btn-nav auth-action-btn" type="button" onclick="logoutUser()">Logout</button>
+    `;
+  } else {
+    slot.innerHTML = `<a href="${getAuthHref()}" class="btn-nav auth-action-btn">Get Started</a>`;
+  }
 }
 
 // ── NAV ACTIVE STATE ──

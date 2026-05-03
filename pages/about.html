@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us — NyaySetu</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <style>
+    .about-header {
+      padding: 80px 0 40px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .about-content {
+      padding: 60px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .about-section {
+      margin-bottom: 48px;
+    }
+    .about-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      color: var(--tp);
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+    .about-section p {
+      font-size: 16px;
+      color: var(--ts);
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+    .disclaimer-box {
+      background: var(--bg1);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      border-left: 4px solid var(--red);
+      padding: 24px;
+      border-radius: 8px;
+      margin-top: 40px;
+    }
+    .disclaimer-box h3 {
+      color: var(--red);
+      font-size: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .disclaimer-box p {
+      color: var(--ts);
+      margin-bottom: 0;
+      font-size: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .about-header {
+        padding: 60px 0 30px;
+      }
+      .about-section h2 {
+        font-size: 24px;
+      }
+      .about-section p {
+        font-size: 15px;
+      }
+      .disclaimer-box {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body data-page="about">
+
+  <script src="../js/utils.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>injectNav();</script>
+
+  <main style="padding-top:64px">
+    <div class="about-header">
+      <div class="container">
+        <h1 class="sh1 fi">About NyaySetu</h1>
+        <p class="sub fi" style="max-width: 600px; margin: 0 auto;">Bridging the gap between the people of India and the law.</p>
+      </div>
+    </div>
+
+    <div class="about-content container">
+      
+      <div class="about-section fi">
+        <h2>1. What is NyaySetu?</h2>
+        <p>NyaySetu is an AI-powered platform designed to make Indian law simple and accessible to everyone. We believe that understanding your legal rights should not depend on how much money you have or who you know.</p>
+      </div>
+
+      <div class="about-section fi">
+        <h2>2. What it does</h2>
+        <p>Our platform allows you to ask legal questions in plain language, whether in English, Hindi, or regional languages. Our intelligent system breaks down complex legal jargon into clear, easy-to-understand steps. Additionally, we provide tools to generate standard legal documents like Legal Notices, Rent Agreements, and Consumer Complaints instantly.</p>
+      </div>
+
+      <div class="about-section fi">
+        <h2>3. Who it is for</h2>
+        <p>NyaySetu is built for the everyday citizen. Whether you are dealing with a property dispute, trying to file a consumer complaint, or simply want to know your rights before signing a contract, NyaySetu is here to guide you.</p>
+        <p>It is also a platform for law students to apply their knowledge by reviewing AI-generated responses and helping citizens, while building their professional portfolios.</p>
+      </div>
+
+      <div class="about-section fi">
+        <h2>4. Our Vision</h2>
+        <p>We envision an India where justice is not delayed by a lack of understanding or resources. By combining the speed of modern AI with the expertise of legal professionals, we aim to provide a reliable first step for millions seeking legal help across the country.</p>
+      </div>
+
+      <div class="disclaimer-box fi">
+        <h3><span>⚠️</span> Important Disclaimer</h3>
+        <p>NyaySetu is a technology platform, <strong>not a law firm</strong>. The information provided by our AI, platform, or student reviewers is for educational and informational purposes only and does <strong>not constitute legal advice</strong>. Using NyaySetu does not create an attorney-client relationship. Always consult a qualified and licensed advocate for professional legal advice regarding your specific situation.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="nav-logo-box" style="width:28px;height:28px;font-size:13px">N</div>
+          <span class="nav-logo-name" style="font-size:15px">NyaySetu</span>
+        </div>
+        <ul class="footer-links">
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Use</a></li>
+          <li><a href="terms.html#disclaimer">Legal Disclaimer</a></li>
+        </ul>
+        <span class="footer-copy">© 2025 NyaySetu &nbsp;·&nbsp; Not a substitute for legal advice</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

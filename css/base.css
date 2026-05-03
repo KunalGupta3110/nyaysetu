@@ -289,25 +289,32 @@ iframe {
 }
 
 .mobile-only-nav-item { display: none; }
-.mobile-only-auth-bar { display: none; }
 
 @media (max-width: 860px) {
   #nav {
     height: 64px;
-    padding: 0 16px;
-    gap: 10px;
+    padding: 0 12px;
+    gap: 8px;
     justify-content: space-between;
   }
 
   .nav-logo {
     min-width: 0;
-    max-width: 45%;
+    max-width: 30%;
     overflow: hidden;
     white-space: nowrap;
+    gap: 6px;
+  }
+
+  .nav-logo-box {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    flex-shrink: 0;
   }
 
   .nav-logo-name {
-    font-size: 16px;
+    font-size: 14px;
     text-overflow: ellipsis;
     overflow: hidden;
   }
@@ -382,44 +389,12 @@ iframe {
     display: flex;
   }
 
-  .mobile-only-auth-bar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 64px;
-    left: 0;
-    width: 100%;
-    z-index: 190;
-    background: var(--bg1);
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .mobile-only-auth-bar #auth-nav-slot-mobile {
-    width: 90%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .mobile-only-auth-bar .btn-nav {
-    width: 100% !important;
-    max-width: none !important;
-    padding: 12px !important;
-    border-radius: 12px !important;
-    font-size: 15px !important;
-    justify-content: center;
-  }
-
-  main, .chat-shell, .page-hero {
-    padding-top: 134px !important;
-  }
-
   .nav-right {
     min-width: 0;
     margin-left: auto;
-    gap: 8px;
+    gap: 6px;
+    flex-wrap: nowrap;
+    align-items: center;
   }
 
   .nav-lang {
@@ -429,25 +404,50 @@ iframe {
   .lang-select {
     width: auto;
     min-width: unset;
-    padding: 6px 8px 6px 6px;
-    font-size: 13px;
+    padding: 6px !important;
+    font-size: 12px !important;
     border-radius: 8px;
+    height: 34px;
   }
 
-  /* Keep nav minimal: Hide everything in nav-right EXCEPT nav-lang on mobile */
-  .nav-right > :not(.nav-lang) {
+  /* Keep nav minimal: Hide everything in nav-right EXCEPT nav-lang and auth-nav-slot on mobile */
+  .nav-right > :not(.nav-lang):not(#auth-nav-slot) {
     display: none !important;
+  }
+
+  #auth-nav-slot {
+    display: flex;
+    align-items: center;
+  }
+
+  .auth-action-btn {
+    background: #c8a96a !important;
+    color: #000 !important;
+    padding: 8px 12px !important;
+    border-radius: 10px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    white-space: nowrap;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: none !important;
+  }
+
+  .auth-action-btn:hover {
+    background: #d4b47a !important;
   }
 
   .nav-icon-btn,
   .nav-menu-toggle {
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
   }
 
   .nav-menu-toggle {
     display: flex;
-    margin-left: 4px;
+    margin-left: 2px;
   }
 }
 

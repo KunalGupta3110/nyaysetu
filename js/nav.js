@@ -34,9 +34,6 @@ function injectNav() {
       <span id="auth-nav-slot"></span>
     </div>
   </nav>
-  <div class="mobile-only-auth-bar">
-    <span id="auth-nav-slot-mobile"></span>
-  </div>
   <div id="toast"><span id="toast-icon">&#10003;</span><span id="toast-msg"></span></div>`;
 
   document.body.insertAdjacentHTML('afterbegin', nav);
