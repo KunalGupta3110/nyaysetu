@@ -20,12 +20,15 @@ function injectNav() {
     </a>
     <div class="nav-tabs">
       <a class="nav-tab" href="${homeHref}" data-page="home"><span class="nav-icon">🏠</span> <span data-i18n="nav_home">Home</span></a>
+      <a class="nav-tab" href="${pageHref('about.html')}" data-page="about"><span class="nav-icon">ℹ️</span> <span data-i18n="footer_about">About Us</span></a>
       <a class="nav-tab" href="${pageHref('chat.html')}" data-page="chat"><span class="nav-icon">⚖️</span> <span data-i18n="nav_chat">AI Chat</span></a>
+      <a class="nav-tab mobile-only-nav-item" href="${pageHref('chat.html')}"><span class="nav-icon">💡</span> <span data-i18n="nav_ask">Ask a Question</span></a>
       <a class="nav-tab" href="${pageHref('documents.html')}" data-page="docs"><span class="nav-icon">📄</span> <span data-i18n="nav_docs">Documents</span></a>
       <a class="nav-tab" href="${pageHref('simplifier.html')}" data-page="simplify"><span class="nav-icon">📚</span> <span data-i18n="nav_simplify">Simplifier</span></a>
       <a class="nav-tab" href="${pageHref('students.html')}" data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
       ${dashboardLink}
       <button class="nav-tab mobile-only-nav-item" onclick="toggleTheme()" style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; border-radius: 0; justify-content: flex-start; border-bottom:none; background:transparent;"><span class="nav-icon">☀/☽</span> Toggle Theme</button>
+      <div id="auth-nav-slot-menu" class="mobile-only-nav-item" style="width: 100%; margin-top: 8px;"></div>
     </div>
     <div class="nav-right">
       <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
