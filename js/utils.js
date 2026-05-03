@@ -140,17 +140,14 @@ function updateAuthNav() {
 
   const user = getStoredUser();
   slots.forEach(slot => {
-    const isMobileSlot = slot.id === 'auth-nav-slot-mobile';
-    const btnStyle = isMobileSlot ? 'width: 100%; text-align: center; justify-content: center;' : '';
-    
     if (user) {
       const displayName = user.name || user.full_name || user.email || 'User';
       slot.innerHTML = `
-        <span class="nav-user-name" style="${isMobileSlot ? 'display:block; margin-bottom: 8px; text-align:center;' : ''}">${esc(displayName)}</span>
-        <button class="btn-nav" type="button" onclick="logoutUser()" style="${btnStyle}">Logout</button>
+        <span class="nav-user-name" style="margin-bottom: 4px;">${esc(displayName)}</span>
+        <button class="btn-nav" type="button" onclick="logoutUser()">Logout</button>
       `;
     } else {
-      slot.innerHTML = `<a href="${getAuthHref()}" class="btn-nav" style="${btnStyle}">Login / Signup</a>`;
+      slot.innerHTML = `<a href="${getAuthHref()}" class="btn-nav">Login / Signup</a>`;
     }
   });
 }

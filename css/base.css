@@ -289,6 +289,7 @@ iframe {
 }
 
 .mobile-only-nav-item { display: none; }
+.mobile-only-auth-bar { display: none; }
 
 @media (max-width: 860px) {
   #nav {
@@ -379,6 +380,40 @@ iframe {
 
   .mobile-only-nav-item {
     display: flex;
+  }
+
+  .mobile-only-auth-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    z-index: 190;
+    background: var(--bg1);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mobile-only-auth-bar #auth-nav-slot-mobile {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .mobile-only-auth-bar .btn-nav {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+    font-size: 15px !important;
+    justify-content: center;
+  }
+
+  main, .chat-shell, .page-hero {
+    padding-top: 134px !important;
   }
 
   .nav-right {

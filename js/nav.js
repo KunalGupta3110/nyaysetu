@@ -26,7 +26,6 @@ function injectNav() {
       <a class="nav-tab" href="${pageHref('students.html')}" data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
       ${dashboardLink}
       <button class="nav-tab mobile-only-nav-item" onclick="toggleTheme()" style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; border-radius: 0; justify-content: flex-start; border-bottom:none; background:transparent;"><span class="nav-icon">☀/☽</span> Toggle Theme</button>
-      <span id="auth-nav-slot-mobile" class="mobile-only-nav-item" style="margin-top: 8px; width: 100%;"></span>
     </div>
     <div class="nav-right">
       <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
@@ -35,6 +34,9 @@ function injectNav() {
       <span id="auth-nav-slot"></span>
     </div>
   </nav>
+  <div class="mobile-only-auth-bar">
+    <span id="auth-nav-slot-mobile"></span>
+  </div>
   <div id="toast"><span id="toast-icon">&#10003;</span><span id="toast-msg"></span></div>`;
 
   document.body.insertAdjacentHTML('afterbegin', nav);
