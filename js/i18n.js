@@ -461,11 +461,25 @@ function getSavedLanguage() {
 }
 
 function getLangSelectHTML() {
-  return `<select class="lang-select" id="lang-select" aria-label="Select language" onchange="changeLanguage(this.value)">` +
-    Object.entries(LANGUAGE_NAMES).map(([code, label]) =>
-      `<option value="${code}">🌐 ${label}</option>`
-    ).join('') +
-    `</select>`;
+  const currentLang = typeof getSavedLanguage === 'function' ? getSavedLanguage() : 'en';
+  const shortCode = currentLang.toUpperCase();
+  const fullName = window.LANGUAGE_NAMES[currentLang] || 'English';
+  
+  return `
+    <div class="lang-select-wrapper">
+      <div class="lang-select-visible">
+        <span class="lang-short">🌐 ${shortCode}</span>
+        <span class="lang-full">🌐 ${fullName}</span>
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="margin-left: 6px; opacity: 0.6;"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <select class="lang-select-invisible" id="lang-select" aria-label="Select language" onchange="changeLanguage(this.value)">
+        ` +
+        Object.entries(window.LANGUAGE_NAMES).map(([code, label]) =>
+          `<option value="${code}">🌐 ${label}</option>`
+        ).join('') +
+      `</select>
+    </div>
+  `;
 }
 
 async function changeLanguage(lang) {
@@ -476,8 +490,15 @@ async function changeLanguage(lang) {
   if (typeof window.onLanguageChange === 'function') window.onLanguageChange(targetLang);
   
   // Update dropdowns if multiple exist
-  document.querySelectorAll('.lang-select').forEach(select => {
+  document.querySelectorAll('.lang-select-invisible, .lang-select').forEach(select => {
     select.value = targetLang;
+  });
+  
+  document.querySelectorAll('.lang-select-visible').forEach(visible => {
+    const shortSpan = visible.querySelector('.lang-short');
+    const fullSpan = visible.querySelector('.lang-full');
+    if (shortSpan) shortSpan.textContent = '🌐 ' + targetLang.toUpperCase();
+    if (fullSpan) fullSpan.textContent = '🌐 ' + (window.LANGUAGE_NAMES[targetLang] || 'English');
   });
   
   // Apply translation
@@ -495,8 +516,15 @@ function initI18n() {
   const savedLang = getSavedLanguage();
   
   // Set select elements to correct value
-  document.querySelectorAll('.lang-select').forEach(select => {
+  document.querySelectorAll('.lang-select-invisible, .lang-select').forEach(select => {
     select.value = savedLang;
+  });
+  
+  document.querySelectorAll('.lang-select-visible').forEach(visible => {
+    const shortSpan = visible.querySelector('.lang-short');
+    const fullSpan = visible.querySelector('.lang-full');
+    if (shortSpan) shortSpan.textContent = '🌐 ' + savedLang.toUpperCase();
+    if (fullSpan) fullSpan.textContent = '🌐 ' + (window.LANGUAGE_NAMES[savedLang] || 'English');
   });
   
   // Apply language on load if it's not default
