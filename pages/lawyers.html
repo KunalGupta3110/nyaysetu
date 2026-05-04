@@ -141,6 +141,7 @@
       <a class="nav-tab" href="documents.html"  data-page="docs"><span class="nav-icon">📄</span> <span data-i18n="nav_docs">Documents</span></a>
       <a class="nav-tab" href="simplifier.html" data-page="simplify"><span class="nav-icon">📚</span> <span data-i18n="nav_simplify">Simplifier</span></a>
       <a class="nav-tab" href="students.html"   data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
+      <a class="nav-tab" href="lawyers.html" data-page="lawyers"><span class="nav-icon">⚖️</span> <span data-i18n="nav_lawyers">Lawyers</span></a>
       <a class="nav-tab" href="about.html"     data-page="about"><span class="nav-icon">ℹ️</span> <span data-i18n="footer_about">About Us</span></a>
       <button class="nav-tab mobile-only-nav-item" onclick="toggleTheme()" style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; border-radius: 0; justify-content: flex-start; border-bottom:none; background:transparent;"><span class="nav-icon">☀/☽</span> Toggle Theme</button>
       <div id="auth-nav-slot-menu" class="mobile-only-nav-item" style="width: 100%; margin-top: 8px;"></div>
@@ -172,25 +173,64 @@
       const urlParams = new URLSearchParams(window.location.search);
       const caseId = urlParams.get('caseId');
       
-      if (!caseId) {
-        document.getElementById('app-container').innerHTML = '<div class="loading" style="color:var(--red);">Error: Case ID not provided.</div>';
-        return;
-      }
-      
       try {
-        const res = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/match-lawyers/' + caseId);
-        if (!res.ok) throw new Error('Failed to fetch case data');
-        const data = await res.json();
-        
-        if (!data.case) {
-          document.getElementById('app-container').innerHTML = '<div class="loading" style="color:var(--red);">Case not found.</div>';
-          return;
+        if (!caseId) {
+          // generic lawyers list
+          const res = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/get-lawyers');
+          if (!res.ok) throw new Error('Failed to fetch lawyers');
+          const lawyers = await res.json();
+          renderGenericPage(lawyers || []);
+        } else {
+          const res = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/match-lawyers/' + caseId);
+          if (!res.ok) throw new Error('Failed to fetch case data');
+          const data = await res.json();
+          
+          if (!data.case) {
+            document.getElementById('app-container').innerHTML = '<div class="loading" style="color:var(--red);">Case not found.</div>';
+            return;
+          }
+          
+          renderPage(data.case, data.lawyers || []);
         }
-        
-        renderPage(data.case, data.lawyers || []);
       } catch (err) {
         document.getElementById('app-container').innerHTML = '<div class="loading" style="color:var(--red);">Failed to load data. Please check your connection and try again.</div>';
       }
+    }
+    
+    function renderGenericPage(lawyers) {
+      const container = document.getElementById('app-container');
+      let html = `
+        <div class="header">
+          <h1>Find the right lawyer for your case</h1>
+          <p>Connect with top-rated verified legal professionals.</p>
+        </div>
+      `;
+      
+      if (lawyers.length === 0) {
+        html += '<p style="color:var(--ts);text-align:center;">No lawyers found at the moment.</p>';
+      } else {
+        lawyers.forEach(l => {
+          const msgBody = `Hello, I need legal consultation. I found your profile on NyaySetu.`;
+          const encodedMessage = encodeURIComponent(msgBody);
+          const waLink = `https://wa.me/${l.phone}?text=${encodedMessage}`;
+          
+          html += `
+            <div class="lawyer-card">
+              <div class="lawyer-name">${esc(l.name)}</div>
+              <div class="lawyer-details">
+                <span style="text-transform:capitalize;">⚖️ ${esc(l.specialization)}</span>
+                <span>💼 ${esc(l.experience)}</span>
+                <span>📍 ${esc(l.location)}</span>
+              </div>
+              <a href="${waLink}" target="_blank" class="connect-btn">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                Connect via WhatsApp
+              </a>
+            </div>
+          `;
+        });
+      }
+      container.innerHTML = html;
     }
     
     function renderPage(caseData, lawyers) {

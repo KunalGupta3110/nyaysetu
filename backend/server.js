@@ -348,6 +348,11 @@ app.get("/match-lawyers/:caseId", (req, res) => {
   });
 });
 
+app.get("/get-lawyers", (req, res) => {
+  const lawyers = readJsonFile(LAWYERS_FILE);
+  res.json(lawyers.slice(0, 6));
+});
+
 // ================= SERVER =================
 const PORT = process.env.PORT || 5000;
 

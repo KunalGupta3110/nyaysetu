@@ -9,7 +9,7 @@
 html,body{height:100%}
 body{display:flex;align-items:center;justify-content:center;padding:20px;min-height:100vh}
 
-.auth-wrap{display:grid;grid-template-columns:1fr 1fr;max-width:900px;width:100%;background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadowlg)}
+.auth-wrap{display:grid;grid-template-columns:0.8fr 1.2fr;max-width:1000px;width:100%;background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadowlg)}
 
 /* Left panel */
 .auth-left{background:linear-gradient(135deg,rgba(201,169,110,.07) 0%,transparent 60%);border-right:1px solid var(--border);padding:48px 44px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
@@ -26,7 +26,7 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 .auth-bottom{position:relative;z-index:2;font-size:11px;color:var(--tm);line-height:1.6}
 
 /* Right panel */
-.auth-right{padding:48px 44px;display:flex;flex-direction:column;justify-content:center}
+.auth-right{padding:48px 52px;display:flex;flex-direction:column;justify-content:center}
 .auth-tabs{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:28px}
 .auth-tab{flex:1;padding:9px;font-size:13px;font-weight:500;background:transparent;border:none;color:var(--ts);transition:all var(--t) var(--ease)}
 .auth-tab.active{background:var(--adim);color:var(--accent)}
@@ -44,13 +44,14 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 .btn-google:disabled{opacity:.55;cursor:not-allowed;transform:none}
 .google-mark{width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
 .google-mark svg{width:14px;height:14px;display:block}
-.role-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
-.role-card{padding:12px;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all var(--t) var(--ease);text-align:center}
+.role-select-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:18px}
+.role-card{padding:12px 8px;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all var(--t) var(--ease);text-align:center}
 .role-card:hover,.role-card.on{border-color:rgba(201,169,110,.35);background:var(--adim)}
 .role-card.on::after{content:none}
 .role-ico{font-size:22px;margin-bottom:6px}
 .role-title{font-size:12.5px;font-weight:600;color:var(--tp)}
 .role-desc{font-size:11px;color:var(--ts);margin-top:2px}
+.form-group{margin-bottom: 20px;}
 
 /* Password strength */
 .pw-bar{height:3px;border-radius:2px;background:var(--bg3);overflow:hidden;margin-top:6px}
@@ -63,9 +64,12 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 .auth-loading{display:none;position:absolute;inset:0;background:rgba(10,10,10,.7);backdrop-filter:blur(4px);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:12px;border-radius:var(--rl)}
 .auth-loading.show{display:flex}
 
-@media(max-width:700px){
+@media(max-width:800px){
   .auth-wrap{grid-template-columns:1fr}
   .auth-left{display:none}
+  .role-select-grid{grid-template-columns:1fr}
+  .btn-primary{width:100%}
+  .auth-right{padding:32px 24px}
 }
 </style>
 </head>
@@ -157,6 +161,11 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
             <div class="role-title" data-i18n="auth_role_student">Law Student</div>
             <div class="role-desc" data-i18n="auth_role_student_desc">Want to review & earn</div>
           </div>
+          <div class="role-card" data-role="lawyer" onclick="selectRole(this,'lawyer')">
+            <div class="role-ico">⚖️</div>
+            <div class="role-title">Lawyer</div>
+            <div class="role-desc">Provide legal services & earn</div>
+          </div>
         </div>
       </div>
 
@@ -214,6 +223,43 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
             <option data-i18n="auth_area_constitutional">Constitutional Law</option>
             <option data-i18n="auth_area_all">All Areas</option>
           </select>
+        </div>
+      </div>
+
+      <!-- Lawyer extra fields (hidden by default) -->
+      <div id="lawyer-fields" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Qualification</label>
+            <input class="form-input" id="su-l-qual" type="text" placeholder="e.g. LLB, LLM">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Specialization</label>
+            <input class="form-input" id="su-l-spec" type="text" placeholder="e.g. Criminal, Civil">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Years of Experience</label>
+            <input class="form-input" id="su-l-exp" type="number" placeholder="e.g. 5">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location (City/State)</label>
+            <input class="form-input" id="su-l-loc" type="text" placeholder="e.g. New Delhi">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Expected Fees</label>
+          <input class="form-input" id="su-l-fees" type="text" placeholder="e.g. ₹1500 per consultation">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Short Bio (Optional)</label>
+          <textarea class="form-input" id="su-l-bio" placeholder="Briefly describe your practice..." style="min-height: 60px; resize: vertical;"></textarea>
+        </div>
+        <div style="background: var(--adim); border: 1px solid rgba(201,169,110,.2); padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+          <p style="font-size: 11.5px; color: var(--accent); margin: 0; line-height: 1.4;">
+            <strong>Verification Required:</strong> All lawyer profiles will be verified before approval.
+          </p>
         </div>
       </div>
 
@@ -339,11 +385,12 @@ function setAuthLoading(mode, loading) {
 }
 
 window.selectRole = (el, role) => {
-  const nextRole = role === 'student' ? 'student' : 'user';
+  const nextRole = role === 'student' ? 'student' : role === 'lawyer' ? 'lawyer' : 'user';
   document.querySelectorAll('.role-card').forEach(card => card.classList.remove('on'));
   el.classList.add('on');
   selectedRole = nextRole;
   document.getElementById('student-fields').style.display = nextRole === 'student' ? 'block' : 'none';
+  document.getElementById('lawyer-fields').style.display = nextRole === 'lawyer' ? 'block' : 'none';
 };
 
 window.switchTab = (tab) => {
@@ -365,7 +412,7 @@ window.checkPwStrength = (pw) => {
 window.signUp = async () => {
   if (authBusy) return;
 
-  const role = selectedRole === 'student' ? 'student' : 'user';
+  const role = selectedRole;
   const user = {
     name: document.getElementById('su-name').value.trim(),
     email: document.getElementById('su-email').value.trim().toLowerCase(),
@@ -374,7 +421,13 @@ window.signUp = async () => {
     city: document.getElementById('su-city').value.trim(),
     college: role === 'student' ? document.getElementById('su-college').value.trim() : '',
     year: role === 'student' ? document.getElementById('su-year').value : '',
-    area: role === 'student' ? document.getElementById('su-area').value : ''
+    area: role === 'student' ? document.getElementById('su-area').value : '',
+    l_qual: role === 'lawyer' ? document.getElementById('su-l-qual').value.trim() : '',
+    l_spec: role === 'lawyer' ? document.getElementById('su-l-spec').value.trim() : '',
+    l_exp: role === 'lawyer' ? document.getElementById('su-l-exp').value.trim() : '',
+    l_loc: role === 'lawyer' ? document.getElementById('su-l-loc').value.trim() : '',
+    l_fees: role === 'lawyer' ? document.getElementById('su-l-fees').value.trim() : '',
+    l_bio: role === 'lawyer' ? document.getElementById('su-l-bio').value.trim() : ''
   };
 
   if (!user.name || !user.email || !user.password || !user.city) {
@@ -391,6 +444,10 @@ window.signUp = async () => {
   }
   if (role === 'student' && (!user.college || !user.year || !user.area)) {
     showToast('Please complete your student details', '!');
+    return;
+  }
+  if (role === 'lawyer' && (!user.l_qual || !user.l_spec || !user.l_exp || !user.l_loc || !user.l_fees)) {
+    showToast('Please complete your lawyer details', '!');
     return;
   }
   if (getSavedUsers().some(saved => saved.email.toLowerCase() === user.email)) {

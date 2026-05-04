@@ -25,6 +25,7 @@ function injectNav() {
       <a class="nav-tab" href="${pageHref('documents.html')}" data-page="docs"><span class="nav-icon">📄</span> <span data-i18n="nav_docs">Documents</span></a>
       <a class="nav-tab" href="${pageHref('simplifier.html')}" data-page="simplify"><span class="nav-icon">📚</span> <span data-i18n="nav_simplify">Simplifier</span></a>
       <a class="nav-tab" href="${pageHref('students.html')}" data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
+      <a class="nav-tab" href="${pageHref('lawyers.html')}" data-page="lawyers"><span class="nav-icon">⚖️</span> <span data-i18n="nav_lawyers">Lawyers</span></a>
       <a class="nav-tab" href="${pageHref('about.html')}" data-page="about"><span class="nav-icon">ℹ️</span> <span data-i18n="footer_about">About Us</span></a>
       ${dashboardLink}
       <button class="nav-tab mobile-only-nav-item" onclick="toggleTheme()" style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; border-radius: 0; justify-content: flex-start; border-bottom:none; background:transparent;"><span class="nav-icon">☀/☽</span> Toggle Theme</button>
