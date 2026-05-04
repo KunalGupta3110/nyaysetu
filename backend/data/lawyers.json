@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "name": "Rahul Sharma",
+    "specialization": "rent dispute",
+    "location": "Delhi",
+    "experience": "5 years",
+    "phone": "919876543210"
+  },
+  {
+    "id": "2",
+    "name": "Priya Singh",
+    "specialization": "consumer complaint",
+    "location": "Mumbai",
+    "experience": "8 years",
+    "phone": "919876543211"
+  },
+  {
+    "id": "3",
+    "name": "Vikram Desai",
+    "specialization": "general",
+    "location": "Delhi",
+    "experience": "10 years",
+    "phone": "919876543212"
+  }
+]

@@ -271,6 +271,80 @@ ${fieldsText}`
     res.json({ document: "Server error while generating document." });
   }
 });
+// ================= LAWYER CONNECTIVITY =================
+
+const CASES_FILE = path.join(__dirname, "data", "cases.json");
+const LAWYERS_FILE = path.join(__dirname, "data", "lawyers.json");
+
+function readJsonFile(file) {
+  try {
+    if (!fs.existsSync(file)) return [];
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch (err) {
+    console.error(`Failed to read file:`, err);
+    return [];
+  }
+}
+
+function writeJsonFile(file, data) {
+  if (!fs.existsSync(path.dirname(file))) {
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+  }
+  fs.writeFileSync(file, JSON.stringify(data, null, 2));
+}
+
+app.post("/create-case", (req, res) => {
+  const { problemType = "General", summary = "", facts = [], documents = [], userId = "anonymous" } = req.body || {};
+  const newCase = {
+    id: crypto.randomUUID(),
+    userId,
+    problemType,
+    summary,
+    facts,
+    documents,
+    createdAt: new Date().toISOString()
+  };
+  
+  const cases = readJsonFile(CASES_FILE);
+  cases.push(newCase);
+  writeJsonFile(CASES_FILE, cases);
+  
+  res.status(201).json(newCase);
+});
+
+app.get("/get-cases/:userId", (req, res) => {
+  const cases = readJsonFile(CASES_FILE);
+  const userCases = cases.filter(c => c.userId === req.params.userId);
+  res.json(userCases);
+});
+
+function matchLawyers(caseData) {
+  const lawyers = readJsonFile(LAWYERS_FILE);
+  let matched = lawyers.filter(l => 
+    l.specialization.toLowerCase().includes(caseData.problemType.toLowerCase()) ||
+    l.specialization.toLowerCase() === "general" || 
+    caseData.problemType.toLowerCase() === "general"
+  );
+  
+  if (matched.length === 0) {
+    matched = lawyers;
+  }
+  
+  return matched.slice(0, 3);
+}
+
+app.get("/match-lawyers/:caseId", (req, res) => {
+  const cases = readJsonFile(CASES_FILE);
+  const caseData = cases.find(c => c.id === req.params.caseId);
+  
+  if (!caseData) {
+    return res.status(404).json({ error: "Case not found" });
+  }
+  
+  const matchedLawyers = matchLawyers(caseData);
+  res.json(matchedLawyers);
+});
+
 // ================= SERVER =================
 const PORT = process.env.PORT || 5000;
 
