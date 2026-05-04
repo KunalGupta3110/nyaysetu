@@ -1,210 +1,674 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Chat — NyaySetu</title>
-<link rel="stylesheet" href="../css/base.css">
-<style>
-html, body { height: 100%; overflow: hidden; }
-body { display: flex; flex-direction: column; }
-.chat-shell { display: flex; flex-direction: column; height: 100dvh; padding-top: 64px; }
-.chat-layout { flex: 1; display: grid; grid-template-columns: 268px 1fr; overflow: hidden; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat — NyaySetu</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <style>
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
 
-/* ── SIDEBAR ── */
-.sidebar {
-  border-right: 1px solid var(--border); background: var(--bg1);
-  display: flex; flex-direction: column; overflow: hidden;
-}
-.sidebar-top {
-  padding: 18px 16px 14px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-}
-.sidebar-heading { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--ts); font-family: 'DM Mono', monospace; }
-.new-btn {
-  width: 28px; height: 28px; border-radius: 6px; background: var(--adim);
-  border: 1px solid rgba(201,169,110,.2); color: var(--accent); font-size: 18px;
-  display: flex; align-items: center; justify-content: center; line-height: 1;
-  transition: all var(--t) var(--ease);
-}
-.new-btn:hover { background: var(--accent); color: #0A0A0A; }
+    body {
+      display: flex;
+      flex-direction: column;
+    }
 
-.sidebar-scroll { flex: 1; overflow-y: auto; padding: 10px 10px; }
-.sidebar-scroll::-webkit-scrollbar { width: 2px; }
-.section-lbl { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--tm); padding: 14px 8px 6px; font-family: 'DM Mono', monospace; }
-.topic {
-  display: flex; align-items: flex-start; gap: 8px;
-  padding: 9px 10px; border-radius: 8px; font-size: 12.5px;
-  color: var(--ts); cursor: pointer; margin-bottom: 2px;
-  transition: all var(--t) var(--ease); line-height: 1.4; border: 1px solid transparent;
-}
-.topic:hover  { background: var(--bg2); color: var(--tp); }
-.topic.active { background: var(--bg2); color: var(--tp); border-color: var(--border); }
-.topic-ico { flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+    .chat-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      padding-top: 64px;
+    }
 
-.sidebar-foot {
-  padding: 14px 16px; border-top: 1px solid var(--border); flex-shrink: 0;
-}
-.lang-select {
-  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
-  background: var(--bg); color: var(--tp); font-size: 13px; outline: none;
-}
+    .chat-layout {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 268px 1fr;
+      overflow: hidden;
+    }
 
-/* ── CHAT MAIN ── */
-.chat-main { display: flex; flex-direction: column; overflow: hidden; }
-.chat-topbar {
-  padding: 13px 24px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center; position: relative;
-  background: var(--bg1); flex-shrink: 0;
-}
-.chat-name { font-size: 16px; font-weight: 600; color: var(--tp); margin-bottom: 0; }
-.chat-online { display: none; }
-.online-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pdot 2s ease-in-out infinite; margin-top: 1px; }
+    /* ── SIDEBAR ── */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: var(--bg1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-.chat-messages { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
-.chat-messages::-webkit-scrollbar { width: 3px; }
+    .sidebar-top {
+      padding: 18px 16px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
 
-/* ── WELCOME ── */
-.welcome {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; text-align: center; padding: 40px; gap: 28px;
-}
-.welcome-ico  { font-size: 52px; margin-bottom: 6px; }
-.welcome-h    { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; color: var(--tp); margin-bottom: 8px; letter-spacing: -.4px; }
-.welcome-sub  { font-size: 15px; color: var(--ts); max-width: 380px; line-height: 1.6; }
-.pill-grid    { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 520px; }
-.pill {
-  padding: 12px 18px; border-radius: 20px; border: 1px solid var(--border);
-  background: var(--bg1); font-size: 14px; color: var(--tp); cursor: pointer;
-  transition: all var(--t) var(--ease); text-align: center; font-weight: 500;
-}
-.pill:hover { border-color: rgba(201,169,110,.4); background: var(--adim); }
+    .sidebar-heading {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--ts);
+      font-family: 'DM Mono', monospace;
+    }
 
-/* ── MESSAGES ── */
-.msg-row { display: flex; flex-direction: column; max-width: 80%; }
-.msg-row.u { align-self: flex-end; align-items: flex-end; }
-.msg-row.a { align-self: flex-start; align-items: flex-start; }
-.msg-from { display: none; }
-.msg-bubble {
-  padding: 12px 16px; border-radius: 18px;
-  font-size: 15px; line-height: 1.5; color: var(--tp);
-}
-.msg-row.u .msg-bubble { background: var(--accent); color: #0A0A0A; border: none; border-bottom-right-radius: 4px; }
-.msg-row.a .msg-bubble { background: var(--bg1); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
-.msg-bubble .mb8 { margin-bottom: 8px; }
-.msg-bubble .mb0 { margin-bottom: 0; }
-.law-chip {
-  display: inline-flex; align-items: center; padding: 1px 6px;
-  background: var(--adim); border: 1px solid rgba(201,169,110,.2);
-  border-radius: 4px; font-size: 11px; color: var(--accent);
-  font-family: 'DM Mono', monospace; font-weight: 500; white-space: nowrap;
-}
-.msg-actions { display: flex; gap: 6px; margin-top: 8px; padding: 0 4px; width: 100%; justify-content: space-between; align-items: center; }
-.msg-act {
-  padding: 6px 14px; border-radius: 20px; border: none;
-  background: var(--bg2); font-size: 13px; color: var(--tp); font-weight: 500;
-  transition: all var(--t) var(--ease); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
-}
-.msg-act.primary { background: var(--accent); color: #0A0A0A; }
-.msg-act:hover { filter: brightness(1.1); }
+    .new-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--adim);
+      border: 1px solid rgba(201, 169, 110, .2);
+      color: var(--accent);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      transition: all var(--t) var(--ease);
+    }
 
-/* Dropdown */
-.msg-dropdown { position: relative; display: inline-block; }
-.msg-dropdown-content {
-  display: none; position: absolute; bottom: 100%; right: 0; 
-  background: var(--bg1); border: 1px solid var(--border); border-radius: 12px;
-  min-width: 140px; z-index: 10; padding: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  margin-bottom: 8px;
-}
-.msg-dropdown:hover .msg-dropdown-content { display: flex; flex-direction: column; }
-.msg-dropdown-item {
-  padding: 10px 14px; font-size: 13px; color: var(--tp); text-decoration: none;
-  border-radius: 8px; cursor: pointer; display: block; text-align: left;
-  background: transparent; border: none; width: 100%; transition: background 0.2s; font-weight: 500;
-}
-.msg-dropdown-item:hover { background: var(--bg2); }
+    .new-btn:hover {
+      background: var(--accent);
+      color: #0A0A0A;
+    }
 
-/* ── TYPING ── */
-.typing-wrap { align-self: flex-start; }
-.typing {
-  display: flex; align-items: center; gap: 4px;
-  padding: 13px 16px; background: var(--bg1); border: 1px solid var(--border);
-  border-radius: 18px; border-bottom-left-radius: 4px;
-}
-.typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--ts); animation: bounce 1.3s ease-in-out infinite; }
-.typing span:nth-child(2) { animation-delay: .18s; }
-.typing span:nth-child(3) { animation-delay: .36s; }
-@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px);} }
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 10px;
+    }
 
-/* ── INPUT ── */
-.chat-input-zone { padding: 12px 24px; border-top: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
-.input-wrap {
-  display: flex; align-items: flex-end; gap: 8px;
-  background: var(--bg1); border: 1px solid var(--border); border-radius: 24px; padding: 6px 10px;
-  transition: border-color var(--t) var(--ease);
-}
-.input-wrap:focus-within { border-color: var(--border2); }
-.chat-ta { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; color: var(--tp); resize: none; line-height: 1.5; max-height: 130px; min-height: 24px; padding: 8px 4px; }
-.chat-ta::placeholder { color: var(--tm); }
-.send-btn {
-  width: 44px; height: 44px; border-radius: 50%; background: var(--accent); border: none;
-  color: #0A0A0A; font-size: 18px; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: all var(--t) var(--ease); cursor: pointer; margin-bottom: 2px;
-}
-.send-btn:hover:not(:disabled)  { background: var(--accent2); transform: scale(1.05); }
-.send-btn:disabled { opacity: .4; cursor: not-allowed; }
-.chat-hint { font-size: 11px; color: var(--tm); text-align: center; margin-top: 8px; display: none; }
+    .sidebar-scroll::-webkit-scrollbar {
+      width: 2px;
+    }
 
-/* ── VOICE ── */
-.mic-btn {
-  width: 44px; height: 44px; border-radius: 50%; background: transparent; border: 1px solid transparent;
-  color: var(--ts); font-size: 18px; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: all var(--t) var(--ease); cursor: pointer; margin-bottom: 2px;
-}
-.mic-btn:hover { color: var(--tp); background: var(--bg2); }
-.mic-btn.listening {
-  color: #ef4444; background: rgba(239, 68, 68, 0.1);
-  animation: pulse-red 1.5s infinite;
-}
-.mic-btn.speaking {
-  color: var(--accent); background: rgba(201, 169, 110, 0.1);
-  animation: pulse-accent 1.5s infinite;
-}
-@keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-@keyframes pulse-accent { 0% { box-shadow: 0 0 0 0 rgba(201, 169, 110, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(201, 169, 110, 0); } 100% { box-shadow: 0 0 0 0 rgba(201, 169, 110, 0); } }
+    .section-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--tm);
+      padding: 14px 8px 6px;
+      font-family: 'DM Mono', monospace;
+    }
 
-/* ── DISCLAIMER BADGE ── */
-.disclaimer { display: flex; align-items: flex-start; gap: 8px; padding: 10px 14px; background: var(--bg1); border-radius: 8px; font-size: 11.5px; color: var(--ts); line-height: 1.5; margin-bottom: 8px; justify-content: center; text-align: center; border: 1px solid var(--border); }
+    .topic {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      color: var(--ts);
+      cursor: pointer;
+      margin-bottom: 2px;
+      transition: all var(--t) var(--ease);
+      line-height: 1.4;
+      border: 1px solid transparent;
+    }
 
-.desktop-only { display: flex; }
+    .topic:hover {
+      background: var(--bg2);
+      color: var(--tp);
+    }
 
-@media (max-width: 860px) {
-  .sidebar { display: none; }
-  .chat-layout { grid-template-columns: 1fr; }
-  .chat-messages { padding: 16px 12px; gap: 14px; }
-  .msg-row { max-width: 92%; }
-  .msg-bubble { font-size: 15px; padding: 12px 16px; }
-  .desktop-only { display: none !important; }
-  .pill-grid { flex-direction: column; width: 100%; max-width: 100%; }
-  .pill { text-align: center; font-size: 15px; padding: 14px; border-radius: 16px; }
-  .chat-input-zone { 
-    background: var(--bg);
-    padding: 10px 12px;
-    box-sizing: border-box;
-    border-top: 1px solid var(--border);
-  }
-  .chat-topbar { padding: 12px 16px; }
-}
-</style>
+    .topic.active {
+      background: var(--bg2);
+      color: var(--tp);
+      border-color: var(--border);
+    }
+
+    .topic-ico {
+      flex-shrink: 0;
+      font-size: 13px;
+      margin-top: 1px;
+    }
+
+    .sidebar-foot {
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .lang-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--tp);
+      font-size: 13px;
+      outline: none;
+    }
+
+    /* ── CHAT MAIN ── */
+    .chat-main {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-topbar {
+      padding: 13px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: var(--bg1);
+      flex-shrink: 0;
+    }
+
+    .chat-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--tp);
+      margin-bottom: 0;
+    }
+
+    .chat-online {
+      display: none;
+    }
+
+    .online-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pdot 2s ease-in-out infinite;
+      margin-top: 1px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    /* ── WELCOME ── */
+    .welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+      gap: 28px;
+    }
+
+    .welcome-ico {
+      font-size: 52px;
+      margin-bottom: 6px;
+    }
+
+    .welcome-h {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--tp);
+      margin-bottom: 8px;
+      letter-spacing: -.4px;
+    }
+
+    .welcome-sub {
+      font-size: 15px;
+      color: var(--ts);
+      max-width: 380px;
+      line-height: 1.6;
+    }
+
+    .pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      max-width: 520px;
+    }
+
+    .pill {
+      padding: 12px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg1);
+      font-size: 14px;
+      color: var(--tp);
+      cursor: pointer;
+      transition: all var(--t) var(--ease);
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .pill:hover {
+      border-color: rgba(201, 169, 110, .4);
+      background: var(--adim);
+    }
+
+    /* ── MESSAGES ── */
+    .msg-row {
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+    }
+
+    .msg-row.u {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .msg-row.a {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .msg-from {
+      display: none;
+    }
+
+    .msg-bubble {
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--tp);
+    }
+
+    .msg-row.u .msg-bubble {
+      background: var(--accent);
+      color: #0A0A0A;
+      border: none;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-row.a .msg-bubble {
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-bubble .mb8 {
+      margin-bottom: 8px;
+    }
+
+    .msg-bubble .mb0 {
+      margin-bottom: 0;
+    }
+
+    .law-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 6px;
+      background: var(--adim);
+      border: 1px solid rgba(201, 169, 110, .2);
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .msg-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 0 4px;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .msg-act {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: none;
+      background: var(--bg2);
+      font-size: 13px;
+      color: var(--tp);
+      font-weight: 500;
+      transition: all var(--t) var(--ease);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .msg-act.primary {
+      background: var(--accent);
+      color: #0A0A0A;
+    }
+
+    .msg-act:hover {
+      filter: brightness(1.1);
+    }
+
+    /* Dropdown */
+    .msg-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .msg-dropdown-content {
+      display: none;
+      position: absolute;
+      bottom: 100%;
+      right: 0;
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      min-width: 140px;
+      z-index: 10;
+      padding: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      margin-bottom: 8px;
+    }
+
+    .msg-dropdown:hover .msg-dropdown-content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .msg-dropdown-item {
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--tp);
+      text-decoration: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: block;
+      text-align: left;
+      background: transparent;
+      border: none;
+      width: 100%;
+      transition: background 0.2s;
+      font-weight: 500;
+    }
+
+    .msg-dropdown-item:hover {
+      background: var(--bg2);
+    }
+
+    /* ── TYPING ── */
+    .typing-wrap {
+      align-self: flex-start;
+    }
+
+    .typing {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 13px 16px;
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+    }
+
+    .typing span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ts);
+      animation: bounce 1.3s ease-in-out infinite;
+    }
+
+    .typing span:nth-child(2) {
+      animation-delay: .18s;
+    }
+
+    .typing span:nth-child(3) {
+      animation-delay: .36s;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0)
+      }
+
+      30% {
+        transform: translateY(-5px);
+      }
+    }
+
+    /* ── INPUT ── */
+    .chat-input-zone {
+      padding: 12px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 6px 10px;
+      transition: border-color var(--t) var(--ease);
+    }
+
+    .input-wrap:focus-within {
+      border-color: var(--border2);
+    }
+
+    .chat-ta {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      color: var(--tp);
+      resize: none;
+      line-height: 1.5;
+      max-height: 130px;
+      min-height: 24px;
+      padding: 8px 4px;
+    }
+
+    .chat-ta::placeholder {
+      color: var(--tm);
+    }
+
+    .send-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      color: #0A0A0A;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--t) var(--ease);
+      cursor: pointer;
+      margin-bottom: 2px;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      background: var(--accent2);
+      transform: scale(1.05);
+    }
+
+    .send-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .chat-hint {
+      font-size: 11px;
+      color: var(--tm);
+      text-align: center;
+      margin-top: 8px;
+      display: none;
+    }
+
+    /* ── VOICE ── */
+    .mic-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--ts);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--t) var(--ease);
+      cursor: pointer;
+      margin-bottom: 2px;
+    }
+
+    .mic-btn:hover {
+      color: var(--tp);
+      background: var(--bg2);
+    }
+
+    .mic-btn.listening {
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      animation: pulse-red 1.5s infinite;
+    }
+
+    .mic-btn.speaking {
+      color: var(--accent);
+      background: rgba(201, 169, 110, 0.1);
+      animation: pulse-accent 1.5s infinite;
+    }
+
+    @keyframes pulse-red {
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+      }
+    }
+
+    @keyframes pulse-accent {
+      0% {
+        box-shadow: 0 0 0 0 rgba(201, 169, 110, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 8px rgba(201, 169, 110, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(201, 169, 110, 0);
+      }
+    }
+
+    /* ── DISCLAIMER BADGE ── */
+    .disclaimer {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--bg1);
+      border-radius: 8px;
+      font-size: 11.5px;
+      color: var(--ts);
+      line-height: 1.5;
+      margin-bottom: 8px;
+      justify-content: center;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .desktop-only {
+      display: flex;
+    }
+
+    @media (max-width: 860px) {
+      .sidebar {
+        display: none;
+      }
+
+      .chat-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .chat-messages {
+        padding: 16px 12px;
+        gap: 14px;
+      }
+
+      .msg-row {
+        max-width: 92%;
+      }
+
+      .msg-bubble {
+        font-size: 15px;
+        padding: 12px 16px;
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+
+      .pill-grid {
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .pill {
+        text-align: center;
+        font-size: 15px;
+        padding: 14px;
+        border-radius: 16px;
+      }
+
+      .chat-input-zone {
+        background: var(--bg);
+        padding: 10px 12px;
+        box-sizing: border-box;
+        border-top: 1px solid var(--border);
+      }
+
+      .chat-topbar {
+        padding: 12px 16px;
+      }
+    }
+  </style>
 </head>
+
 <body data-page="chat">
-<script src="../js/utils.js"></script>
-<script src="../js/i18n.js"></script>
-<script src="../js/nav.js"></script>
-<script>
-// Fix nav paths for pages/ subdirectory
-function injectNav() {
-  document.body.insertAdjacentHTML('afterbegin', `
+  <script src="../js/utils.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>
+    // Fix nav paths for pages/ subdirectory
+    function injectNav() {
+      document.body.insertAdjacentHTML('afterbegin', `
   <nav id="nav">
     <a href="../index.html" class="nav-logo">
       <div class="nav-logo-box">N</div>
@@ -229,148 +693,171 @@ function injectNav() {
     </div>
   </nav>
   <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>`);
-  initTheme(); setActiveNav(); initI18n?.();
-}
-injectNav();
-</script>
+      initTheme(); setActiveNav(); initI18n?.();
+    }
+    injectNav();
+  </script>
 
-<div class="chat-shell">
-  <div class="chat-layout">
+  <div class="chat-shell">
+    <div class="chat-layout">
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <span class="sidebar-heading" data-i18n="sidebar_topics">Topics</span>
-        <button class="new-btn" onclick="clearChat()" title="New chat">+</button>
-      </div>
-      <div class="sidebar-scroll">
-        <div class="section-lbl">Common Questions</div>
-        <div class="topic" onclick="prefill('What is an FIR and how do I file one?')"><span class="topic-ico">📋</span>How to file an FIR</div>
-        <div class="topic" onclick="prefill('My landlord is not returning my security deposit for 3 months. What can I do legally?')"><span class="topic-ico">🏠</span>Security deposit dispute</div>
-        <div class="topic" onclick="prefill('What are my rights if police arrest me without a warrant?')"><span class="topic-ico">🚔</span>Rights on arrest</div>
-        <div class="topic" onclick="prefill('How do I file a consumer complaint against a company that cheated me?')"><span class="topic-ico">🛒</span>Consumer complaint</div>
-        <div class="topic" onclick="prefill('What is Section 498A IPC — explain it simply with penalties.')"><span class="topic-ico">📖</span>Section 498A IPC</div>
-        <div class="topic" onclick="prefill('How to apply for anticipatory bail and what is the court process?')"><span class="topic-ico">⚖️</span>Anticipatory bail</div>
-        <div class="topic" onclick="prefill('How do I file for divorce in India? What are the grounds and procedure?')"><span class="topic-ico">👨‍👩‍👧</span>Divorce procedure</div>
-        <div class="topic" onclick="prefill('What is the RTI application process and who can I file it against?')"><span class="topic-ico">📄</span>RTI application</div>
-        <div class="topic" onclick="prefill('My employer has not paid my salary for 2 months. What legal options do I have?')"><span class="topic-ico">💼</span>Unpaid salary</div>
-        <div class="topic" onclick="prefill('What is the process for registering a property in India and what documents are needed?')"><span class="topic-ico">🏡</span>Property registration</div>
-        <div class="section-lbl">Criminal Law</div>
-        <div class="topic" onclick="prefill('What are the bail provisions under CrPC and when can bail be denied?')"><span class="topic-ico">⛓</span>Bail provisions CrPC</div>
-        <div class="topic" onclick="prefill('What is the difference between cognizable and non-cognizable offences?')"><span class="topic-ico">📘</span>Cognizable offences</div>
-        <div class="topic" onclick="prefill('What are the rights of an accused person under Indian law?')"><span class="topic-ico">🛡</span>Rights of accused</div>
-        <div class="section-lbl">Family & Property</div>
-        <div class="topic" onclick="prefill('What are a woman\'s rights in ancestral property under Hindu Succession Act?')"><span class="topic-ico">👩‍⚖️</span>Women property rights</div>
-        <div class="topic" onclick="prefill('How does child custody work in India after divorce?')"><span class="topic-ico">👶</span>Child custody India</div>
-      </div>
-      <div class="sidebar-foot">
-        <div style="font-size:11px;color:var(--tm);margin-bottom:8px;font-family:'DM Mono',monospace">Use the top language selector for UI and response language.</div>
-      </div>
-    </aside>
-
-    <!-- CHAT MAIN -->
-    <main class="chat-main">
-      <div class="chat-topbar">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div class="chat-name" data-i18n="chat_name">NyaySetu AI</div>
-          <div class="online-dot"></div>
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <span class="sidebar-heading" data-i18n="sidebar_topics">Topics</span>
+          <button class="new-btn" onclick="clearChat()" title="New chat">+</button>
         </div>
-        <div class="desktop-only" style="position: absolute; right: 24px; display: flex; gap: 8px;">
-          <button class="btn-ghost btn-sm" onclick="clearChat()" data-i18n="chat_new">New Chat</button>
+        <div class="sidebar-scroll">
+          <div class="section-lbl">Common Questions</div>
+          <div class="topic" onclick="prefill('What is an FIR and how do I file one?')"><span
+              class="topic-ico">📋</span>How to file an FIR</div>
+          <div class="topic"
+            onclick="prefill('My landlord is not returning my security deposit for 3 months. What can I do legally?')">
+            <span class="topic-ico">🏠</span>Security deposit dispute</div>
+          <div class="topic" onclick="prefill('What are my rights if police arrest me without a warrant?')"><span
+              class="topic-ico">🚔</span>Rights on arrest</div>
+          <div class="topic" onclick="prefill('How do I file a consumer complaint against a company that cheated me?')">
+            <span class="topic-ico">🛒</span>Consumer complaint</div>
+          <div class="topic" onclick="prefill('What is Section 498A IPC — explain it simply with penalties.')"><span
+              class="topic-ico">📖</span>Section 498A IPC</div>
+          <div class="topic" onclick="prefill('How to apply for anticipatory bail and what is the court process?')">
+            <span class="topic-ico">⚖️</span>Anticipatory bail</div>
+          <div class="topic"
+            onclick="prefill('How do I file for divorce in India? What are the grounds and procedure?')"><span
+              class="topic-ico">👨‍👩‍👧</span>Divorce procedure</div>
+          <div class="topic" onclick="prefill('What is the RTI application process and who can I file it against?')">
+            <span class="topic-ico">📄</span>RTI application</div>
+          <div class="topic"
+            onclick="prefill('My employer has not paid my salary for 2 months. What legal options do I have?')"><span
+              class="topic-ico">💼</span>Unpaid salary</div>
+          <div class="topic"
+            onclick="prefill('What is the process for registering a property in India and what documents are needed?')">
+            <span class="topic-ico">🏡</span>Property registration</div>
+          <div class="section-lbl">Criminal Law</div>
+          <div class="topic" onclick="prefill('What are the bail provisions under CrPC and when can bail be denied?')">
+            <span class="topic-ico">⛓</span>Bail provisions CrPC</div>
+          <div class="topic"
+            onclick="prefill('What is the difference between cognizable and non-cognizable offences?')"><span
+              class="topic-ico">📘</span>Cognizable offences</div>
+          <div class="topic" onclick="prefill('What are the rights of an accused person under Indian law?')"><span
+              class="topic-ico">🛡</span>Rights of accused</div>
+          <div class="section-lbl">Family & Property</div>
+          <div class="topic"
+            onclick="prefill('What are a woman\'s rights in ancestral property under Hindu Succession Act?')"><span
+              class="topic-ico">👩‍⚖️</span>Women property rights</div>
+          <div class="topic" onclick="prefill('How does child custody work in India after divorce?')"><span
+              class="topic-ico">👶</span>Child custody India</div>
         </div>
-      </div>
+        <div class="sidebar-foot">
+          <div style="font-size:11px;color:var(--tm);margin-bottom:8px;font-family:'DM Mono',monospace">Use the top
+            language selector for UI and response language.</div>
+        </div>
+      </aside>
 
-      <div class="chat-messages" id="messages">
-        <div class="welcome" id="welcome">
-          <div>
-            <div class="welcome-ico">⚖️</div>
-            <div class="welcome-h" data-i18n="chat_welcome_heading">NyaySetu AI</div>
-            <div class="welcome-sub" data-i18n="chat_welcome_sub">Your personal legal assistant. Simple, fast, and reliable.</div>
+      <!-- CHAT MAIN -->
+      <main class="chat-main">
+        <div class="chat-topbar">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="chat-name" data-i18n="chat_name">NyaySetu AI</div>
+            <div class="online-dot"></div>
           </div>
-          <div class="pill-grid">
-            <div class="pill" onclick="prefill('Generate a Legal Notice for me')">📄 Generate Legal Notice</div>
-            <div class="pill" onclick="prefill('What are my rights in this situation?')">🛡️ Check My Rights</div>
-            <div class="pill" onclick="prefill('How do I file a formal complaint?')">⚖️ File Complaint</div>
+          <div class="desktop-only" style="position: absolute; right: 24px; display: flex; gap: 8px;">
+            <button class="btn-ghost btn-sm" onclick="clearChat()" data-i18n="chat_new">New Chat</button>
           </div>
         </div>
-      </div>
 
-      <div class="chat-input-zone">
-        <div class="disclaimer">
-          <span data-i18n="chat_disclaimer">Guidance only. Consult a lawyer for serious matters.</span>
+        <div class="chat-messages" id="messages">
+          <div class="welcome" id="welcome">
+            <div>
+              <div class="welcome-ico">⚖️</div>
+              <div class="welcome-h" data-i18n="chat_welcome_heading">NyaySetu AI</div>
+              <div class="welcome-sub" data-i18n="chat_welcome_sub">Your personal legal assistant. Simple, fast, and
+                reliable.</div>
+            </div>
+            <div class="pill-grid">
+              <div class="pill" onclick="prefill('Generate a Legal Notice for me')">📄 Generate Legal Notice</div>
+              <div class="pill" onclick="prefill('What are my rights in this situation?')">🛡️ Check My Rights</div>
+              <div class="pill" onclick="prefill('How do I file a formal complaint?')">⚖️ File Complaint</div>
+            </div>
+          </div>
         </div>
-        <div class="input-wrap">
-          <textarea class="chat-ta" id="chat-input" data-i18n-placeholder="chat_placeholder" placeholder="Ask your legal question or tap mic..." rows="1"
-            onkeydown="onKey(event)" oninput="autoGrow(this)"></textarea>
-          <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Voice Input">🎤</button>
-          <button class="send-btn" id="send-btn" onclick="send()">→</button>
+
+        <div class="chat-input-zone">
+          <div class="disclaimer">
+          </div>
+          <div class="input-wrap">
+            <textarea class="chat-ta" id="chat-input" data-i18n-placeholder="chat_placeholder"
+              placeholder="Ask your legal question or tap mic..." rows="1" onkeydown="onKey(event)"
+              oninput="autoGrow(this)"></textarea>
+            <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Voice Input">🎤</button>
+            <button class="send-btn" id="send-btn" onclick="send()">→</button>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
-</div>
 
-<script>
-// ── STATE ──
-let history = [];
-let lang = 'en';
-let busy = false;
+  <script>
+    // ── STATE ──
+    let history = [];
+    let lang = 'en';
+    let busy = false;
 
-const LANGUAGE_PROMPTS = {
-  en: 'Respond in clear English.',
-  hi: 'Respond in Hindi using Devanagari script and proper legal Hindi terminology.',
-  ur: 'Respond in Urdu using Perso-Arabic script and proper legal Urdu terminology.',
-  bn: 'Respond in Bengali using Bengali script and proper legal Bengali terminology.',
-  pa: 'Respond in Punjabi using Gurmukhi script and proper legal Punjabi terminology.',
-  gu: 'Respond in Gujarati using Gujarati script and proper legal Gujarati terminology.',
-  mr: 'Respond in Marathi using Devanagari script and proper legal Marathi terminology.',
-  ta: 'Respond in Tamil using Tamil script and proper legal Tamil terminology.',
-  te: 'Respond in Telugu using Telugu script and proper legal Telugu terminology.',
-  kn: 'Respond in Kannada using Kannada script and proper legal Kannada terminology.',
-  ml: 'Respond in Malayalam using Malayalam script and proper legal Malayalam terminology.',
-  or: 'Respond in Odia using Odia script and proper legal Odia terminology.',
-  as: 'Respond in Assamese using Assamese script and proper legal Assamese terminology.',
-  mai: 'Respond in Maithili using Devanagari script and proper legal Maithili terminology.',
-  sa: 'Respond in Sanskrit using Devanagari script and proper legal Sanskrit terminology.',
-  ne: 'Respond in Nepali using Devanagari script and proper legal Nepali terminology.',
-  sd: 'Respond in Sindhi using Perso-Arabic script and proper legal Sindhi terminology.',
-  ks: 'Respond in Kashmiri using Perso-Arabic script and proper legal Kashmiri terminology.',
-  kok: 'Respond in Konkani using Devanagari script and proper legal Konkani terminology.',
-  sat: 'Respond in Santali using Ol Chiki script and proper legal Santali terminology.',
-  doi: 'Respond in Dogri using Devanagari script and proper legal Dogri terminology.',
-  brx: 'Respond in Bodo using Devanagari script and proper legal Bodo terminology.',
-  mni: 'Respond in Manipuri using Bengali script and proper legal Manipuri terminology.'
-};
+    const LANGUAGE_PROMPTS = {
+      en: 'Respond in clear English.',
+      hi: 'Respond in Hindi using Devanagari script and proper legal Hindi terminology.',
+      ur: 'Respond in Urdu using Perso-Arabic script and proper legal Urdu terminology.',
+      bn: 'Respond in Bengali using Bengali script and proper legal Bengali terminology.',
+      pa: 'Respond in Punjabi using Gurmukhi script and proper legal Punjabi terminology.',
+      gu: 'Respond in Gujarati using Gujarati script and proper legal Gujarati terminology.',
+      mr: 'Respond in Marathi using Devanagari script and proper legal Marathi terminology.',
+      ta: 'Respond in Tamil using Tamil script and proper legal Tamil terminology.',
+      te: 'Respond in Telugu using Telugu script and proper legal Telugu terminology.',
+      kn: 'Respond in Kannada using Kannada script and proper legal Kannada terminology.',
+      ml: 'Respond in Malayalam using Malayalam script and proper legal Malayalam terminology.',
+      or: 'Respond in Odia using Odia script and proper legal Odia terminology.',
+      as: 'Respond in Assamese using Assamese script and proper legal Assamese terminology.',
+      mai: 'Respond in Maithili using Devanagari script and proper legal Maithili terminology.',
+      sa: 'Respond in Sanskrit using Devanagari script and proper legal Sanskrit terminology.',
+      ne: 'Respond in Nepali using Devanagari script and proper legal Nepali terminology.',
+      sd: 'Respond in Sindhi using Perso-Arabic script and proper legal Sindhi terminology.',
+      ks: 'Respond in Kashmiri using Perso-Arabic script and proper legal Kashmiri terminology.',
+      kok: 'Respond in Konkani using Devanagari script and proper legal Konkani terminology.',
+      sat: 'Respond in Santali using Ol Chiki script and proper legal Santali terminology.',
+      doi: 'Respond in Dogri using Devanagari script and proper legal Dogri terminology.',
+      brx: 'Respond in Bodo using Devanagari script and proper legal Bodo terminology.',
+      mni: 'Respond in Manipuri using Bengali script and proper legal Manipuri terminology.'
+    };
 
-window.onLanguageChange = (l) => {
-  lang = l;
-};
+    window.onLanguageChange = (l) => {
+      lang = l;
+    };
 
-function autoGrow(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 130) + 'px';
-}
+    function autoGrow(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 130) + 'px';
+    }
 
-function onKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
-}
+    function onKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+    }
 
-function prefill(q) {
-  const inp = document.getElementById('chat-input');
-  inp.value = q; autoGrow(inp);
-  send();
-}
+    function prefill(q) {
+      const inp = document.getElementById('chat-input');
+      inp.value = q; autoGrow(inp);
+      send();
+    }
 
-function clearChat() {
-  history = [];
-  const msgs = document.getElementById('messages');
-  msgs.innerHTML = '';
-  msgs.insertAdjacentHTML('beforeend', welcomeHTML());
-  applyTranslations?.(currentStrings);
-}
+    function clearChat() {
+      history = [];
+      const msgs = document.getElementById('messages');
+      msgs.innerHTML = '';
+      msgs.insertAdjacentHTML('beforeend', welcomeHTML());
+      applyTranslations?.(currentStrings);
+    }
 
-function welcomeHTML() {
-  return `<div class="welcome" id="welcome">
+    function welcomeHTML() {
+      return `<div class="welcome" id="welcome">
     <div>
       <div class="welcome-ico">⚖️</div>
       <div class="welcome-h" data-i18n="chat_welcome_heading">NyaySetu AI</div>
@@ -382,45 +869,45 @@ function welcomeHTML() {
       <div class="pill" onclick="prefill('How do I file a formal complaint?')">⚖️ File Complaint</div>
     </div>
   </div>`;
-}
+    }
 
-async function send() {
-  if (busy) return;
-  const inp = document.getElementById('chat-input');
-  const text = inp.value.trim();
-  if (!text) return;
+    async function send() {
+      if (busy) return;
+      const inp = document.getElementById('chat-input');
+      const text = inp.value.trim();
+      if (!text) return;
 
-  if (typeof stopSpeaking === 'function') stopSpeaking();
+      if (typeof stopSpeaking === 'function') stopSpeaking();
 
-  // Remove welcome
-  document.getElementById('welcome')?.remove();
+      // Remove welcome
+      document.getElementById('welcome')?.remove();
 
-  busy = true;
-  document.getElementById('send-btn').disabled = true;
-  inp.value = ''; inp.style.height = 'auto';
+      busy = true;
+      document.getElementById('send-btn').disabled = true;
+      inp.value = ''; inp.style.height = 'auto';
 
-  const msgs = document.getElementById('messages');
+      const msgs = document.getElementById('messages');
 
-  // User bubble
-  msgs.insertAdjacentHTML('beforeend', `
+      // User bubble
+      msgs.insertAdjacentHTML('beforeend', `
     <div class="msg-row u">
       <div class="msg-bubble">${esc(text)}</div>
     </div>`);
-  scrollDown();
+      scrollDown();
 
-  // Typing
-  const tid = 'ty' + Date.now();
-  msgs.insertAdjacentHTML('beforeend', `
+      // Typing
+      const tid = 'ty' + Date.now();
+      msgs.insertAdjacentHTML('beforeend', `
     <div class="typing-wrap" id="${tid}">
       <div class="typing"><span></span><span></span><span></span></div>
     </div>`);
-  scrollDown();
+      scrollDown();
 
-  const langInstr = typeof getLanguagePrompt === 'function'
-    ? getLanguagePrompt(lang)
-    : (LANGUAGE_PROMPTS[lang] || LANGUAGE_PROMPTS.en);
+      const langInstr = typeof getLanguagePrompt === 'function'
+        ? getLanguagePrompt(lang)
+        : (LANGUAGE_PROMPTS[lang] || LANGUAGE_PROMPTS.en);
 
-  const systemPrompt = `You are NyaySetu, an expert Indian legal AI assistant helping Indian citizens understand their legal rights and options. ${langInstr}
+      const systemPrompt = `You are NyaySetu, an expert Indian legal AI assistant helping Indian citizens understand their legal rights and options. ${langInstr}
 
 Structure every response clearly in these simple sections:
 1. **Steps** — Numbered list of concrete actions the person can take immediately.
@@ -434,15 +921,15 @@ Rules:
 - Be accurate and empathetic.
 - Always end with a brief disclaimer that this is guidance, not legal advice.`;
 
-  try {
-    history.push({ role: 'user', content: text });
-    const reply = await callClaude(systemPrompt, history.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n\n'));
-    history.push({ role: 'assistant', content: reply });
+      try {
+        history.push({ role: 'user', content: text });
+        const reply = await callClaude(systemPrompt, history.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join('\n\n'));
+        history.push({ role: 'assistant', content: reply });
 
-    document.getElementById(tid)?.remove();
+        document.getElementById(tid)?.remove();
 
-    const mid = 'msg' + Date.now();
-    msgs.insertAdjacentHTML('beforeend', `
+        const mid = 'msg' + Date.now();
+        msgs.insertAdjacentHTML('beforeend', `
       <div class="msg-row a" id="${mid}">
         <div class="msg-bubble">${formatMarkdown(reply)}</div>
         <div class="msg-actions">
@@ -456,102 +943,102 @@ Rules:
           </div>
         </div>
       </div>`);
-    scrollDown();
-    
-    window.lastUserText = text;
-    window.lastAiReply = reply;
+        scrollDown();
 
-    msgs.insertAdjacentHTML('beforeend', `
+        window.lastUserText = text;
+        window.lastAiReply = reply;
+
+        msgs.insertAdjacentHTML('beforeend', `
       <div class="msg-row a" id="lawyer-prompt-${mid}" style="margin-top:-10px;">
         <button class="pill" onclick="findLawyer('${mid}')" style="background:var(--accent); color:#0A0A0A; border:none; margin-left: 48px; display:inline-flex; align-items:center; gap:6px;">
           👨‍⚖️ Need a lawyer? Your case is ready.
         </button>
       </div>
     `);
-    scrollDown();
-    
-    if (typeof speakResponse === 'function') {
-      speakResponse(reply, lang);
-    }
-  } catch (err) {
-    document.getElementById(tid)?.remove();
-    msgs.insertAdjacentHTML('beforeend', `
+        scrollDown();
+
+        if (typeof speakResponse === 'function') {
+          speakResponse(reply, lang);
+        }
+      } catch (err) {
+        document.getElementById(tid)?.remove();
+        msgs.insertAdjacentHTML('beforeend', `
       <div class="msg-row a">
         <div class="msg-from">⚖ NyaySetu AI</div>
         <div class="msg-bubble" style="border-color:rgba(248,113,113,.2);background:var(--reddim)">
           <p class="mb0" style="color:var(--red)">⚠ Unable to connect to the AI service. Please check your internet connection and try again.</p>
         </div>
       </div>`);
-    scrollDown();
-  }
+        scrollDown();
+      }
 
-  busy = false;
-  document.getElementById('send-btn').disabled = false;
-  document.getElementById('chat-input').focus();
-}
+      busy = false;
+      document.getElementById('send-btn').disabled = false;
+      document.getElementById('chat-input').focus();
+    }
 
-function scrollDown() {
-  const m = document.getElementById('messages');
-  m.scrollTop = m.scrollHeight;
-}
+    function scrollDown() {
+      const m = document.getElementById('messages');
+      m.scrollTop = m.scrollHeight;
+    }
 
-// ── LAWYER CONNECTIVITY ──
-window.findLawyer = async function(mid) {
-  const btnDiv = document.getElementById('lawyer-prompt-' + mid);
-  if (btnDiv) btnDiv.style.display = 'none';
-  
-  const msgs = document.getElementById('messages');
-  const loadId = 'lawyer-load-' + Date.now();
-  msgs.insertAdjacentHTML('beforeend', `
+    // ── LAWYER CONNECTIVITY ──
+    window.findLawyer = async function (mid) {
+      const btnDiv = document.getElementById('lawyer-prompt-' + mid);
+      if (btnDiv) btnDiv.style.display = 'none';
+
+      const msgs = document.getElementById('messages');
+      const loadId = 'lawyer-load-' + Date.now();
+      msgs.insertAdjacentHTML('beforeend', `
     <div class="msg-row a" id="${loadId}">
       <div class="msg-bubble" style="background:var(--bg1);">
         <div class="typing"><span></span><span></span><span></span></div>
       </div>
     </div>`);
-  scrollDown();
+      scrollDown();
 
-  try {
-    const userText = window.lastUserText || "Legal inquiry";
-    const summaryText = window.lastAiReply || "Case details";
-    const user = getStoredUser();
-    const userId = user ? user.id : 'anonymous';
-    
-    let problemType = "General";
-    if (userText.toLowerCase().includes("rent") || userText.toLowerCase().includes("tenant")) problemType = "rent dispute";
-    else if (userText.toLowerCase().includes("consumer") || userText.toLowerCase().includes("product")) problemType = "consumer complaint";
-    
-    const caseRes = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/create-case', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId, problemType,
-        summary: summaryText.substring(0, 500) + (summaryText.length > 500 ? "..." : ""),
-        facts: [userText], documents: []
-      })
-    });
-    const caseData = await caseRes.json();
-    
-    const matchRes = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/match-lawyers/' + caseData.id);
-    const lawyers = await matchRes.json();
-    
-    document.getElementById(loadId)?.remove();
-    
-    let lawyersHtml = '<p class="mb8" style="font-size:14px;"><strong>Top Lawyer Matches for your case:</strong></p>';
-    lawyersHtml += '<div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">';
-    
-    lawyers.forEach(l => {
-      const msgBody = `Hello, I need help with a legal case.
+      try {
+        const userText = window.lastUserText || "Legal inquiry";
+        const summaryText = window.lastAiReply || "Case details";
+        const user = getStoredUser();
+        const userId = user ? user.id : 'anonymous';
+
+        let problemType = "General";
+        if (userText.toLowerCase().includes("rent") || userText.toLowerCase().includes("tenant")) problemType = "rent dispute";
+        else if (userText.toLowerCase().includes("consumer") || userText.toLowerCase().includes("product")) problemType = "consumer complaint";
+
+        const caseRes = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/create-case', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId, problemType,
+            summary: summaryText.substring(0, 500) + (summaryText.length > 500 ? "..." : ""),
+            facts: [userText], documents: []
+          })
+        });
+        const caseData = await caseRes.json();
+
+        const matchRes = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/match-lawyers/' + caseData.id);
+        const lawyers = await matchRes.json();
+
+        document.getElementById(loadId)?.remove();
+
+        let lawyersHtml = '<p class="mb8" style="font-size:14px;"><strong>Top Lawyer Matches for your case:</strong></p>';
+        lawyersHtml += '<div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">';
+
+        lawyers.forEach(l => {
+          const msgBody = `Hello, I need help with a legal case.
 
 Case Summary:
 ${summaryText.substring(0, 150)}...
 
 Facts:
 ${userText.substring(0, 150)}...`;
-      
-      const encodedMessage = encodeURIComponent(msgBody);
-      const waLink = `https://wa.me/${l.phone}?text=${encodedMessage}`;
-      
-      lawyersHtml += `
+
+          const encodedMessage = encodeURIComponent(msgBody);
+          const waLink = `https://wa.me/${l.phone}?text=${encodedMessage}`;
+
+          lawyersHtml += `
         <div style="border:1px solid var(--border); border-radius:12px; padding:12px; background:var(--bg2);">
           <div style="font-weight:600; font-size:15px; color:var(--tp); margin-bottom:4px;">${l.name}</div>
           <div style="font-size:13px; color:var(--ts); margin-bottom:12px;">${l.experience} • ${l.location} • <span style="text-transform:capitalize;">${l.specialization}</span></div>
@@ -561,205 +1048,206 @@ ${userText.substring(0, 150)}...`;
           </a>
         </div>
       `;
-    });
-    
-    lawyersHtml += '</div>';
-    
-    msgs.insertAdjacentHTML('beforeend', `
+        });
+
+        lawyersHtml += '</div>';
+
+        msgs.insertAdjacentHTML('beforeend', `
       <div class="msg-row a">
         <div class="msg-bubble" style="background:var(--bg1); padding:16px;">${lawyersHtml}</div>
       </div>`);
-    scrollDown();
-    
-  } catch (err) {
-    document.getElementById(loadId)?.remove();
-    console.error(err);
-    msgs.insertAdjacentHTML('beforeend', `
+        scrollDown();
+
+      } catch (err) {
+        document.getElementById(loadId)?.remove();
+        console.error(err);
+        msgs.insertAdjacentHTML('beforeend', `
       <div class="msg-row a">
         <div class="msg-bubble" style="background:var(--bg1); color:var(--red);">Failed to connect. Please try again later.</div>
       </div>`);
-    scrollDown();
-  }
-};
-
-// ── VOICE SYSTEM ──
-const VOICE_LANGS = {
-  en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN',
-  ta: 'ta-IN', ur: 'ur-IN', gu: 'gu-IN', kn: 'kn-IN', ml: 'ml-IN',
-  or: 'or-IN', pa: 'pa-IN', as: 'as-IN', ne: 'ne-NP'
-};
-
-let recognition = null;
-let isListening = false;
-let isSpeaking = false;
-
-function initVoice() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    document.getElementById('mic-btn').onclick = () => {
-      if (typeof showToast === 'function') {
-        showToast('Voice not supported in this browser.', true);
-      } else {
-        alert('Voice not supported in this browser.');
+        scrollDown();
       }
     };
-    return;
-  }
-  
-  recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = true;
-  
-  recognition.onstart = () => {
-    isListening = true;
-    const mic = document.getElementById('mic-btn');
-    mic.classList.add('listening');
-    mic.title = 'Stop listening';
-    document.getElementById('chat-input').placeholder = 'Listening...';
-  };
-  
-  recognition.onresult = (event) => {
-    let interimTranscript = '';
-    let finalTranscript = '';
-    
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) {
-        finalTranscript += event.results[i][0].transcript;
+
+    // ── VOICE SYSTEM ──
+    const VOICE_LANGS = {
+      en: 'en-IN', hi: 'hi-IN', bn: 'bn-IN', te: 'te-IN', mr: 'mr-IN',
+      ta: 'ta-IN', ur: 'ur-IN', gu: 'gu-IN', kn: 'kn-IN', ml: 'ml-IN',
+      or: 'or-IN', pa: 'pa-IN', as: 'as-IN', ne: 'ne-NP'
+    };
+
+    let recognition = null;
+    let isListening = false;
+    let isSpeaking = false;
+
+    function initVoice() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        document.getElementById('mic-btn').onclick = () => {
+          if (typeof showToast === 'function') {
+            showToast('Voice not supported in this browser.', true);
+          } else {
+            alert('Voice not supported in this browser.');
+          }
+        };
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        isListening = true;
+        const mic = document.getElementById('mic-btn');
+        mic.classList.add('listening');
+        mic.title = 'Stop listening';
+        document.getElementById('chat-input').placeholder = 'Listening...';
+      };
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+
+        const inp = document.getElementById('chat-input');
+        if (finalTranscript) {
+          inp.value = finalTranscript;
+          autoGrow(inp);
+        } else if (interimTranscript) {
+          inp.value = interimTranscript;
+          autoGrow(inp);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error', event.error);
+        if (event.error === 'not-allowed') {
+          if (typeof showToast === 'function') {
+            showToast('Microphone permission denied.', true);
+          } else {
+            alert('Microphone permission denied.');
+          }
+        }
+        stopListening();
+      };
+
+      recognition.onend = () => {
+        stopListening();
+        const inp = document.getElementById('chat-input');
+        if (inp.value.trim()) {
+          send();
+        }
+      };
+    }
+
+    function toggleMic() {
+      if (isSpeaking) {
+        stopSpeaking();
+      }
+      if (isListening) {
+        stopListening();
       } else {
-        interimTranscript += event.results[i][0].transcript;
+        startListening();
       }
     }
-    
-    const inp = document.getElementById('chat-input');
-    if (finalTranscript) {
-        inp.value = finalTranscript;
-        autoGrow(inp);
-    } else if (interimTranscript) {
-        inp.value = interimTranscript;
-        autoGrow(inp);
-    }
-  };
-  
-  recognition.onerror = (event) => {
-    console.error('Speech recognition error', event.error);
-    if (event.error === 'not-allowed') {
-      if (typeof showToast === 'function') {
-        showToast('Microphone permission denied.', true);
-      } else {
-        alert('Microphone permission denied.');
+
+    function startListening() {
+      if (!recognition) return;
+      const vLang = VOICE_LANGS[lang] || 'en-IN';
+      recognition.lang = vLang;
+      try {
+        recognition.start();
+      } catch (e) {
+        console.error(e);
       }
     }
-    stopListening();
-  };
-  
-  recognition.onend = () => {
-    stopListening();
-    const inp = document.getElementById('chat-input');
-    if (inp.value.trim()) {
-      send();
+
+    function stopListening() {
+      if (!recognition) return;
+      isListening = false;
+      try {
+        recognition.stop();
+      } catch (e) { }
+
+      const mic = document.getElementById('mic-btn');
+      if (mic) {
+        mic.classList.remove('listening');
+        mic.title = 'Voice Input';
+      }
+
+      const inp = document.getElementById('chat-input');
+      if (inp) {
+        const originalPlaceholder = document.documentElement.lang === 'hi' ? 'अपना कानूनी प्रश्न या माइक टैप करें...' : 'Ask your legal question or tap mic...'; // Fallback if translation is missed momentarily
+        inp.placeholder = originalPlaceholder;
+        if (typeof applyTranslations === 'function' && typeof currentStrings !== 'undefined') {
+          applyTranslations(currentStrings);
+        }
+      }
     }
-  };
-}
 
-function toggleMic() {
-  if (isSpeaking) {
-    stopSpeaking();
-  }
-  if (isListening) {
-    stopListening();
-  } else {
-    startListening();
-  }
-}
-
-function startListening() {
-  if (!recognition) return;
-  const vLang = VOICE_LANGS[lang] || 'en-IN';
-  recognition.lang = vLang;
-  try {
-    recognition.start();
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-function stopListening() {
-  if (!recognition) return;
-  isListening = false;
-  try {
-    recognition.stop();
-  } catch(e){}
-  
-  const mic = document.getElementById('mic-btn');
-  if(mic) {
-    mic.classList.remove('listening');
-    mic.title = 'Voice Input';
-  }
-  
-  const inp = document.getElementById('chat-input');
-  if(inp) {
-    const originalPlaceholder = document.documentElement.lang === 'hi' ? 'अपना कानूनी प्रश्न या माइक टैप करें...' : 'Ask your legal question or tap mic...'; // Fallback if translation is missed momentarily
-    inp.placeholder = originalPlaceholder; 
-    if (typeof applyTranslations === 'function' && typeof currentStrings !== 'undefined') {
-        applyTranslations(currentStrings);
+    function stripMarkdown(text) {
+      return text.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
     }
-  }
-}
 
-function stripMarkdown(text) {
-  return text.replace(/\*\*/g, '').replace(/\*/g, '').replace(/#/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
-}
+    function speakResponse(text, currentLang) {
+      if (!('speechSynthesis' in window)) return;
 
-function speakResponse(text, currentLang) {
-  if (!('speechSynthesis' in window)) return;
-  
-  stopSpeaking(); // Stop any current speech
-  
-  const plainText = stripMarkdown(text);
-  const utterance = new SpeechSynthesisUtterance(plainText);
-  const vLang = VOICE_LANGS[currentLang] || 'en-IN';
-  
-  utterance.lang = vLang;
-  utterance.rate = 1.0;
-  
-  const voices = speechSynthesis.getVoices();
-  const voice = voices.find(v => v.lang.startsWith(vLang) || v.lang.startsWith(currentLang)) 
-             || voices.find(v => v.lang.startsWith('en'));
-  if (voice) {
-    utterance.voice = voice;
-  }
-  
-  utterance.onstart = () => {
-    isSpeaking = true;
-    document.getElementById('mic-btn')?.classList.add('speaking');
-  };
-  
-  utterance.onend = () => {
-    isSpeaking = false;
-    document.getElementById('mic-btn')?.classList.remove('speaking');
-  };
-  
-  utterance.onerror = () => {
-    isSpeaking = false;
-    document.getElementById('mic-btn')?.classList.remove('speaking');
-  };
-  
-  speechSynthesis.speak(utterance);
-}
+      stopSpeaking(); // Stop any current speech
 
-function stopSpeaking() {
-  if ('speechSynthesis' in window) {
-    speechSynthesis.cancel();
-  }
-  isSpeaking = false;
-  document.getElementById('mic-btn')?.classList.remove('speaking');
-}
+      const plainText = stripMarkdown(text);
+      const utterance = new SpeechSynthesisUtterance(plainText);
+      const vLang = VOICE_LANGS[currentLang] || 'en-IN';
 
-if ('speechSynthesis' in window) {
-  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
-}
+      utterance.lang = vLang;
+      utterance.rate = 1.0;
 
-initVoice();
-</script>
+      const voices = speechSynthesis.getVoices();
+      const voice = voices.find(v => v.lang.startsWith(vLang) || v.lang.startsWith(currentLang))
+        || voices.find(v => v.lang.startsWith('en'));
+      if (voice) {
+        utterance.voice = voice;
+      }
+
+      utterance.onstart = () => {
+        isSpeaking = true;
+        document.getElementById('mic-btn')?.classList.add('speaking');
+      };
+
+      utterance.onend = () => {
+        isSpeaking = false;
+        document.getElementById('mic-btn')?.classList.remove('speaking');
+      };
+
+      utterance.onerror = () => {
+        isSpeaking = false;
+        document.getElementById('mic-btn')?.classList.remove('speaking');
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function stopSpeaking() {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+      }
+      isSpeaking = false;
+      document.getElementById('mic-btn')?.classList.remove('speaking');
+    }
+
+    if ('speechSynthesis' in window) {
+      speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+    }
+
+    initVoice();
+  </script>
 </body>
+
 </html>
