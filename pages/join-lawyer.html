@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join as a Lawyer — NyaySetu</title>
+<link rel="stylesheet" href="../css/base.css">
+<style>
+/* ── PAGE HERO ── */
+.page-hero { padding: 52px 0 32px; border-bottom: 1px solid var(--border); }
+
+/* ── CONTENT ── */
+.content-area { padding: 56px 0 80px; }
+
+/* ── SIGNUP ── */
+.signup-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: start; }
+.benefit-list { display: flex; flex-direction: column; gap: 16px; margin-top: 28px; }
+.benefit { display: flex; align-items: flex-start; gap: 14px; }
+.benefit-ico { width: 36px; height: 36px; border-radius: 9px; background: var(--adim); border: 1px solid rgba(201,169,110,.15); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; margin-top: 2px; }
+.benefit-title { font-size: 14px; font-weight: 600; color: var(--tp); margin-bottom: 3px; }
+.benefit-desc  { font-size: 13px; color: var(--ts); line-height: 1.6; }
+
+.signup-form-card { background: var(--bg1); border: 1px solid var(--border); border-radius: var(--rl); padding: 32px; }
+.signup-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--tp); margin-bottom: 6px; }
+.signup-sub   { font-size: 13px; color: var(--ts); margin-bottom: 24px; }
+.terms-note   { font-size: 11.5px; color: var(--tm); margin-top: 12px; text-align: center; line-height: 1.6; }
+
+@media (max-width: 860px) {
+  .signup-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body data-page="join-lawyer">
+<script src="../js/utils.js"></script>
+<script src="../js/i18n.js"></script>
+<script src="../js/nav.js"></script>
+<script>
+function injectNav() {
+  document.body.insertAdjacentHTML('afterbegin', `
+  <nav id="nav">
+    <a href="../index.html" class="nav-logo"><div class="nav-logo-box">N</div><span class="nav-logo-name">NyaySetu</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="../index.html"  data-page="home"><span data-i18n="nav_home">Home</span></a>
+      <a class="nav-tab" href="chat.html"       data-page="chat"><span class="nav-icon">⚖</span> <span data-i18n="nav_chat">AI Chat</span></a>
+      <a class="nav-tab" href="documents.html"  data-page="docs"><span class="nav-icon">📄</span> <span data-i18n="nav_docs">Documents</span></a>
+      <a class="nav-tab" href="simplifier.html" data-page="simplify"><span class="nav-icon">📚</span> <span data-i18n="nav_simplify">Simplifier</span></a>
+      <a class="nav-tab" href="students.html"   data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
+      <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()">☀</button>
+      <a href="chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
+      <span id="auth-nav-slot"></span>
+    </div>
+  </nav>
+  <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>`);
+  if (typeof initTheme === 'function') initTheme();
+  if (typeof setActiveNav === 'function') setActiveNav();
+}
+injectNav();
+</script>
+
+<main style="padding-top:64px">
+
+  <!-- HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="eyebrow fi">Lawyer Network</div>
+      <h1 class="sh2 fi">Empower your legal practice.</h1>
+      <p class="sub fi" style="max-width:500px;margin-bottom:24px">Join the NyaySetu network to connect with clients seeking expert legal representation. Grow your practice through our trusted AI-powered platform.</p>
+    </div>
+  </section>
+
+  <div class="content-area">
+    <div class="container">
+
+      <div class="signup-grid">
+        <div>
+          <div class="eyebrow fi">For Legal Professionals</div>
+          <h2 class="sh2 fi">Expand your client base</h2>
+          <p class="sub fi" style="max-width:440px">NyaySetu connects verified advocates with clients facing real legal challenges. We handle the initial analysis, you provide the expertise.</p>
+          <div class="benefit-list">
+            <div class="benefit fi">
+              <div class="benefit-ico">📈</div>
+              <div><div class="benefit-title">Verified Leads</div><div class="benefit-desc">Receive highly specific case details before connecting, saving you time on initial consultations.</div></div>
+            </div>
+            <div class="benefit fi">
+              <div class="benefit-ico">💼</div>
+              <div><div class="benefit-title">Practice Growth</div><div class="benefit-desc">Increase your visibility to thousands of daily users looking for specialized legal assistance.</div></div>
+            </div>
+            <div class="benefit fi">
+              <div class="benefit-ico">🛡️</div>
+              <div><div class="benefit-title">Trusted Platform</div><div class="benefit-desc">Join a curated network of professionals. All lawyer profiles are verified to maintain quality and trust.</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="signup-form-card fi">
+          <div class="signup-title">Join as a Lawyer</div>
+          <div class="signup-sub">Apply to become a verified NyaySetu advocate.</div>
+          
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input class="form-input" id="l-name" placeholder="Advocate Name" type="text" required>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email Address *</label>
+              <input class="form-input" id="l-email" placeholder="your@email.com" type="email" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <input class="form-input" id="l-phone" placeholder="10-digit number" type="tel" required>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Qualification *</label>
+              <select class="form-select" id="l-qual" required>
+                <option value="">Select qualification</option>
+                <option>LLB</option>
+                <option>LLM</option>
+                <option>PhD in Law</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Specialization *</label>
+              <select class="form-select" id="l-spec" required>
+                <option value="">Select primary area</option>
+                <option>Criminal Law</option>
+                <option>Civil / Property Law</option>
+                <option>Family / Divorce Law</option>
+                <option>Corporate Law</option>
+                <option>Cyber Law</option>
+                <option>Consumer Protection</option>
+                <option>Labor & Employment</option>
+                <option>General Practice</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Years of Experience *</label>
+              <input class="form-input" id="l-exp" placeholder="e.g. 5" type="number" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Location (City/State) *</label>
+              <input class="form-input" id="l-loc" placeholder="e.g. New Delhi" type="text" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Expected Fees (per consultation) *</label>
+            <input class="form-input" id="l-fees" placeholder="e.g. ₹1500" type="text" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Short Bio (Optional)</label>
+            <textarea class="form-input" id="l-bio" placeholder="Briefly describe your practice and achievements..." style="min-height: 80px; resize: vertical;"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Upload Certificate / Bar ID *</label>
+            <div style="border: 1px dashed var(--border2); padding: 16px; border-radius: 8px; text-align: center; cursor: pointer; background: var(--bg);" onclick="document.getElementById('l-file').click()">
+              <span style="font-size: 13px; color: var(--ts);">📄 Click to upload document (PDF/JPG)</span>
+              <input type="file" id="l-file" style="display: none;" accept=".pdf,.jpg,.jpeg,.png">
+            </div>
+          </div>
+          
+          <div style="background: var(--adim); border: 1px solid rgba(201,169,110,.2); padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+            <p style="font-size: 12px; color: var(--accent); margin: 0; display: flex; align-items: flex-start; gap: 8px;">
+              <span style="font-size: 16px;">🛡️</span>
+              <span><strong>Verification Required:</strong> All lawyer profiles will be verified before approval to ensure platform trust and quality.</span>
+            </p>
+          </div>
+          
+          <button class="btn-primary" style="width:100%;justify-content:center;font-size:14.5px;padding:13px" onclick="submitLawyerForm()">
+            ⚖️ Apply as Lawyer
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script>
+function submitLawyerForm() {
+  const name  = document.getElementById('l-name').value.trim();
+  const email = document.getElementById('l-email').value.trim();
+  const phone = document.getElementById('l-phone').value.trim();
+  const qual  = document.getElementById('l-qual').value;
+  const spec  = document.getElementById('l-spec').value;
+  const exp   = document.getElementById('l-exp').value.trim();
+  const loc   = document.getElementById('l-loc').value.trim();
+  const fees  = document.getElementById('l-fees').value.trim();
+  const file  = document.getElementById('l-file').files.length > 0;
+
+  if (!name || !email || !phone || !qual || !spec || !exp || !loc || !fees) {
+    if (typeof showToast === 'function') showToast('Please fill in all required fields', '⚠');
+    else alert('Please fill in all required fields');
+    return;
+  }
+  
+  if (!email.includes('@')) {
+    if (typeof showToast === 'function') showToast('Please enter a valid email address', '⚠');
+    else alert('Please enter a valid email address');
+    return;
+  }
+  
+  if (!file) {
+    if (typeof showToast === 'function') showToast('Please upload your Bar ID or Certificate', '⚠');
+    else alert('Please upload your Bar ID or Certificate');
+    return;
+  }
+
+  // Simulate success
+  const card = document.querySelector('.signup-form-card');
+  card.innerHTML = \`
+    <div style="text-align:center;padding:40px 20px">
+      <div style="font-size:52px;margin-bottom:16px">✅</div>
+      <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--tp);margin-bottom:8px">Application Received</div>
+      <div style="font-size:14px;color:var(--ts);line-height:1.7;max-width:300px;margin:0 auto 24px">Thank you, Advocate \${esc(name)}. Your application is under review. Our verification team will contact you at <strong style="color:var(--tp)">\${esc(email)}</strong> shortly.</div>
+      <button class="btn-ghost" onclick="window.location.href='../index.html'" style="margin:0 auto">
+        ← Return to Home
+      </button>
+    </div>\`;
+    
+  if (typeof showToast === 'function') showToast('Application submitted successfully!', '⚖️');
+}
+
+// Fallback escape func in case utils.js fails to load
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+if (typeof initScrollAnim === 'function') {
+  initScrollAnim();
+}
+
+// Add simple file input feedback
+document.getElementById('l-file').addEventListener('change', function(e) {
+  const fileName = e.target.files[0]?.name;
+  if (fileName) {
+    e.target.parentElement.querySelector('span').textContent = '📄 ' + fileName;
+    e.target.parentElement.style.borderColor = 'var(--accent)';
+    e.target.parentElement.style.background = 'var(--adim)';
+  }
+});
+</script>
+</body>
+</html>
