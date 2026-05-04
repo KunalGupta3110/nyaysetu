@@ -350,7 +350,9 @@ function upsertSavedUser(user) {
 }
 
 function redirectAfterAuth(user = getCurrentUser()) {
-  window.location.href = user && user.role === 'student' ? 'dashboard.html' : '../index.html';
+  if (user && user.role === 'student') window.location.href = 'dashboard.html';
+  else if (user && user.role === 'lawyer') window.location.href = 'lawyer-dashboard.html';
+  else window.location.href = '../index.html';
 }
 
 function isValidEmail(email) {

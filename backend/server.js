@@ -276,6 +276,8 @@ ${fieldsText}`
 const CASES_FILE = path.join(__dirname, "data", "cases.json");
 const LAWYERS_FILE = path.join(__dirname, "data", "lawyers.json");
 
+const APPLICATIONS_FILE = path.join(__dirname, "data", "applications.json");
+
 function readJsonFile(file) {
   try {
     if (!fs.existsSync(file)) return [];
@@ -302,6 +304,8 @@ app.post("/create-case", (req, res) => {
     summary,
     facts,
     documents,
+    status: "open",
+    assignedLawyerId: null,
     createdAt: new Date().toISOString()
   };
   
@@ -316,6 +320,59 @@ app.get("/get-cases/:userId", (req, res) => {
   const cases = readJsonFile(CASES_FILE);
   const userCases = cases.filter(c => c.userId === req.params.userId);
   res.json(userCases);
+});
+
+app.get("/cases", (req, res) => {
+  const cases = readJsonFile(CASES_FILE);
+  const openCases = cases.filter(c => c.status === "open" || !c.status); // Fallback for old cases
+  res.json(openCases);
+});
+
+app.post("/apply-case", (req, res) => {
+  const { caseId, lawyerId, role } = req.body || {};
+  
+  if (role !== "lawyer") {
+    return res.status(403).json({ error: "Only lawyers can apply for cases." });
+  }
+  if (!caseId || !lawyerId) {
+    return res.status(400).json({ error: "Missing caseId or lawyerId." });
+  }
+
+  const applications = readJsonFile(APPLICATIONS_FILE);
+  const alreadyApplied = applications.some(a => a.caseId === caseId && a.lawyerId === lawyerId);
+  
+  if (alreadyApplied) {
+    return res.status(400).json({ error: "You have already applied for this case." });
+  }
+
+  const newApp = {
+    id: crypto.randomUUID(),
+    caseId,
+    lawyerId,
+    status: "pending",
+    createdAt: new Date().toISOString()
+  };
+
+  applications.push(newApp);
+  writeJsonFile(APPLICATIONS_FILE, applications);
+
+  res.status(201).json(newApp);
+});
+
+app.get("/my-applications/:lawyerId", (req, res) => {
+  const { lawyerId } = req.params;
+  const applications = readJsonFile(APPLICATIONS_FILE).filter(a => a.lawyerId === lawyerId);
+  const cases = readJsonFile(CASES_FILE);
+
+  const enrichedApps = applications.map(app => {
+    const caseData = cases.find(c => c.id === app.caseId) || {};
+    return {
+      ...app,
+      case: caseData
+    };
+  });
+
+  res.json(enrichedApps);
 });
 
 function matchLawyers(caseData) {
