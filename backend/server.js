@@ -342,7 +342,10 @@ app.get("/match-lawyers/:caseId", (req, res) => {
   }
   
   const matchedLawyers = matchLawyers(caseData);
-  res.json(matchedLawyers);
+  res.json({
+    case: caseData,
+    lawyers: matchedLawyers
+  });
 });
 
 // ================= SERVER =================

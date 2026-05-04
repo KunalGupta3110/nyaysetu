@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Lawyers — NyaySetu</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <style>
+    body {
+      padding-top: 80px; /* Space for nav */
+      background: var(--bg);
+      color: var(--tp);
+      font-family: 'Inter', sans-serif;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--tp);
+      margin-bottom: 8px;
+      font-family: 'Playfair Display', serif;
+    }
+    .header p {
+      font-size: 15px;
+      color: var(--ts);
+    }
+    .case-card {
+      padding: 20px;
+      border-radius: 12px;
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+    .case-card h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: var(--accent);
+    }
+    .case-card h3 {
+      font-size: 14px;
+      color: var(--tp);
+      margin: 16px 0 8px;
+      font-weight: 600;
+    }
+    .case-card p {
+      font-size: 14px;
+      color: var(--ts);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .case-card ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 14px;
+      color: var(--ts);
+    }
+    .case-card li {
+      margin-bottom: 6px;
+    }
+    
+    .lawyer-card {
+      padding: 16px;
+      border-radius: 12px;
+      background: #111;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .lawyer-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--tp);
+      margin-bottom: 6px;
+    }
+    .lawyer-details {
+      font-size: 14px;
+      color: var(--ts);
+      margin-bottom: 16px;
+    }
+    .lawyer-details span {
+      display: inline-block;
+      margin-right: 12px;
+      margin-bottom: 4px;
+    }
+    .connect-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #25D366;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      width: 100%;
+    }
+    .connect-btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--ts);
+    }
+    .lawyers-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--tp);
+    }
+  </style>
+</head>
+<body data-page="chat">
+  <script src="../js/utils.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>
+    function injectNav() {
+      document.body.insertAdjacentHTML('afterbegin', `
+  <nav id="nav">
+    <a href="../index.html" class="nav-logo">
+      <div class="nav-logo-box">N</div>
+      <span class="nav-logo-name">NyaySetu</span>
+    </a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="../index.html"  data-page="home"><span class="nav-icon">🏠</span> <span data-i18n="nav_home">Home</span></a>
+      <a class="nav-tab" href="chat.html"       data-page="chat"><span class="nav-icon">⚖️</span> <span data-i18n="nav_chat">AI Chat</span></a>
+      <a class="nav-tab mobile-only-nav-item" href="chat.html"><span class="nav-icon">💡</span> <span data-i18n="nav_ask">Ask a Question</span></a>
+      <a class="nav-tab" href="documents.html"  data-page="docs"><span class="nav-icon">📄</span> <span data-i18n="nav_docs">Documents</span></a>
+      <a class="nav-tab" href="simplifier.html" data-page="simplify"><span class="nav-icon">📚</span> <span data-i18n="nav_simplify">Simplifier</span></a>
+      <a class="nav-tab" href="students.html"   data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
+      <a class="nav-tab" href="about.html"     data-page="about"><span class="nav-icon">ℹ️</span> <span data-i18n="footer_about">About Us</span></a>
+      <button class="nav-tab mobile-only-nav-item" onclick="toggleTheme()" style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; border-radius: 0; justify-content: flex-start; border-bottom:none; background:transparent;"><span class="nav-icon">☀/☽</span> Toggle Theme</button>
+      <div id="auth-nav-slot-menu" class="mobile-only-nav-item" style="width: 100%; margin-top: 8px;"></div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
+      <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀</button>
+      <a href="chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
+      <span id="auth-nav-slot"></span>
+    </div>
+  </nav>
+  <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>`);
+      if(typeof initTheme === 'function') initTheme();
+      if(typeof setActiveNav === 'function') setActiveNav();
+      if(typeof initI18n === 'function') initI18n();
+    }
+    injectNav();
+  </script>
+
+  <div class="container" id="app-container">
+    <div class="loading">
+      <div class="typing" style="justify-content:center; border:none; background:transparent; padding:0; margin-bottom:12px;"><span></span><span></span><span></span></div>
+      Finding the best lawyers for your case...
+    </div>
+  </div>
+
+  <script>
+    async function init() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const caseId = urlParams.get('caseId');
+      
+      if (!caseId) {
+        document.getElementById('app-container').innerHTML = '<div class="loading" style="color:var(--red);">Error: Case ID not provided.</div>';
+        return;
+      }
+      
+      try {
+        const res = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/match-lawyers/' + caseId);
+        if (!res.ok) throw new Error('Failed to fetch case data');
+        const data = await res.json();
+        
+        if (!data.case) {
+          document.getElementById('app-container').innerHTML = '<div class="loading" style="color:var(--red);">Case not found.</div>';
+          return;
+        }
+        
+        renderPage(data.case, data.lawyers || []);
+      } catch (err) {
+        document.getElementById('app-container').innerHTML = '<div class="loading" style="color:var(--red);">Failed to load data. Please check your connection and try again.</div>';
+      }
+    }
+    
+    function renderPage(caseData, lawyers) {
+      const container = document.getElementById('app-container');
+      
+      const factsList = (caseData.facts || []).map(f => `<li>${esc(f)}</li>`).join('');
+      const factsHtml = factsList ? `<ul>${factsList}</ul>` : '<p>No specific facts provided.</p>';
+      
+      let html = `
+        <div class="header">
+          <h1>Your case is ready.</h1>
+          <p>Here are the best lawyers for you.</p>
+        </div>
+        
+        <div class="case-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+            <h2 style="margin:0;">Case Details</h2>
+            <span style="text-transform: capitalize; padding:4px 10px; background:var(--adim); color:var(--accent); border-radius:12px; font-size:12px; font-weight:600;">${esc(caseData.problemType)}</span>
+          </div>
+          
+          <h3>Summary</h3>
+          <p>${esc(caseData.summary).replace(/\\n/g, '<br>')}</p>
+          
+          <h3>Key Facts</h3>
+          ${factsHtml}
+        </div>
+        
+        <div class="lawyers-title">Recommended Lawyers</div>
+      `;
+      
+      if (lawyers.length === 0) {
+        html += '<p style="color:var(--ts);">No lawyers found matching your criteria right now.</p>';
+      } else {
+        lawyers.forEach(l => {
+          const summaryStr = caseData.summary || '';
+          const factsStr = caseData.facts && caseData.facts.length > 0 ? caseData.facts[0] : '';
+          
+          const msgBody = `Hello, I need help with a legal case.\n\nCase Summary:\n${summaryStr.substring(0, 200)}...\n\nFacts:\n${factsStr.substring(0, 200)}...`;
+          
+          const encodedMessage = encodeURIComponent(msgBody);
+          const waLink = `https://wa.me/${l.phone}?text=${encodedMessage}`;
+          
+          html += `
+            <div class="lawyer-card">
+              <div class="lawyer-name">${esc(l.name)}</div>
+              <div class="lawyer-details">
+                <span style="text-transform:capitalize;">⚖️ ${esc(l.specialization)}</span>
+                <span>💼 ${esc(l.experience)}</span>
+                <span>📍 ${esc(l.location)}</span>
+              </div>
+              <a href="${waLink}" target="_blank" class="connect-btn">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                Connect via WhatsApp
+              </a>
+            </div>
+          `;
+        });
+      }
+      
+      container.innerHTML = html;
+    }
+    
+    // Fallback escape func in case utils.js fails to load
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
