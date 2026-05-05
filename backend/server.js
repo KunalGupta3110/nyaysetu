@@ -56,6 +56,50 @@ function createToken() {
   return crypto.randomBytes(32).toString("hex");
 }
 
+function getFallbackLawyers() {
+  try {
+    const dataPath = path.join(__dirname, "data", "lawyers.json");
+    const data = JSON.parse(fs.readFileSync(dataPath, "utf8"));
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function mapLawyerForList(lawyer) {
+  const profile = lawyer.profile || {};
+  return {
+    id: lawyer._id || lawyer.id,
+    name: lawyer.name || "Unknown Lawyer",
+    specialization: profile.l_spec || lawyer.specialization || "General",
+    experience: profile.l_exp ? profile.l_exp + " Years" : lawyer.experience || "Unknown",
+    location: profile.l_loc || lawyer.location || "Unknown",
+    phone: profile.phone || lawyer.phone || "Unknown",
+    keywords: lawyer.keywords || []
+  };
+}
+
+function matchLawyersForCase(lawyers, caseData) {
+  const problemType = String(caseData.problemType || "").toLowerCase();
+  const caseText = [
+    caseData.problemType,
+    caseData.summary,
+    ...(caseData.facts || [])
+  ].filter(Boolean).join(" ").toLowerCase();
+
+  const matched = lawyers.filter(lawyer => {
+    const spec = String(lawyer.specialization || "").toLowerCase();
+    const keywords = Array.isArray(lawyer.keywords) ? lawyer.keywords : [];
+    return spec.includes(problemType) ||
+      problemType.includes(spec.split(" ")[0]) ||
+      spec === "general" ||
+      problemType === "general" ||
+      keywords.some(keyword => caseText.includes(String(keyword).toLowerCase()));
+  });
+
+  return matched.length ? matched : lawyers;
+}
+
 // ================= AUTH ROUTES =================
 app.post("/signup", async (req, res) => {
   try {
@@ -408,17 +452,8 @@ app.get("/get-lawyers", async (req, res) => {
   try {
     const lawyers = await User.find({ role: "lawyer" }).limit(6).select('name email profile');
 
-    // Map to old structure for frontend compatibility
-    const mapped = lawyers.map(l => ({
-      id: l._id,
-      name: l.name || "Unknown Lawyer",
-      specialization: l.profile?.l_spec || "General",
-      experience: l.profile?.l_exp ? l.profile.l_exp + " Years" : "Unknown",
-      location: l.profile?.l_loc || "Unknown",
-      phone: l.profile?.phone || "Unknown"
-    }));
-
-    res.json(mapped);
+    const mapped = lawyers.map(mapLawyerForList);
+    res.json(mapped.length ? mapped : getFallbackLawyers());
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch lawyers." });
   }
@@ -431,22 +466,9 @@ app.get("/match-lawyers/:caseId", async (req, res) => {
 
     // Match logic
     const lawyers = await User.find({ role: "lawyer" }).select('name email profile');
-    const mapped = lawyers.map(l => ({
-      id: l._id,
-      name: l.name || "Unknown Lawyer",
-      specialization: l.profile?.l_spec || "General",
-      experience: l.profile?.l_exp ? l.profile.l_exp + " Years" : "Unknown",
-      location: l.profile?.l_loc || "Unknown",
-      phone: l.profile?.phone || "Unknown"
-    }));
-
-    let matched = mapped.filter(l =>
-      l.specialization.toLowerCase().includes(caseData.problemType.toLowerCase()) ||
-      l.specialization.toLowerCase() === "general" ||
-      caseData.problemType.toLowerCase() === "general"
-    );
-
-    if (matched.length === 0) matched = mapped;
+    const mapped = lawyers.map(mapLawyerForList);
+    const lawyerPool = mapped.length ? mapped : getFallbackLawyers();
+    const matched = matchLawyersForCase(lawyerPool, caseData);
 
     res.json({ case: caseData, lawyers: matched.slice(0, 3) });
   } catch (err) {

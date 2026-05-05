@@ -13,7 +13,7 @@
       font-family: 'Inter', sans-serif;
     }
     .container {
-      max-width: 600px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 20px;
     }
@@ -67,23 +67,32 @@
     }
     
     .lawyer-card {
-      padding: 16px;
+      padding: 18px;
       border-radius: 12px;
       background: #111;
-      margin-bottom: 12px;
       border: 1px solid var(--border);
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 100%;
+      margin-bottom: 12px;
+    }
+    .lawyer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
     }
     .lawyer-name {
       font-size: 18px;
       font-weight: 600;
       color: var(--tp);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .lawyer-details {
       font-size: 14px;
       color: var(--ts);
-      margin-bottom: 16px;
+      line-height: 1.55;
     }
     .lawyer-details span {
       display: inline-block;
@@ -104,6 +113,7 @@
       text-decoration: none;
       transition: transform 0.2s ease, opacity 0.2s ease;
       width: 100%;
+      margin-top: auto;
     }
     .connect-btn:hover {
       transform: translateY(-2px);
@@ -120,9 +130,14 @@
       margin-bottom: 16px;
       color: var(--tp);
     }
+    @media(max-width:640px) {
+      body { padding-top: 72px; }
+      .container { padding: 16px; }
+      .header { text-align: left; }
+    }
   </style>
 </head>
-<body data-page="chat">
+<body data-page="lawyers">
   <script src="../js/utils.js"></script>
   <script src="../js/i18n.js"></script>
   <script src="../js/nav.js"></script>
@@ -169,6 +184,15 @@
   </div>
 
   <script>
+    const FALLBACK_LAWYERS = [
+      { id: 'l-101', name: 'Adv. Rajesh Kumar', specialization: 'Criminal Law', experience: '15+ Years', location: 'New Delhi', phone: '919876543210', keywords: ['criminal', 'bail', 'fir', 'police', 'fraud'] },
+      { id: 'l-102', name: 'Adv. Sneha Sharma', specialization: 'Family and Divorce', experience: '8+ Years', location: 'Mumbai', phone: '919876543211', keywords: ['divorce', 'family', 'maintenance', 'child custody', 'marriage'] },
+      { id: 'l-103', name: 'Adv. Vikram Singh', specialization: 'Property and Real Estate', experience: '12+ Years', location: 'Bengaluru', phone: '919876543212', keywords: ['property', 'real estate', 'rent', 'tenant', 'landlord', 'dispute'] },
+      { id: 'l-104', name: 'Adv. Anjali Desai', specialization: 'Corporate Law', experience: '10+ Years', location: 'Pune', phone: '919876543213', keywords: ['corporate', 'business', 'startup', 'contract', 'company'] },
+      { id: 'l-105', name: 'Adv. Rohan Gupta', specialization: 'Cyber Law', experience: '6+ Years', location: 'Hyderabad', phone: '919876543214', keywords: ['cyber', 'online fraud', 'scam', 'it act', 'data privacy'] },
+      { id: 'l-106', name: 'Adv. Meera Reddy', specialization: 'Consumer Rights', experience: '9+ Years', location: 'Chennai', phone: '919876543215', keywords: ['consumer', 'complaint', 'defective', 'service', 'refund'] }
+    ];
+
     async function init() {
       const urlParams = new URLSearchParams(window.location.search);
       const caseId = urlParams.get('caseId');
@@ -179,7 +203,7 @@
           const res = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/get-lawyers');
           if (!res.ok) throw new Error('Failed to fetch lawyers');
           const lawyers = await res.json();
-          renderGenericPage(lawyers || []);
+          renderGenericPage(lawyers && lawyers.length ? lawyers : FALLBACK_LAWYERS);
         } else {
           const res = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/match-lawyers/' + caseId);
           if (!res.ok) throw new Error('Failed to fetch case data');
@@ -190,10 +214,10 @@
             return;
           }
           
-          renderPage(data.case, data.lawyers || []);
+          renderPage(data.case, data.lawyers && data.lawyers.length ? data.lawyers : matchFallbackLawyers(data.case));
         }
       } catch (err) {
-        document.getElementById('app-container').innerHTML = '<div class="loading" style="color:var(--red);">Failed to load data. Please check your connection and try again.</div>';
+        renderGenericPage(FALLBACK_LAWYERS);
       }
     }
     
@@ -205,6 +229,7 @@
           <p>Connect with top-rated verified legal professionals.</p>
         </div>
       `;
+      html += '<div class="lawyer-grid">';
       
       if (lawyers.length === 0) {
         html += '<p style="color:var(--ts);text-align:center;">No lawyers found at the moment.</p>';
@@ -230,6 +255,7 @@
           `;
         });
       }
+      html += '</div>';
       container.innerHTML = html;
     }
     
@@ -260,6 +286,7 @@
         
         <div class="lawyers-title">Recommended Lawyers</div>
       `;
+      html += '<div class="lawyer-grid">';
       
       if (lawyers.length === 0) {
         html += '<p style="color:var(--ts);">No lawyers found matching your criteria right now.</p>';
@@ -290,9 +317,27 @@
         });
       }
       
+      html += '</div>';
       container.innerHTML = html;
     }
     
+    function matchFallbackLawyers(caseData) {
+      const caseText = [
+        caseData?.problemType,
+        caseData?.summary,
+        ...(caseData?.facts || [])
+      ].filter(Boolean).join(' ').toLowerCase();
+
+      const matched = FALLBACK_LAWYERS.filter(lawyer => {
+        const spec = String(lawyer.specialization || '').toLowerCase();
+        const keywords = Array.isArray(lawyer.keywords) ? lawyer.keywords : [];
+        return caseText.includes(spec.split(' ')[0]) ||
+          keywords.some(keyword => caseText.includes(String(keyword).toLowerCase()));
+      });
+
+      return matched.length ? matched : FALLBACK_LAWYERS;
+    }
+
     // Fallback escape func in case utils.js fails to load
     function esc(s) {
       if (!s) return '';

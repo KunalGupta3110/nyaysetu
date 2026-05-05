@@ -6,14 +6,14 @@
 <title data-i18n="auth_page_title">Sign In — NyaySetu</title>
 <link rel="stylesheet" href="../css/base.css">
 <style>
-html,body{height:100%}
-body{display:flex;align-items:center;justify-content:center;padding:20px;min-height:100vh}
+html{min-height:100%}
+body{display:flex;align-items:flex-start;justify-content:center;padding:clamp(16px,3vw,32px);min-height:100vh;min-height:100dvh;overflow-y:auto}
 
-.auth-wrap{display:grid;grid-template-columns:0.8fr 1.2fr;max-width:1000px;width:100%;max-height:90vh;background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadowlg)}
+.auth-wrap{position:relative;display:grid;grid-template-columns:minmax(320px,0.8fr) minmax(0,1.2fr);max-width:1000px;width:100%;min-height:min(760px,calc(100vh - 40px));min-height:min(760px,calc(100dvh - 40px));margin-block:auto;background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadowlg)}
 
 /* Left panel */
-.auth-left{background:linear-gradient(135deg,rgba(201,169,110,.07) 0%,transparent 60%);border-right:1px solid var(--border);padding:48px 44px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
-.auth-left-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.5}
+.auth-left{background:linear-gradient(135deg,rgba(201,169,110,.07) 0%,transparent 60%);border-right:1px solid var(--border);padding:48px 44px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;min-height:0}
+.auth-left-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.5;pointer-events:none}
 .auth-left-content{position:relative;z-index:2}
 .auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:48px}
 .auth-brand-box{width:36px;height:36px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#0A0A0A}
@@ -26,9 +26,10 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 .auth-bottom{position:relative;z-index:2;font-size:11px;color:var(--tm);line-height:1.6}
 
 /* Right panel */
-.auth-right{padding:48px 52px;display:flex;flex-direction:column;justify-content:center;overflow-y:auto}
+.auth-right{padding:48px 52px;display:flex;flex-direction:column;justify-content:flex-start;min-width:0;min-height:0;overflow:visible}
+.auth-right>*{flex-shrink:0}
 .auth-tabs{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:28px}
-.auth-tab{flex:1;padding:9px;font-size:13px;font-weight:500;background:transparent;border:none;color:var(--ts);transition:all var(--t) var(--ease)}
+.auth-tab{flex:1;min-height:38px;padding:9px;font-size:13px;font-weight:500;background:transparent;border:none;color:var(--ts);transition:all var(--t) var(--ease)}
 .auth-tab.active{background:var(--adim);color:var(--accent)}
 .auth-panel{display:none}
 .auth-panel.active{display:block}
@@ -44,14 +45,14 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 .btn-google:disabled{opacity:.55;cursor:not-allowed;transform:none}
 .google-mark{width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
 .google-mark svg{width:14px;height:14px;display:block}
-.role-select-grid{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:18px}
-.role-card{padding:12px 8px;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all var(--t) var(--ease);text-align:center}
+.role-select-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.role-card{min-width:0;padding:12px 8px;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all var(--t) var(--ease);text-align:center}
 .role-card:hover,.role-card.on{border-color:rgba(201,169,110,.35);background:var(--adim)}
 .role-card.on::after{content:none}
 .role-ico{font-size:22px;margin-bottom:6px}
 .role-title{font-size:12.5px;font-weight:600;color:var(--tp)}
-.role-desc{font-size:11px;color:var(--ts);margin-top:2px}
-.form-group{margin-bottom: 20px;}
+.role-desc{font-size:11px;color:var(--ts);line-height:1.35;margin-top:2px}
+.form-group{margin-bottom:18px}
 
 /* Password strength */
 .pw-bar{height:3px;border-radius:2px;background:var(--bg3);overflow:hidden;margin-top:6px}
@@ -61,22 +62,39 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 .pw-strong{background:var(--green);width:100%}
 
 /* Loading overlay */
-.auth-loading{display:none;position:absolute;inset:0;background:rgba(10,10,10,.7);backdrop-filter:blur(4px);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:12px;border-radius:var(--rl)}
+.auth-loading{display:none;position:fixed;inset:0;background:rgba(10,10,10,.72);backdrop-filter:blur(4px);z-index:10000;align-items:center;justify-content:center;flex-direction:column;gap:12px}
 .auth-loading.show{display:flex}
 
-@media(max-width:800px){
-  .auth-wrap{grid-template-columns:1fr}
+@media(max-width:900px){
+  body{align-items:flex-start}
+  .auth-wrap{grid-template-columns:1fr;max-width:640px;min-height:auto;margin-block:0}
   .auth-left{display:none}
-  .role-select-grid{grid-template-columns:1fr}
   .btn-primary{width:100%}
   .auth-right{padding:32px 24px}
+}
+
+@media(max-width:560px){
+  body{padding:0;background:var(--bg1)}
+  .auth-wrap{width:100%;min-height:100dvh;border-left:0;border-right:0;border-radius:0;box-shadow:none}
+  .auth-right{padding:28px 18px 32px}
+  .auth-tabs{margin-bottom:22px}
+  .role-select-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .role-card{padding:10px 6px}
+  .role-ico{font-size:18px;margin-bottom:4px}
+  .role-title{font-size:11.5px}
+  .role-desc{display:none}
+}
+
+@media(max-width:360px){
+  .role-select-grid{grid-template-columns:1fr}
+  .role-desc{display:block}
 }
 </style>
 </head>
 <body data-page="auth">
 <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
 
-<div class="auth-wrap" style="position:relative">
+<div class="auth-wrap">
   <div class="auth-loading" id="auth-loading">
     <div class="spinner"></div>
     <span style="font-size:13px;color:var(--ts)">Signing you in…</span>
