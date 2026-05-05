@@ -415,54 +415,66 @@ window.signUp = async () => {
   if (authBusy) return;
 
   const role = selectedRole;
-  const user = {
+  const userPayload = {
     name: document.getElementById('su-name').value.trim(),
     email: document.getElementById('su-email').value.trim().toLowerCase(),
     password: document.getElementById('su-pass').value,
     role,
-    city: document.getElementById('su-city').value.trim(),
-    college: role === 'student' ? document.getElementById('su-college').value.trim() : '',
-    year: role === 'student' ? document.getElementById('su-year').value : '',
-    area: role === 'student' ? document.getElementById('su-area').value : '',
-    l_qual: role === 'lawyer' ? document.getElementById('su-l-qual').value.trim() : '',
-    l_spec: role === 'lawyer' ? document.getElementById('su-l-spec').value.trim() : '',
-    l_exp: role === 'lawyer' ? document.getElementById('su-l-exp').value.trim() : '',
-    l_loc: role === 'lawyer' ? document.getElementById('su-l-loc').value.trim() : '',
-    l_fees: role === 'lawyer' ? document.getElementById('su-l-fees').value.trim() : '',
-    l_bio: role === 'lawyer' ? document.getElementById('su-l-bio').value.trim() : ''
+    profile: {
+      city: document.getElementById('su-city').value.trim(),
+      college: role === 'student' ? document.getElementById('su-college').value.trim() : '',
+      year: role === 'student' ? document.getElementById('su-year').value : '',
+      area: role === 'student' ? document.getElementById('su-area').value : '',
+      l_qual: role === 'lawyer' ? document.getElementById('su-l-qual').value.trim() : '',
+      l_spec: role === 'lawyer' ? document.getElementById('su-l-spec').value.trim() : '',
+      l_exp: role === 'lawyer' ? document.getElementById('su-l-exp').value.trim() : '',
+      l_loc: role === 'lawyer' ? document.getElementById('su-l-loc').value.trim() : '',
+      l_fees: role === 'lawyer' ? document.getElementById('su-l-fees').value.trim() : '',
+      l_bio: role === 'lawyer' ? document.getElementById('su-l-bio').value.trim() : ''
+    }
   };
 
-  if (!user.name || !user.email || !user.password || !user.city) {
+  if (!userPayload.name || !userPayload.email || !userPayload.password || !userPayload.profile.city) {
     showToast('Please fill all required fields', '!');
     return;
   }
-  if (!isValidEmail(user.email)) {
+  if (!isValidEmail(userPayload.email)) {
     showToast('Please enter a valid email address', '!');
     return;
   }
-  if (user.password.length < 8) {
+  if (userPayload.password.length < 8) {
     showToast('Password must be at least 8 characters', '!');
     return;
   }
-  if (role === 'student' && (!user.college || !user.year || !user.area)) {
+  if (role === 'student' && (!userPayload.profile.college || !userPayload.profile.year || !userPayload.profile.area)) {
     showToast('Please complete your student details', '!');
     return;
   }
-  if (role === 'lawyer' && (!user.l_qual || !user.l_spec || !user.l_exp || !user.l_loc || !user.l_fees)) {
+  if (role === 'lawyer' && (!userPayload.profile.l_qual || !userPayload.profile.l_spec || !userPayload.profile.l_exp || !userPayload.profile.l_loc || !userPayload.profile.l_fees)) {
     showToast('Please complete your lawyer details', '!');
-    return;
-  }
-  if (getSavedUsers().some(saved => saved.email.toLowerCase() === user.email)) {
-    showToast('An account with this email already exists', '!');
     return;
   }
 
   setAuthLoading('signup', true);
-  await wait(300);
-  upsertSavedUser(user);
-  saveCurrentUser(user);
-  showToast('Account created successfully', 'OK');
-  setTimeout(() => redirectAfterAuth(user), 450);
+  
+  try {
+    const res = await fetch('/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userPayload)
+    });
+    
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to create account');
+    
+    saveCurrentUser(data.user);
+    localStorage.setItem('nyaysetu_token', data.token);
+    showToast('Account created successfully', 'OK');
+    setTimeout(() => redirectAfterAuth(data.user), 450);
+  } catch (err) {
+    showToast(err.message, '!');
+    setAuthLoading('signup', false);
+  }
 };
 
 window.signIn = async () => {
@@ -481,18 +493,25 @@ window.signIn = async () => {
   }
 
   setAuthLoading('signin', true);
-  await wait(250);
-
-  const user = getSavedUsers().find(saved => saved.email.toLowerCase() === email && saved.password === password);
-  if (!user) {
+  
+  try {
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Login failed');
+    
+    saveCurrentUser(data.user);
+    localStorage.setItem('nyaysetu_token', data.token);
+    showToast('Signed in successfully', 'OK');
+    setTimeout(() => redirectAfterAuth(data.user), 450);
+  } catch (err) {
+    showToast(err.message, '!');
     setAuthLoading('signin', false);
-    showToast('Email or password is incorrect', '!');
-    return;
   }
-
-  saveCurrentUser(user);
-  showToast('Signed in successfully', 'OK');
-  setTimeout(() => redirectAfterAuth(user), 450);
 };
 
 window.resetPass = () => {
