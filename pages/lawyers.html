@@ -3,137 +3,337 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Lawyers — NyaySetu</title>
+  <title>Connect with Verified Lawyers - NyaySetu</title>
   <link rel="stylesheet" href="../css/base.css">
   <style>
+    html, body { overflow-x: hidden; }
     body {
-      padding-top: 80px; /* Space for nav */
+      padding-top: 64px;
       background: var(--bg);
       color: var(--tp);
-      font-family: 'Inter', sans-serif;
     }
-    .container {
-      max-width: 960px;
+    .lawyer-page {
+      width: 100%;
+      overflow-x: hidden;
+    }
+    .lawyer-wrap {
+      width: 100%;
+      max-width: 1120px;
       margin: 0 auto;
-      padding: 20px;
+      padding: 0 20px;
     }
-    .header {
-      margin-bottom: 24px;
+    .lawyer-hero {
+      position: relative;
+      padding: 54px 0 42px;
+      border-bottom: 1px solid var(--border);
+      background:
+        linear-gradient(135deg, rgba(201,169,110,.10), transparent 38%),
+        radial-gradient(circle at 78% 12%, rgba(129,140,248,.08), transparent 30%);
+      overflow: hidden;
+    }
+    .lawyer-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: .38;
+      pointer-events: none;
+    }
+    .hero-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+      gap: 42px;
+      align-items: center;
+      z-index: 1;
+    }
+    .eyebrow-mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 6px 10px;
+      border: 1px solid rgba(201,169,110,.20);
+      border-radius: 999px;
+      background: var(--adim);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .8px;
+      text-transform: uppercase;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 6vw, 68px);
+      line-height: 1.04;
+      letter-spacing: -1.8px;
+      margin-bottom: 18px;
+      color: var(--tp);
+    }
+    .hero-sub {
+      max-width: 560px;
+      color: var(--ts);
+      font-size: 17px;
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .workflow-card {
+      background: rgba(17,17,17,.86);
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      box-shadow: var(--shadowlg);
+      padding: 24px;
+      backdrop-filter: blur(16px);
+    }
+    .workflow-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .workflow-card p {
+      color: var(--ts);
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .workflow-form {
+      display: grid;
+      gap: 12px;
+    }
+    .workflow-form .form-row {
+      grid-template-columns: 1fr 1fr;
+    }
+    .workflow-progress {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .progress-track {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .progress-step {
+      height: 6px;
+      border-radius: 999px;
+      background: var(--bg3);
+    }
+    .progress-step.done {
+      background: var(--accent);
+    }
+    .status-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      color: var(--ts);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(201,169,110,.24);
+      color: var(--accent);
+      background: var(--adim);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      white-space: nowrap;
+    }
+    .section {
+      padding: 58px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-head {
+      max-width: 680px;
+      margin-bottom: 34px;
+    }
+    .section-head.center {
+      margin-left: auto;
+      margin-right: auto;
       text-align: center;
     }
-    .header h1 {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--tp);
-      margin-bottom: 8px;
+    .section-title {
       font-family: 'Playfair Display', serif;
+      font-size: clamp(30px, 4vw, 44px);
+      line-height: 1.12;
+      letter-spacing: -.8px;
+      margin-bottom: 10px;
     }
-    .header p {
-      font-size: 15px;
+    .section-sub {
       color: var(--ts);
+      font-size: 15px;
+      line-height: 1.75;
     }
-    .case-card {
-      padding: 20px;
-      border-radius: 12px;
-      background: var(--bg1);
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .timeline-step {
+      position: relative;
+      min-height: 168px;
+      padding: 18px 14px;
       border: 1px solid var(--border);
-      margin-bottom: 32px;
+      border-radius: var(--r);
+      background: var(--bg1);
+      transition: transform var(--t) var(--ease), border-color var(--t) var(--ease);
     }
-    .case-card h2 {
-      font-size: 18px;
-      margin-bottom: 16px;
+    .timeline-step:hover {
+      transform: translateY(-3px);
+      border-color: rgba(201,169,110,.28);
+    }
+    .step-num {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--adim);
+      border: 1px solid rgba(201,169,110,.18);
       color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 14px;
     }
-    .case-card h3 {
+    .timeline-step h3 {
       font-size: 14px;
       color: var(--tp);
-      margin: 16px 0 8px;
-      font-weight: 600;
+      margin-bottom: 7px;
     }
-    .case-card p {
-      font-size: 14px;
-      color: var(--ts);
+    .timeline-step p {
+      font-size: 12.5px;
       line-height: 1.6;
-      margin-bottom: 8px;
-    }
-    .case-card ul {
-      margin: 0;
-      padding-left: 20px;
-      font-size: 14px;
       color: var(--ts);
-    }
-    .case-card li {
-      margin-bottom: 6px;
-    }
-    
-    .lawyer-card {
-      padding: 18px;
-      border-radius: 12px;
-      background: #111;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      min-height: 100%;
-      margin-bottom: 12px;
     }
     .lawyer-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 14px;
     }
+    .lawyer-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 260px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: var(--bg1);
+      transition: transform var(--t) var(--ease), border-color var(--t) var(--ease);
+    }
+    .lawyer-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(201,169,110,.26);
+    }
+    .lawyer-avatar {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--adim);
+      color: var(--accent);
+      border: 1px solid rgba(201,169,110,.22);
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
     .lawyer-name {
-      font-size: 18px;
-      font-weight: 600;
+      font-size: 17px;
+      font-weight: 700;
       color: var(--tp);
-      margin-bottom: 4px;
+      margin-bottom: 7px;
     }
-    .lawyer-details {
-      font-size: 14px;
+    .lawyer-meta {
+      display: grid;
+      gap: 5px;
+      margin-bottom: 16px;
       color: var(--ts);
-      line-height: 1.55;
+      font-size: 13px;
+      line-height: 1.45;
     }
-    .lawyer-details span {
-      display: inline-block;
-      margin-right: 12px;
-      margin-bottom: 4px;
+    .rating {
+      color: var(--accent);
+      font-weight: 700;
     }
-    .connect-btn {
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .trust-card {
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: var(--bg1);
+    }
+    .trust-card h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .trust-card p {
+      color: var(--ts);
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+    .muted-action {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      background: #25D366;
-      color: #fff;
-      padding: 12px 20px;
-      border-radius: 24px;
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-      width: 100%;
-      margin-top: auto;
-    }
-    .connect-btn:hover {
-      transform: translateY(-2px);
-      opacity: 0.95;
-    }
-    .loading {
-      text-align: center;
-      padding: 40px;
+      min-height: 44px;
+      padding: 11px 18px;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
       color: var(--ts);
-    }
-    .lawyers-title {
-      font-size: 18px;
+      background: transparent;
       font-weight: 600;
-      margin-bottom: 16px;
-      color: var(--tp);
+      transition: all var(--t) var(--ease);
     }
-    @media(max-width:640px) {
-      body { padding-top: 72px; }
-      .container { padding: 16px; }
-      .header { text-align: left; }
+    .muted-action:hover {
+      color: var(--tp);
+      border-color: var(--border2);
+      background: var(--bg2);
+    }
+    .case-output {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: var(--bg);
+      color: var(--ts);
+      font-size: 13px;
+      line-height: 1.55;
+      margin-top: 12px;
+    }
+    @media(max-width:1020px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .timeline { grid-template-columns: repeat(2, 1fr); }
+      .lawyer-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media(max-width:680px) {
+      .lawyer-wrap { padding: 0 16px; }
+      .lawyer-hero { padding: 52px 0 42px; }
+      .workflow-form .form-row { grid-template-columns: 1fr; }
+      .timeline,
+      .lawyer-grid,
+      .trust-grid { grid-template-columns: 1fr; }
+      .status-line { align-items: flex-start; flex-direction: column; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions .btn-primary,
+      .hero-actions .muted-action { width: 100%; }
     }
   </style>
 </head>
@@ -141,210 +341,322 @@
   <script src="../js/utils.js"></script>
   <script src="../js/i18n.js"></script>
   <script src="../js/nav.js"></script>
-  <script>
-    function injectNav() {
-      document.body.insertAdjacentHTML('afterbegin', `
-  <nav id="nav">
-    <a href="../index.html" class="nav-logo">
-      <div class="nav-logo-box">N</div>
-      <span class="nav-logo-name">NyaySetu</span>
-    </a>
-    <div class="nav-tabs">
-      <a class="nav-tab" href="../index.html"  data-page="home"><span class="nav-icon">🏠</span> <span data-i18n="nav_home">Home</span></a>
-      <a class="nav-tab" href="chat.html"       data-page="chat"><span class="nav-icon">⚖️</span> <span data-i18n="nav_chat">AI Chat</span></a>
-      <a class="nav-tab mobile-only-nav-item" href="chat.html"><span class="nav-icon">💡</span> <span data-i18n="nav_ask">Ask a Question</span></a>
-      <a class="nav-tab" href="documents.html"  data-page="docs"><span class="nav-icon">📄</span> <span data-i18n="nav_docs">Documents</span></a>
-      <a class="nav-tab" href="simplifier.html" data-page="simplify"><span class="nav-icon">📚</span> <span data-i18n="nav_simplify">Simplifier</span></a>
-      <a class="nav-tab" href="students.html"   data-page="students"><span class="nav-icon">🎓</span> <span data-i18n="nav_students">Students</span></a>
-      <a class="nav-tab" href="lawyers.html" data-page="lawyers"><span class="nav-icon">⚖️</span> <span data-i18n="nav_lawyers">Lawyers</span></a>
-      <a class="nav-tab" href="about.html"     data-page="about"><span class="nav-icon">ℹ️</span> <span data-i18n="footer_about">About Us</span></a>
-      <button class="nav-tab mobile-only-nav-item" onclick="toggleTheme()" style="margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; border-radius: 0; justify-content: flex-start; border-bottom:none; background:transparent;"><span class="nav-icon">☀/☽</span> Toggle Theme</button>
-      <div id="auth-nav-slot-menu" class="mobile-only-nav-item" style="width: 100%; margin-top: 8px;"></div>
-    </div>
-    <div class="nav-right">
-      <div class="nav-lang">${typeof getLangSelectHTML === 'function' ? getLangSelectHTML() : ''}</div>
-      <button class="nav-icon-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle theme">☀</button>
-      <a href="chat.html" class="btn-nav" data-i18n="nav_ask">Ask a Question</a>
-      <span id="auth-nav-slot"></span>
-    </div>
-  </nav>
-  <div id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>`);
-      if(typeof initTheme === 'function') initTheme();
-      if(typeof setActiveNav === 'function') setActiveNav();
-      if(typeof initI18n === 'function') initI18n();
-    }
-    injectNav();
-  </script>
+  <script>injectNav();</script>
 
-  <div class="container" id="app-container">
-    <div class="loading">
-      <div class="typing" style="justify-content:center; border:none; background:transparent; padding:0; margin-bottom:12px;"><span></span><span></span><span></span></div>
-      Finding the best lawyers for your case...
-    </div>
-  </div>
+  <main class="lawyer-page">
+    <section class="lawyer-hero">
+      <div class="lawyer-wrap hero-grid">
+        <div>
+          <div class="eyebrow-mini">Lawyer review network</div>
+          <h1 class="hero-title">Connect with Verified Lawyers</h1>
+          <p class="hero-sub">Get your legal documents reviewed and certified by lawyers who understand your case type, location, and language needs.</p>
+          <div class="hero-actions">
+            <button class="btn-primary" type="button" onclick="scrollToCaseForm()">Submit Your Case</button>
+            <a class="muted-action" href="chat.html">Ask AI First</a>
+          </div>
+        </div>
+
+        <aside class="workflow-card" id="submit-case">
+          <h2>Submit your case</h2>
+          <p>Create a case, request lawyer review, track approval, pay, and receive your final document.</p>
+          <form class="workflow-form" id="case-form" onsubmit="submitCase(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Case Type</label>
+                <select class="form-select" id="case-type" required>
+                  <option value="">Select type</option>
+                  <option>Consumer complaint</option>
+                  <option>Rent dispute</option>
+                  <option>Property dispute</option>
+                  <option>Family matter</option>
+                  <option>Criminal matter</option>
+                  <option>Cyber fraud</option>
+                  <option>Corporate contract</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Location</label>
+                <input class="form-input" id="case-location" placeholder="City or state" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Preferred Language</label>
+              <input class="form-input" id="case-language" placeholder="Hindi, English, Marathi">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Case Summary</label>
+              <textarea class="form-textarea" id="case-summary" placeholder="Briefly explain what happened and what document you need reviewed." required></textarea>
+            </div>
+            <button class="btn-primary" id="create-case-btn" type="submit">Create Case</button>
+          </form>
+          <div class="workflow-progress" id="case-progress" style="display:none"></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="lawyer-wrap">
+        <div class="section-head center">
+          <h2 class="section-title">How It Works</h2>
+          <p class="section-sub">A clear path from AI guidance to lawyer-certified delivery.</p>
+        </div>
+        <div class="timeline">
+          <div class="timeline-step fi"><div class="step-num">1</div><h3>Ask AI</h3><p>Start with plain-language legal guidance for your situation.</p></div>
+          <div class="timeline-step fi"><div class="step-num">2</div><h3>Generate Document</h3><p>Create a draft notice, complaint, affidavit, or agreement.</p></div>
+          <div class="timeline-step fi"><div class="step-num">3</div><h3>Request Lawyer Review</h3><p>Move your case into the verified lawyer queue.</p></div>
+          <div class="timeline-step fi"><div class="step-num">4</div><h3>Lawyer Reviews and Edits</h3><p>A matched lawyer checks facts, structure, and legal risk.</p></div>
+          <div class="timeline-step fi"><div class="step-num">5</div><h3>Lawyer Verifies and Approves</h3><p>Your document is approved after professional review.</p></div>
+          <div class="timeline-step fi"><div class="step-num">6</div><h3>Payment</h3><p>Pay only after the case reaches approval stage.</p></div>
+          <div class="timeline-step fi"><div class="step-num">7</div><h3>Final Document Delivery</h3><p>Receive the final reviewed document for download or filing.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="lawyer-wrap">
+        <div class="section-head">
+          <h2 class="section-title">Featured Lawyers</h2>
+          <p class="section-sub">Demo profiles shown for a complete browsing experience. Live lawyer accounts from MongoDB appear here when available.</p>
+        </div>
+        <div class="lawyer-grid" id="featured-lawyers"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="lawyer-wrap">
+        <div class="trust-grid">
+          <div class="trust-card fi">
+            <h3>Verified Lawyers</h3>
+            <p>Profiles are reviewed before they can accept cases or approve documents.</p>
+          </div>
+          <div class="trust-card fi">
+            <h3>Secure Data</h3>
+            <p>Case details are anonymized for browsing and shared only when a lawyer is assigned.</p>
+          </div>
+          <div class="trust-card fi">
+            <h3>Transparent Pricing</h3>
+            <p>The workflow separates review, approval, payment, and final delivery so every stage is clear.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script>
-    const FALLBACK_LAWYERS = [
-      { id: 'l-101', name: 'Adv. Rajesh Kumar', specialization: 'Criminal Law', experience: '15+ Years', location: 'New Delhi', phone: '919876543210', keywords: ['criminal', 'bail', 'fir', 'police', 'fraud'] },
-      { id: 'l-102', name: 'Adv. Sneha Sharma', specialization: 'Family and Divorce', experience: '8+ Years', location: 'Mumbai', phone: '919876543211', keywords: ['divorce', 'family', 'maintenance', 'child custody', 'marriage'] },
-      { id: 'l-103', name: 'Adv. Vikram Singh', specialization: 'Property and Real Estate', experience: '12+ Years', location: 'Bengaluru', phone: '919876543212', keywords: ['property', 'real estate', 'rent', 'tenant', 'landlord', 'dispute'] },
-      { id: 'l-104', name: 'Adv. Anjali Desai', specialization: 'Corporate Law', experience: '10+ Years', location: 'Pune', phone: '919876543213', keywords: ['corporate', 'business', 'startup', 'contract', 'company'] },
-      { id: 'l-105', name: 'Adv. Rohan Gupta', specialization: 'Cyber Law', experience: '6+ Years', location: 'Hyderabad', phone: '919876543214', keywords: ['cyber', 'online fraud', 'scam', 'it act', 'data privacy'] },
-      { id: 'l-106', name: 'Adv. Meera Reddy', specialization: 'Consumer Rights', experience: '9+ Years', location: 'Chennai', phone: '919876543215', keywords: ['consumer', 'complaint', 'defective', 'service', 'refund'] }
+    const STATUS_FLOW = ['open', 'pending_review', 'assigned', 'approved', 'paid', 'completed'];
+    const STATUS_LABELS = {
+      open: 'Open',
+      pending_review: 'Pending Review',
+      assigned: 'Assigned',
+      approved: 'Approved',
+      paid: 'Paid',
+      completed: 'Completed'
+    };
+    const DEMO_LAWYERS = [
+      { id: 'l-101', name: 'Adv. Rajesh Kumar', specialization: 'Criminal Law', experience: '15+ Years', location: 'New Delhi', rating: '4.9/5' },
+      { id: 'l-102', name: 'Adv. Sneha Sharma', specialization: 'Family and Divorce', experience: '8+ Years', location: 'Mumbai', rating: '4.8/5' },
+      { id: 'l-103', name: 'Adv. Vikram Singh', specialization: 'Property and Real Estate', experience: '12+ Years', location: 'Bengaluru', rating: '4.9/5' },
+      { id: 'l-106', name: 'Adv. Meera Reddy', specialization: 'Consumer Rights', experience: '9+ Years', location: 'Chennai', rating: '4.7/5' }
     ];
 
-    async function init() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const caseId = urlParams.get('caseId');
-      
-      try {
-        if (!caseId) {
-          // generic lawyers list
-          const res = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/get-lawyers');
-          if (!res.ok) throw new Error('Failed to fetch lawyers');
-          const lawyers = await res.json();
-          renderGenericPage(lawyers && lawyers.length ? lawyers : FALLBACK_LAWYERS);
-        } else {
-          const res = await fetch((typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '') + '/match-lawyers/' + caseId);
-          if (!res.ok) throw new Error('Failed to fetch case data');
-          const data = await res.json();
-          
-          if (!data.case) {
-            document.getElementById('app-container').innerHTML = '<div class="loading" style="color:var(--red);">Case not found.</div>';
-            return;
-          }
-          
-          renderPage(data.case, data.lawyers && data.lawyers.length ? data.lawyers : matchFallbackLawyers(data.case));
-        }
-      } catch (err) {
-        renderGenericPage(FALLBACK_LAWYERS);
-      }
+    let activeCase = null;
+    const API_BASE = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initScrollAnim();
+      renderFeaturedLawyers(DEMO_LAWYERS);
+      loadCaseFromUrlOrStorage();
+    });
+
+    function scrollToCaseForm() {
+      document.getElementById('submit-case')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => document.getElementById('case-type')?.focus(), 420);
     }
-    
-    function renderGenericPage(lawyers) {
-      const container = document.getElementById('app-container');
-      let html = `
-        <div class="header">
-          <h1>Find the right lawyer for your case</h1>
-          <p>Connect with top-rated verified legal professionals.</p>
-        </div>
-      `;
-      html += '<div class="lawyer-grid">';
-      
-      if (lawyers.length === 0) {
-        html += '<p style="color:var(--ts);text-align:center;">No lawyers found at the moment.</p>';
-      } else {
-        lawyers.forEach(l => {
-          const msgBody = `Hello, I need legal consultation. I found your profile on NyaySetu.`;
-          const encodedMessage = encodeURIComponent(msgBody);
-          const waLink = `https://wa.me/${l.phone}?text=${encodedMessage}`;
-          
-          html += `
-            <div class="lawyer-card">
-              <div class="lawyer-name">${esc(l.name)}</div>
-              <div class="lawyer-details">
-                <span style="text-transform:capitalize;">⚖️ ${esc(l.specialization)}</span>
-                <span>💼 ${esc(l.experience)}</span>
-                <span>📍 ${esc(l.location)}</span>
-              </div>
-              <a href="${waLink}" target="_blank" class="connect-btn">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-                Connect via WhatsApp
-              </a>
-            </div>
-          `;
-        });
-      }
-      html += '</div>';
-      container.innerHTML = html;
-    }
-    
-    function renderPage(caseData, lawyers) {
-      const container = document.getElementById('app-container');
-      
-      const factsList = (caseData.facts || []).map(f => `<li>${esc(f)}</li>`).join('');
-      const factsHtml = factsList ? `<ul>${factsList}</ul>` : '<p>No specific facts provided.</p>';
-      
-      let html = `
-        <div class="header">
-          <h1>Your case is ready.</h1>
-          <p>Here are the best lawyers for you.</p>
-        </div>
-        
-        <div class="case-card">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
-            <h2 style="margin:0;">Case Details</h2>
-            <span style="text-transform: capitalize; padding:4px 10px; background:var(--adim); color:var(--accent); border-radius:12px; font-size:12px; font-weight:600;">${esc(caseData.problemType)}</span>
+
+    function renderFeaturedLawyers(lawyers) {
+      document.getElementById('featured-lawyers').innerHTML = lawyers.map(lawyer => `
+        <article class="lawyer-card fi">
+          <div class="lawyer-avatar">${esc(getInitials(lawyer.name))}</div>
+          <div class="lawyer-name">${esc(lawyer.name)}</div>
+          <div class="lawyer-meta">
+            <span><strong>Specialization:</strong> ${esc(lawyer.specialization)}</span>
+            <span><strong>Experience:</strong> ${esc(lawyer.experience)}</span>
+            <span><strong>Location:</strong> ${esc(lawyer.location)}</span>
+            <span class="rating">Rating ${esc(lawyer.rating)}</span>
           </div>
-          
-          <h3>Summary</h3>
-          <p>${esc(caseData.summary).replace(/\\n/g, '<br>')}</p>
-          
-          <h3>Key Facts</h3>
-          ${factsHtml}
-        </div>
-        
-        <div class="lawyers-title">Recommended Lawyers</div>
-      `;
-      html += '<div class="lawyer-grid">';
-      
-      if (lawyers.length === 0) {
-        html += '<p style="color:var(--ts);">No lawyers found matching your criteria right now.</p>';
-      } else {
-        lawyers.forEach(l => {
-          const summaryStr = caseData.summary || '';
-          const factsStr = caseData.facts && caseData.facts.length > 0 ? caseData.facts[0] : '';
-          
-          const msgBody = `Hello, I need help with a legal case.\n\nCase Summary:\n${summaryStr.substring(0, 200)}...\n\nFacts:\n${factsStr.substring(0, 200)}...`;
-          
-          const encodedMessage = encodeURIComponent(msgBody);
-          const waLink = `https://wa.me/${l.phone}?text=${encodedMessage}`;
-          
-          html += `
-            <div class="lawyer-card">
-              <div class="lawyer-name">${esc(l.name)}</div>
-              <div class="lawyer-details">
-                <span style="text-transform:capitalize;">⚖️ ${esc(l.specialization)}</span>
-                <span>💼 ${esc(l.experience)}</span>
-                <span>📍 ${esc(l.location)}</span>
-              </div>
-              <a href="${waLink}" target="_blank" class="connect-btn">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-                Connect via WhatsApp
-              </a>
-            </div>
-          `;
-        });
+          <button class="btn-primary" type="button" onclick="prefillCaseType('${escAttr(lawyer.specialization)}')">Request Review</button>
+        </article>
+      `).join('');
+      initScrollAnim(document);
+    }
+
+    function prefillCaseType(type) {
+      const select = document.getElementById('case-type');
+      const normalized = String(type || '').toLowerCase();
+      const option = Array.from(select.options).find(opt => normalized.includes(opt.textContent.toLowerCase().split(' ')[0]));
+      if (option) select.value = option.value;
+      scrollToCaseForm();
+    }
+
+    async function loadCaseFromUrlOrStorage() {
+      const urlCaseId = new URLSearchParams(window.location.search).get('caseId');
+      const savedCaseId = localStorage.getItem('nyaysetu_active_case_id');
+      const caseId = urlCaseId || savedCaseId;
+      if (!caseId) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/case/${caseId}`);
+        if (!res.ok) throw new Error('Case not found');
+        activeCase = await res.json();
+        localStorage.setItem('nyaysetu_active_case_id', activeCase.id);
+        renderCaseProgress();
+      } catch (err) {
+        localStorage.removeItem('nyaysetu_active_case_id');
       }
-      
-      html += '</div>';
-      container.innerHTML = html;
     }
-    
-    function matchFallbackLawyers(caseData) {
-      const caseText = [
-        caseData?.problemType,
-        caseData?.summary,
-        ...(caseData?.facts || [])
-      ].filter(Boolean).join(' ').toLowerCase();
 
-      const matched = FALLBACK_LAWYERS.filter(lawyer => {
-        const spec = String(lawyer.specialization || '').toLowerCase();
-        const keywords = Array.isArray(lawyer.keywords) ? lawyer.keywords : [];
-        return caseText.includes(spec.split(' ')[0]) ||
-          keywords.some(keyword => caseText.includes(String(keyword).toLowerCase()));
+    async function submitCase(event) {
+      event.preventDefault();
+      const btn = document.getElementById('create-case-btn');
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+
+      const user = typeof getStoredUser === 'function' ? getStoredUser() : null;
+      const payload = {
+        userId: user?.id || '',
+        problemType: document.getElementById('case-type').value,
+        location: document.getElementById('case-location').value.trim(),
+        language: document.getElementById('case-language').value.trim(),
+        summary: document.getElementById('case-summary').value.trim(),
+        facts: [document.getElementById('case-summary').value.trim()],
+        documents: []
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/create-case`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Unable to create case');
+
+        activeCase = data;
+        localStorage.setItem('nyaysetu_active_case_id', activeCase.id);
+        showToast('Case created');
+        renderCaseProgress();
+      } catch (err) {
+        showToast(err.message, '!');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create Case';
+      }
+    }
+
+    async function updateWorkflow(endpoint, payload = {}) {
+      if (!activeCase?.id) return;
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ caseId: activeCase.id, ...payload })
       });
-
-      return matched.length ? matched : FALLBACK_LAWYERS;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Workflow update failed');
+      activeCase = data;
+      renderCaseProgress();
+      return data;
     }
 
-    // Fallback escape func in case utils.js fails to load
-    function esc(s) {
-      if (!s) return '';
-      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    async function requestLawyerReview() {
+      try {
+        await updateWorkflow('/request-lawyer-review');
+        showToast('Lawyer review requested');
+      } catch (err) {
+        showToast(err.message, '!');
+      }
     }
-    
-    document.addEventListener('DOMContentLoaded', init);
+
+    async function completePayment() {
+      try {
+        await updateWorkflow('/complete-payment', {
+          amount: 999,
+          reference: `NS-${Date.now()}`
+        });
+        showToast('Payment marked complete');
+      } catch (err) {
+        showToast(err.message, '!');
+      }
+    }
+
+    async function finalDelivery() {
+      try {
+        await updateWorkflow('/final-delivery', {
+          finalDocument: 'Final lawyer-reviewed document is ready for delivery.'
+        });
+        showToast('Final document delivered');
+      } catch (err) {
+        showToast(err.message, '!');
+      }
+    }
+
+    function renderCaseProgress() {
+      const panel = document.getElementById('case-progress');
+      if (!activeCase) {
+        panel.style.display = 'none';
+        return;
+      }
+
+      const index = Math.max(0, STATUS_FLOW.indexOf(activeCase.status));
+      const steps = STATUS_FLOW.map((status, i) => `<div class="progress-step ${i <= index ? 'done' : ''}" title="${STATUS_LABELS[status]}"></div>`).join('');
+
+      panel.style.display = 'block';
+      panel.innerHTML = `
+        <div class="status-line">
+          <span>Case ID: ${esc(activeCase.id)}</span>
+          <span class="status-pill">${esc(STATUS_LABELS[activeCase.status] || activeCase.status)}</span>
+        </div>
+        <div class="progress-track">${steps}</div>
+        <div class="case-output">
+          <strong>${esc(activeCase.problemType)}</strong><br>
+          ${esc(activeCase.summary || '').slice(0, 180)}
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+          ${getNextActionHtml(activeCase.status)}
+          <button class="muted-action" type="button" onclick="refreshActiveCase()">Refresh Status</button>
+        </div>
+      `;
+    }
+
+    function getNextActionHtml(status) {
+      if (status === 'open') return '<button class="btn-primary" type="button" onclick="requestLawyerReview()">Request Lawyer Review</button>';
+      if (status === 'pending_review') return '<span class="muted-action">Waiting for lawyer applications</span>';
+      if (status === 'assigned') return '<span class="muted-action">Assigned lawyer is reviewing</span>';
+      if (status === 'approved') return '<button class="btn-primary" type="button" onclick="completePayment()">Proceed to Payment</button>';
+      if (status === 'paid') return '<button class="btn-primary" type="button" onclick="finalDelivery()">Final Document Delivery</button>';
+      if (status === 'completed') return '<span class="muted-action">Completed</span>';
+      return '';
+    }
+
+    async function refreshActiveCase() {
+      if (!activeCase?.id) return;
+      try {
+        const res = await fetch(`${API_BASE}/case/${activeCase.id}`);
+        if (!res.ok) throw new Error('Unable to refresh case');
+        activeCase = await res.json();
+        renderCaseProgress();
+        showToast('Status refreshed');
+      } catch (err) {
+        showToast(err.message, '!');
+      }
+    }
+
+    function getInitials(name) {
+      return String(name || 'L').split(/\s+/).map(part => part[0]).join('').replace(/[^A-Za-z]/g, '').slice(0, 2) || 'L';
+    }
+
+    function escAttr(value) {
+      return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
   </script>
 </body>
 </html>

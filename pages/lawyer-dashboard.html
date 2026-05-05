@@ -1,334 +1,516 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lawyer Dashboard — NyaySetu</title>
-<link rel="stylesheet" href="../css/base.css">
-<style>
-.dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 64px);margin-top:64px}
-.sidenav{border-right:1px solid var(--border);background:var(--bg1);padding:20px 12px;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
-.sidenav-user{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:var(--bg2);border:1px solid var(--border);margin-bottom:20px}
-.sidenav-avatar{width:36px;height:36px;border-radius:50%;background:var(--adim);border:1px solid rgba(201,169,110,.3);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:var(--accent);flex-shrink:0;overflow:hidden}
-.sidenav-name{font-size:13px;font-weight:600;color:var(--tp)}
-.sidenav-role{font-size:11px;color:var(--ts)}
-.snav-section{font-size:10px;font-weight:600;letter-spacing:1.3px;text-transform:uppercase;color:var(--tm);padding:14px 10px 6px;font-family:'DM Mono',monospace}
-.snav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;font-size:13px;color:var(--ts);cursor:pointer;margin-bottom:2px;transition:all var(--t) var(--ease);border:1px solid transparent}
-.snav-item:hover{background:var(--bg2);color:var(--tp)}
-.snav-item.active{background:var(--adim);color:var(--accent);border-color:rgba(201,169,110,.18)}
-.snav-ico{font-size:15px;flex-shrink:0}
-.dash-content{padding:32px 36px;overflow-y:auto}
-.dash-pane{display:none}
-.dash-pane.active{display:block}
-
-.welcome-banner{background:linear-gradient(135deg,rgba(201,169,110,.08),transparent 70%);border:1px solid rgba(201,169,110,.15);border-radius:var(--rl);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:28px}
-.wb-text h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--tp);margin-bottom:5px}
-.wb-text p{font-size:13px;color:var(--ts)}
-
-.quick-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
-.qs-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:18px}
-.qs-val{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--tp);letter-spacing:-1px;margin-bottom:3px}
-.qs-lbl{font-size:12px;color:var(--ts)}
-
-.case-list{display:flex;flex-direction:column;gap:12px}
-.case-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:20px;transition:all var(--t) var(--ease)}
-.case-card:hover{border-color:var(--border2);background:var(--bg2)}
-.case-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.case-type{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--accent);font-family:'DM Mono',monospace}
-.case-date{font-size:11px;color:var(--tm);font-family:'DM Mono',monospace}
-.case-summary{font-size:14px;color:var(--tp);line-height:1.5;margin-bottom:16px}
-.case-actions{display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border);padding-top:14px;margin-top:10px}
-
-.empty-state{text-align:center;padding:60px 20px;color:var(--tm);background:var(--bg1);border:1px solid var(--border);border-radius:var(--r)}
-.empty-ico{font-size:40px;margin-bottom:12px}
-.empty-title{font-size:15px;font-weight:600;color:var(--ts);margin-bottom:6px}
-.empty-sub{font-size:13px;color:var(--tm)}
-
-.loading-state{display:flex;flex-direction:column;align-items:center;padding:40px;color:var(--ts)}
-.spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-.badge-pending{background:var(--adim);color:var(--accent);padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;border:1px solid rgba(201,169,110,.2)}
-.badge-accepted{background:var(--greendim);color:var(--green);padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;border:1px solid rgba(74,222,128,.2)}
-
-@media(max-width:860px){
-  .dash-layout{grid-template-columns:1fr}
-  .sidenav{display:none}
-  .quick-stats{grid-template-columns:1fr}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lawyer Dashboard - NyaySetu</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <style>
+    html, body { overflow-x: hidden; }
+    body {
+      padding-top: 64px;
+      background: var(--bg);
+      color: var(--tp);
+    }
+    .dash-shell {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 32px 20px 56px;
+    }
+    .dash-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .dash-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+    .dash-sub {
+      color: var(--ts);
+      font-size: 14.5px;
+      line-height: 1.7;
+      max-width: 640px;
+    }
+    .profile-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: var(--bg1);
+      min-width: 220px;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--adim);
+      border: 1px solid rgba(201,169,110,.24);
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .profile-name {
+      font-size: 13.5px;
+      color: var(--tp);
+      font-weight: 700;
+    }
+    .profile-role {
+      color: var(--ts);
+      font-size: 12px;
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: var(--bg1);
+    }
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      line-height: 1;
+      color: var(--tp);
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      color: var(--ts);
+      font-size: 12.5px;
+    }
+    .tabs {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      background: var(--bg1);
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      flex: 1;
+      min-height: 44px;
+      color: var(--ts);
+      background: transparent;
+      font-weight: 700;
+      border-right: 1px solid var(--border);
+    }
+    .tab-btn:last-child { border-right: 0; }
+    .tab-btn.active {
+      background: var(--adim);
+      color: var(--accent);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .panel-title {
+      font-size: 18px;
+      color: var(--tp);
+      font-weight: 700;
+    }
+    .panel-note {
+      color: var(--ts);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .case-list {
+      display: grid;
+      gap: 12px;
+    }
+    .case-card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: var(--bg1);
+      transition: border-color var(--t) var(--ease), background var(--t) var(--ease), transform var(--t) var(--ease);
+    }
+    .case-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(201,169,110,.22);
+      background: var(--bg2);
+    }
+    .case-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .case-type {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .case-summary {
+      color: var(--tp);
+      font-size: 14px;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .meta-chip,
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--ts);
+      font-size: 12px;
+      background: var(--bg);
+    }
+    .status-badge {
+      color: var(--accent);
+      border-color: rgba(201,169,110,.22);
+      background: var(--adim);
+      font-weight: 700;
+      text-transform: capitalize;
+      white-space: nowrap;
+    }
+    .case-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .empty-state,
+    .loading-state {
+      text-align: center;
+      padding: 44px 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      background: var(--bg1);
+      color: var(--ts);
+    }
+    .empty-title {
+      color: var(--tp);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    @media(max-width:760px) {
+      .dash-shell { padding: 24px 16px 44px; }
+      .dash-head { align-items: stretch; flex-direction: column; }
+      .profile-pill { width: 100%; }
+      .stats-row { grid-template-columns: 1fr; }
+      .panel-head { align-items: flex-start; flex-direction: column; }
+      .case-top { flex-direction: column; }
+      .case-actions .btn-primary,
+      .case-actions .btn-ghost { width: 100%; }
+    }
+  </style>
 </head>
 <body data-page="lawyer-dashboard">
-<script src="../js/utils.js"></script>
-<script src="../js/i18n.js"></script>
-<script src="../js/nav.js"></script>
-<script>
-function getDashboardUser() {
-  try {
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
-    if (!user) return null;
-    return {
-      ...user,
-      role: String(user.role || 'user').toLowerCase()
-    };
-  } catch (err) {
-    return null;
-  }
-}
-
-const dashboardUser = getDashboardUser();
-if (!dashboardUser) {
-  window.location.replace('auth.html');
-} else if (dashboardUser.role !== 'lawyer') {
-  window.location.replace('../index.html');
-}
-
-const API_BASE = (typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '');
-
-function injectNavLocal() {
-  document.body.insertAdjacentHTML('afterbegin', `
-  <nav id="nav">
-    <a href="../index.html" class="nav-logo"><div class="nav-logo-box">N</div><span class="nav-logo-name">NyaySetu</span></a>
-    <div class="nav-tabs">
-      <a class="nav-tab" href="../index.html" data-page="home">Home</a>
-      <a class="nav-tab" href="chat.html" data-page="chat">AI Chat</a>
-      <a class="nav-tab" href="documents.html" data-page="docs">Documents</a>
-      <a class="nav-tab" href="simplifier.html" data-page="simplify">Simplifier</a>
-      <a class="nav-tab" href="students.html" data-page="students">Students</a>
-      <a class="nav-tab" href="lawyers.html" data-page="lawyers">Lawyers</a>
-      <a class="nav-tab active" href="lawyer-dashboard.html" data-page="lawyer-dashboard">Dashboard</a>
-    </div>
-    <div class="nav-right">
-      <button class="nav-icon-btn" onclick="toggleTheme()" title="Toggle theme">&#9728;</button>
-      <button class="btn-nav" type="button" onclick="signOut()">Logout</button>
-    </div>
-  </nav>
-  <div id="toast"><span id="toast-icon">&#10003;</span><span id="toast-msg"></span></div>`);
-  initTheme();
-}
-
-function signOut() {
-  localStorage.removeItem('user');
-  window.location.href = '../index.html';
-}
-
-function showPane(name) {
-  document.querySelectorAll('.dash-pane').forEach((pane) => pane.classList.remove('active'));
-  document.querySelectorAll('.snav-item').forEach((item) => item.classList.remove('active'));
-  document.getElementById('pane-' + name)?.classList.add('active');
-  document.querySelector(`.snav-item[data-pane="${name}"]`)?.classList.add('active');
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  injectNavLocal();
-  
-  const name = dashboardUser.name || 'Lawyer';
-  const firstName = name.split(' ')[0] || 'there';
-  const initials = String(name).split(/\s+/).map((p) => p[0]).join('').toUpperCase().slice(0, 2) || 'L';
-
-  document.getElementById('wb-name').textContent = firstName;
-  document.getElementById('sn-avatar').textContent = initials;
-  document.getElementById('sn-name').textContent = name;
-  document.getElementById('sn-role').textContent = dashboardUser.l_spec || 'Verified Lawyer';
-
-  loadDashboardData();
-});
-
-async function loadDashboardData() {
-  await Promise.all([
-    fetchAvailableCases(),
-    fetchMyApplications()
-  ]);
-}
-
-async function fetchAvailableCases() {
-  const container = document.getElementById('available-cases-list');
-  container.innerHTML = '<div class="loading-state"><div class="spinner"></div><div>Loading available cases...</div></div>';
-  
-  try {
-    const res = await fetch(API_BASE + '/cases');
-    if (!res.ok) throw new Error('Failed to fetch cases');
-    const cases = await res.json();
-    
-    document.getElementById('qs-available').textContent = cases.length;
-    
-    if (cases.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-ico">⚖️</div>
-          <div class="empty-title">No cases available</div>
-          <div class="empty-sub">There are currently no open cases. Check back later.</div>
-        </div>`;
-      return;
+  <script src="../js/utils.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/nav.js"></script>
+  <script>
+    function getDashboardUser() {
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || localStorage.getItem('nyaysetu_user') || 'null');
+        if (!user) return null;
+        const profile = user.profile || {};
+        return {
+          ...user,
+          id: user.id || user._id,
+          role: String(user.role || profile.role || 'user').toLowerCase(),
+          specialization: profile.l_spec || user.l_spec || profile.specialization || 'Verified Lawyer',
+          location: profile.l_loc || user.location || ''
+        };
+      } catch (err) {
+        return null;
+      }
     }
-    
-    container.innerHTML = cases.map(c => `
-      <div class="case-card" id="case-${c.id}">
-        <div class="case-header">
-          <div class="case-type">${esc(c.problemType)}</div>
-          <div class="case-date">${new Date(c.createdAt).toLocaleDateString('en-IN')}</div>
-        </div>
-        <div class="case-summary">${esc(c.summary || 'No summary provided.')}</div>
-        <div class="case-actions">
-          <button class="btn-primary btn-sm" onclick="applyForCase('${c.id}')" id="btn-apply-${c.id}">Apply for Case</button>
-        </div>
-      </div>
-    `).join('');
-  } catch (err) {
-    container.innerHTML = `<div class="empty-state" style="color:var(--red)"><div class="empty-ico">⚠️</div><div class="empty-title">Error loading cases</div></div>`;
-  }
-}
 
-async function fetchMyApplications() {
-  const container = document.getElementById('my-applications-list');
-  container.innerHTML = '<div class="loading-state"><div class="spinner"></div><div>Loading applications...</div></div>';
-  
-  try {
-    const res = await fetch(API_BASE + '/my-applications/' + dashboardUser.id);
-    if (!res.ok) throw new Error('Failed to fetch applications');
-    const apps = await res.json();
-    
-    document.getElementById('qs-apps').textContent = apps.length;
-    
-    if (apps.length === 0) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-ico">📄</div>
-          <div class="empty-title">No applications yet</div>
-          <div class="empty-sub">You haven't applied to any cases.</div>
-        </div>`;
-      return;
+    const dashboardUser = getDashboardUser();
+    if (!dashboardUser) {
+      window.location.replace('auth.html');
+    } else if (dashboardUser.role !== 'lawyer') {
+      window.location.replace('../index.html');
     }
-    
-    container.innerHTML = apps.map(a => `
-      <div class="case-card">
-        <div class="case-header">
-          <div class="case-type">${esc(a.case?.problemType || 'Unknown Case')}</div>
-          <span class="badge-${a.status}">${a.status === 'pending' ? 'Pending Approval' : 'Accepted'}</span>
-        </div>
-        <div class="case-summary">${esc(a.case?.summary || 'No summary provided.')}</div>
-        <div style="font-size: 11px; color: var(--tm); margin-top: 10px;">Applied on: ${new Date(a.createdAt).toLocaleDateString('en-IN')}</div>
-      </div>
-    `).join('');
-  } catch (err) {
-    container.innerHTML = `<div class="empty-state" style="color:var(--red)"><div class="empty-ico">⚠️</div><div class="empty-title">Error loading applications</div></div>`;
-  }
-}
+    injectNav();
+  </script>
 
-async function applyForCase(caseId) {
-  const btn = document.getElementById(`btn-apply-${caseId}`);
-  const originalText = btn.textContent;
-  btn.textContent = 'Applying...';
-  btn.disabled = true;
-
-  try {
-    const res = await fetch(API_BASE + '/apply-case', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        caseId,
-        lawyerId: dashboardUser.id,
-        role: dashboardUser.role
-      })
-    });
-    
-    const data = await res.json();
-    
-    if (!res.ok) {
-      throw new Error(data.error || 'Failed to apply');
-    }
-    
-    showToast('Application submitted successfully');
-    btn.textContent = 'Applied ✓';
-    btn.classList.replace('btn-primary', 'btn-ghost');
-    
-    // Refresh applications list
-    fetchMyApplications();
-  } catch (err) {
-    showToast(err.message, '✕', 'error');
-    btn.textContent = originalText;
-    btn.disabled = false;
-  }
-}
-</script>
-
-<div class="dash-layout">
-  <!-- SIDENAV -->
-  <aside class="sidenav">
-    <div class="sidenav-user">
-      <div class="sidenav-avatar" id="sn-avatar">L</div>
+  <main class="dash-shell">
+    <header class="dash-head">
       <div>
-        <div class="sidenav-name" id="sn-name">Lawyer</div>
-        <div class="sidenav-role" id="sn-role">Verified Lawyer</div>
+        <h1 class="dash-title">Lawyer Dashboard</h1>
+        <p class="dash-sub">See matched review requests, apply for relevant cases, and track your applications.</p>
       </div>
-    </div>
-    <div class="snav-section">Main</div>
-    <div class="snav-item active" data-pane="home" onclick="showPane('home')"><span class="snav-ico">📊</span> Overview</div>
-    <div class="snav-item" data-pane="cases" onclick="showPane('cases')"><span class="snav-ico">⚖️</span> Available Cases</div>
-    <div class="snav-item" data-pane="applications" onclick="showPane('applications')"><span class="snav-ico">📄</span> My Applications</div>
-    
-    <div class="snav-section">Account</div>
-    <div class="snav-item" onclick="signOut()" style="color:var(--red)"><span class="snav-ico">←</span> Sign Out</div>
-  </aside>
+      <div class="profile-pill">
+        <div class="avatar" id="lawyer-avatar">L</div>
+        <div>
+          <div class="profile-name" id="lawyer-name">Lawyer</div>
+          <div class="profile-role" id="lawyer-role">Verified Lawyer</div>
+        </div>
+      </div>
+    </header>
 
-  <!-- CONTENT -->
-  <main class="dash-content">
-    <!-- OVERVIEW -->
-    <div class="dash-pane active" id="pane-home">
-      <div class="welcome-banner">
-        <div class="wb-text">
-          <h2>Welcome, <span id="wb-name">there</span> 👋</h2>
-          <p>Review open cases and provide legal assistance to citizens in need.</p>
-        </div>
+    <section class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-cases">0</div>
+        <div class="stat-label">Matched Cases</div>
       </div>
-      
-      <div class="quick-stats">
-        <div class="qs-card">
-          <div class="qs-val" id="qs-available">0</div>
-          <div class="qs-lbl">Available Cases</div>
-        </div>
-        <div class="qs-card">
-          <div class="qs-val" id="qs-apps">0</div>
-          <div class="qs-lbl">My Applications</div>
-        </div>
-        <div class="qs-card">
-          <div class="qs-val">0</div>
-          <div class="qs-lbl">Active Clients</div>
-        </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-apps">0</div>
+        <div class="stat-label">My Applications</div>
       </div>
-      
-      <h3 class="sh3" style="margin:24px 0 14px">Quick Links</h3>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
-        <div onclick="showPane('cases')" style="cursor:pointer; display:flex;flex-direction:column;gap:8px;padding:20px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);transition:all var(--t) var(--ease)" onmouseover="this.style.borderColor='rgba(201,169,110,.3)'" onmouseout="this.style.borderColor='var(--border)'">
-          <span style="font-size:24px">⚖️</span><span style="font-size:13.5px;font-weight:600;color:var(--tp)">Browse Cases</span><span style="font-size:12px;color:var(--ts)">View all open cases needing legal help</span>
-        </div>
-        <div onclick="showPane('applications')" style="cursor:pointer; display:flex;flex-direction:column;gap:8px;padding:20px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);transition:all var(--t) var(--ease)" onmouseover="this.style.borderColor='rgba(201,169,110,.3)'" onmouseout="this.style.borderColor='var(--border)'">
-          <span style="font-size:24px">📄</span><span style="font-size:13.5px;font-weight:600;color:var(--tp)">Track Applications</span><span style="font-size:12px;color:var(--ts)">Check the status of your applications</span>
-        </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-accepted">0</div>
+        <div class="stat-label">Accepted</div>
       </div>
-    </div>
+    </section>
 
-    <!-- AVAILABLE CASES -->
-    <div class="dash-pane" id="pane-cases">
-      <div style="margin-bottom:20px">
-        <h2 class="sh3">Available Cases</h2>
-        <p style="font-size:13px;color:var(--ts);margin-top:6px">Apply to cases that match your expertise.</p>
-      </div>
-      <div class="case-list" id="available-cases-list">
-        <!-- Cases render here -->
-      </div>
-    </div>
+    <nav class="tabs" aria-label="Lawyer dashboard tabs">
+      <button class="tab-btn active" type="button" data-tab="cases" onclick="switchTab('cases')">Available Cases</button>
+      <button class="tab-btn" type="button" data-tab="applications" onclick="switchTab('applications')">My Applications</button>
+    </nav>
 
-    <!-- MY APPLICATIONS -->
-    <div class="dash-pane" id="pane-applications">
-      <div style="margin-bottom:20px">
-        <h2 class="sh3">My Applications</h2>
-        <p style="font-size:13px;color:var(--ts);margin-top:6px">Track the status of cases you've applied for.</p>
+    <section class="tab-panel active" id="tab-cases">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Available Cases</div>
+          <div class="panel-note">Matched by case type, location, and language where your profile has enough information.</div>
+        </div>
+        <button class="btn-ghost btn-sm" type="button" onclick="loadDashboardData()">Refresh</button>
       </div>
-      <div class="case-list" id="my-applications-list">
-        <!-- Applications render here -->
+      <div class="case-list" id="available-cases-list"></div>
+    </section>
+
+    <section class="tab-panel" id="tab-applications">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">My Applications</div>
+          <div class="panel-note">Pending means the user/admin has not assigned the case yet. Accepted means you can review and approve.</div>
+        </div>
       </div>
-    </div>
+      <div class="case-list" id="my-applications-list"></div>
+    </section>
   </main>
-</div>
+
+  <script>
+    const API_BASE = typeof API_BASE_URL !== 'undefined' ? API_BASE_URL : '';
+    let currentApplications = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      hydrateProfile();
+      loadDashboardData();
+    });
+
+    function hydrateProfile() {
+      const name = dashboardUser.name || 'Lawyer';
+      document.getElementById('lawyer-name').textContent = name;
+      document.getElementById('lawyer-role').textContent = dashboardUser.specialization;
+      document.getElementById('lawyer-avatar').textContent = getInitials(name);
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.toggle('active', panel.id === 'tab-' + tab));
+    }
+
+    async function loadDashboardData() {
+      await Promise.all([fetchAvailableCases(), fetchMyApplications()]);
+    }
+
+    async function fetchAvailableCases() {
+      const container = document.getElementById('available-cases-list');
+      container.innerHTML = '<div class="loading-state">Loading matched cases...</div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/cases?lawyerId=${encodeURIComponent(dashboardUser.id || '')}`);
+        if (!res.ok) throw new Error('Failed to fetch cases');
+        const cases = await res.json();
+        document.getElementById('stat-cases').textContent = cases.length;
+
+        if (!cases.length) {
+          container.innerHTML = emptyState('No matched cases', 'Cases appear here after users request lawyer review and match your profile.');
+          return;
+        }
+
+        container.innerHTML = cases.map(renderCaseCard).join('');
+      } catch (err) {
+        container.innerHTML = emptyState('Unable to load cases', err.message);
+      }
+    }
+
+    async function fetchMyApplications() {
+      const container = document.getElementById('my-applications-list');
+      container.innerHTML = '<div class="loading-state">Loading applications...</div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/my-applications/${encodeURIComponent(dashboardUser.id || '')}`);
+        if (!res.ok) throw new Error('Failed to fetch applications');
+        currentApplications = await res.json();
+
+        document.getElementById('stat-apps').textContent = currentApplications.length;
+        document.getElementById('stat-accepted').textContent = currentApplications.filter(app => app.status === 'accepted').length;
+
+        if (!currentApplications.length) {
+          container.innerHTML = emptyState('No applications yet', 'Apply for a matched case to start tracking it here.');
+          return;
+        }
+
+        container.innerHTML = currentApplications.map(renderApplicationCard).join('');
+      } catch (err) {
+        container.innerHTML = emptyState('Unable to load applications', err.message);
+      }
+    }
+
+    function renderCaseCard(caseData) {
+      const id = caseData.id || caseData._id;
+      const alreadyApplied = Boolean(caseData.applicationStatus);
+      const button = alreadyApplied
+        ? `<button class="btn-ghost btn-sm" type="button" disabled>${caseData.applicationStatus === 'accepted' ? 'Accepted' : 'Applied'}</button>`
+        : `<button class="btn-primary btn-sm" type="button" id="btn-apply-${escAttr(id)}" onclick="applyForCase('${escAttr(id)}')">Apply for Case</button>`;
+
+      return `
+        <article class="case-card">
+          <div class="case-top">
+            <div class="case-type">${esc(caseData.problemType || 'General')}</div>
+            <span class="status-badge">${formatStatus(caseData.status)}</span>
+          </div>
+          <div class="case-summary">${esc(caseData.summary || 'No summary provided.')}</div>
+          <div class="meta-row">
+            <span class="meta-chip">Location: ${esc(caseData.location || 'Not specified')}</span>
+            <span class="meta-chip">Language: ${esc(caseData.language || 'Any')}</span>
+            <span class="meta-chip">Created: ${formatDate(caseData.createdAt)}</span>
+          </div>
+          <div class="case-actions">${button}</div>
+        </article>
+      `;
+    }
+
+    function renderApplicationCard(app) {
+      const caseData = app.case || {};
+      const canApprove = app.status === 'accepted' && caseData.status === 'assigned';
+      const approveButton = canApprove
+        ? `<button class="btn-primary btn-sm" type="button" id="btn-approve-${escAttr(caseData.id)}" onclick="approveCase('${escAttr(caseData.id)}')">Approve Case</button>`
+        : '';
+
+      return `
+        <article class="case-card">
+          <div class="case-top">
+            <div class="case-type">${esc(caseData.problemType || 'Unknown Case')}</div>
+            <span class="status-badge">${formatStatus(app.status)}</span>
+          </div>
+          <div class="case-summary">${esc(caseData.summary || 'No summary provided.')}</div>
+          <div class="meta-row">
+            <span class="meta-chip">Case Status: ${formatStatus(caseData.status || 'open')}</span>
+            <span class="meta-chip">Applied: ${formatDate(app.createdAt)}</span>
+          </div>
+          <div class="case-actions">
+            ${approveButton || '<span class="meta-chip">Awaiting assignment or user action</span>'}
+          </div>
+        </article>
+      `;
+    }
+
+    async function applyForCase(caseId) {
+      const btn = document.getElementById(`btn-apply-${caseId}`);
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Applying...';
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/apply-case`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ caseId, lawyerId: dashboardUser.id, role: 'lawyer' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to apply');
+        showToast('Application submitted');
+        await loadDashboardData();
+      } catch (err) {
+        showToast(err.message, '!');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Apply for Case';
+        }
+      }
+    }
+
+    async function approveCase(caseId) {
+      const btn = document.getElementById(`btn-approve-${caseId}`);
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Approving...';
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/approve-case`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            caseId,
+            lawyerId: dashboardUser.id,
+            lawyerNotes: 'Reviewed and approved by assigned lawyer.'
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to approve case');
+        showToast('Case approved');
+        await loadDashboardData();
+      } catch (err) {
+        showToast(err.message, '!');
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Approve Case';
+        }
+      }
+    }
+
+    function emptyState(title, text) {
+      return `<div class="empty-state"><div class="empty-title">${esc(title)}</div><div>${esc(text)}</div></div>`;
+    }
+
+    function formatStatus(status) {
+      return String(status || '').replace(/_/g, ' ');
+    }
+
+    function formatDate(value) {
+      if (!value) return 'Unknown';
+      return new Date(value).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function getInitials(name) {
+      return String(name || 'L').split(/\s+/).map(part => part[0]).join('').replace(/[^A-Za-z]/g, '').slice(0, 2) || 'L';
+    }
+
+    function escAttr(value) {
+      return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+  </script>
 </body>
 </html>

@@ -10,7 +10,9 @@ function injectNav() {
   const user = typeof getStoredUser === 'function' ? getStoredUser() : null;
   const dashboardLink = user && user.role === 'student'
     ? `<a class="nav-tab" href="${pageHref('dashboard.html')}" data-page="dashboard"><span class="nav-icon"></span> <span data-i18n="nav_dashboard">Dashboard</span></a>`
-    : '';
+    : user && user.role === 'lawyer'
+      ? `<a class="nav-tab" href="${pageHref('lawyer-dashboard.html')}" data-page="lawyer-dashboard"><span class="nav-icon"></span> Dashboard</a>`
+      : '';
 
   const nav = `
   <nav id="nav">

@@ -37,6 +37,7 @@ function publicUser(user) {
     id: user.id,
     name: user.name,
     email: user.email,
+    role: user.role,
     profile: user.profile || {},
     createdAt: user.createdAt
   };
@@ -56,6 +57,31 @@ function createToken() {
   return crypto.randomBytes(32).toString("hex");
 }
 
+const CASE_STATUS_FLOW = ["open", "pending_review", "assigned", "approved", "paid", "completed"];
+
+function isValidObjectId(value) {
+  return mongoose.Types.ObjectId.isValid(String(value || ""));
+}
+
+function normalizeList(value) {
+  if (Array.isArray(value)) return value.map(v => String(v || "").trim()).filter(Boolean);
+  if (!value) return [];
+  return String(value).split(",").map(v => v.trim()).filter(Boolean);
+}
+
+function serializeCase(caseData) {
+  if (!caseData) return null;
+  const obj = typeof caseData.toObject === "function" ? caseData.toObject() : caseData;
+  return {
+    ...obj,
+    id: String(obj._id || obj.id),
+    assignedLawyerId: obj.assignedLawyerId ? String(obj.assignedLawyerId) : null,
+    userId: obj.userId ? String(obj.userId?._id || obj.userId) : null,
+    progressIndex: Math.max(0, CASE_STATUS_FLOW.indexOf(obj.status)),
+    statusFlow: CASE_STATUS_FLOW
+  };
+}
+
 function getFallbackLawyers() {
   try {
     const dataPath = path.join(__dirname, "data", "lawyers.json");
@@ -68,13 +94,15 @@ function getFallbackLawyers() {
 
 function mapLawyerForList(lawyer) {
   const profile = lawyer.profile || {};
+  const languages = normalizeList(profile.languages || profile.language || lawyer.languages);
   return {
-    id: lawyer._id || lawyer.id,
+    id: String(lawyer._id || lawyer.id),
     name: lawyer.name || "Unknown Lawyer",
     specialization: profile.l_spec || lawyer.specialization || "General",
     experience: profile.l_exp ? profile.l_exp + " Years" : lawyer.experience || "Unknown",
     location: profile.l_loc || lawyer.location || "Unknown",
     phone: profile.phone || lawyer.phone || "Unknown",
+    languages,
     keywords: lawyer.keywords || []
   };
 }
@@ -100,6 +128,72 @@ function matchLawyersForCase(lawyers, caseData) {
   return matched.length ? matched : lawyers;
 }
 
+function scoreCaseForLawyer(caseData, lawyer) {
+  const profile = lawyer?.profile || {};
+  const spec = String(profile.l_spec || profile.specialization || "").toLowerCase();
+  const lawyerLocation = String(profile.l_loc || profile.location || profile.city || "").toLowerCase();
+  const lawyerLanguages = normalizeList(profile.languages || profile.language).map(v => v.toLowerCase());
+  const caseText = [
+    caseData.problemType,
+    caseData.summary,
+    ...(caseData.facts || [])
+  ].filter(Boolean).join(" ").toLowerCase();
+  const caseLocation = String(caseData.location || "").toLowerCase();
+  const caseLanguage = String(caseData.language || "").toLowerCase();
+
+  let score = 0;
+  if (spec && caseText.includes(spec.split(" ")[0])) score += 5;
+  if (spec && String(caseData.problemType || "").toLowerCase().includes(spec.split(" ")[0])) score += 5;
+  if (lawyerLocation && caseLocation && (caseLocation.includes(lawyerLocation) || lawyerLocation.includes(caseLocation))) score += 3;
+  if (caseLanguage && lawyerLanguages.includes(caseLanguage)) score += 2;
+  if (!spec) score += 1;
+  return score;
+}
+
+async function getMatchedCasesForLawyer(lawyerId) {
+  const query = { status: { $in: ["pending_review", "open"] } };
+  const cases = await Case.find(query)
+    .select("problemType summary facts location language status createdAt")
+    .sort({ createdAt: -1 })
+    .limit(40);
+
+  if (!lawyerId || !isValidObjectId(lawyerId)) {
+    return cases.slice(0, 5);
+  }
+
+  const lawyer = await User.findById(lawyerId);
+  if (!lawyer || lawyer.role !== "lawyer") return [];
+
+  return cases
+    .map(caseData => ({ caseData, score: scoreCaseForLawyer(caseData, lawyer) }))
+    .filter(item => item.score > 0 || cases.length <= 5)
+    .sort((a, b) => b.score - a.score || new Date(b.caseData.createdAt) - new Date(a.caseData.createdAt))
+    .slice(0, 5)
+    .map(item => item.caseData);
+}
+
+async function updateCaseStatus(caseId, status, fields = {}) {
+  if (!isValidObjectId(caseId)) {
+    const err = new Error("Invalid caseId.");
+    err.status = 400;
+    throw err;
+  }
+
+  const caseData = await Case.findById(caseId);
+  if (!caseData) {
+    const err = new Error("Case not found.");
+    err.status = 404;
+    throw err;
+  }
+
+  caseData.status = status;
+  Object.entries(fields).forEach(([key, value]) => {
+    caseData[key] = value;
+  });
+  await caseData.save();
+  return caseData;
+}
+
 // ================= AUTH ROUTES =================
 app.post("/signup", async (req, res) => {
   try {
@@ -110,7 +204,7 @@ app.post("/signup", async (req, res) => {
     if (!cleanName || !cleanEmail || !password) {
       return res.status(400).json({ error: "Name, email, and password are required." });
     }
-    if (!/^[^s@]+@[^s@]+\.[^s@]+$/.test(cleanEmail)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
       return res.status(400).json({ error: "Please enter a valid email address." });
     }
     if (String(password).length < 8) {
@@ -321,23 +415,36 @@ ${fieldsText}`
 
 app.post("/create-case", async (req, res) => {
   try {
-    const { problemType, summary, facts = [], documents = [], userId } = req.body || {};
+    const {
+      problemType,
+      summary,
+      facts = [],
+      documents = [],
+      userId,
+      location = "",
+      language = ""
+    } = req.body || {};
 
-    if (!userId || !problemType || !summary) {
+    if (!problemType || !summary) {
       return res.status(400).json({ error: "Missing required case fields." });
     }
 
-    const newCase = await Case.create({
-      userId,
+    const casePayload = {
       problemType,
       summary,
-      facts,
-      documents,
+      facts: normalizeList(facts),
+      documents: normalizeList(documents),
+      location: String(location || "").trim(),
+      language: String(language || "").trim(),
       status: "open",
       assignedLawyerId: null
-    });
+    };
 
-    res.status(201).json(newCase);
+    if (isValidObjectId(userId)) casePayload.userId = userId;
+
+    const newCase = await Case.create(casePayload);
+
+    res.status(201).json(serializeCase(newCase));
   } catch (err) {
     res.status(500).json({ error: "Failed to create case." });
   }
@@ -345,23 +452,134 @@ app.post("/create-case", async (req, res) => {
 
 app.get("/get-cases/:userId", async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.userId)) return res.json([]);
     const userCases = await Case.find({ userId: req.params.userId }).sort({ createdAt: -1 });
-    res.json(userCases);
+    res.json(userCases.map(serializeCase));
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch cases." });
   }
 });
 
+app.get("/case/:caseId", async (req, res) => {
+  try {
+    if (!isValidObjectId(req.params.caseId)) {
+      return res.status(400).json({ error: "Invalid caseId." });
+    }
+
+    const caseData = await Case.findById(req.params.caseId).select("-__v");
+    if (!caseData) return res.status(404).json({ error: "Case not found." });
+    res.json(serializeCase(caseData));
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch case." });
+  }
+});
+
 app.get("/cases", async (req, res) => {
   try {
-    // Return only anonymized data
-    const openCases = await Case.find({ status: "open" })
-      .select('problemType summary facts location status createdAt')
-      .sort({ createdAt: -1 });
+    const matchedCases = await getMatchedCasesForLawyer(req.query.lawyerId);
+    const applications = req.query.lawyerId && isValidObjectId(req.query.lawyerId)
+      ? await Application.find({ lawyerId: req.query.lawyerId }).select("caseId status")
+      : [];
+    const applicationMap = new Map(applications.map(app => [String(app.caseId), app.status]));
 
-    res.json(openCases);
+    res.json(matchedCases.map(caseData => ({
+      ...serializeCase(caseData),
+      applicationStatus: applicationMap.get(String(caseData._id)) || null
+    })));
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch open cases." });
+  }
+});
+
+app.post("/request-lawyer-review", async (req, res) => {
+  try {
+    const { caseId } = req.body || {};
+    const caseData = await updateCaseStatus(caseId, "pending_review", {
+      reviewRequestedAt: new Date()
+    });
+    res.json(serializeCase(caseData));
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message || "Failed to request lawyer review." });
+  }
+});
+
+app.post("/assign-lawyer", async (req, res) => {
+  try {
+    const { caseId, lawyerId, applicationId } = req.body || {};
+    if (!isValidObjectId(lawyerId)) {
+      return res.status(400).json({ error: "Invalid lawyerId." });
+    }
+
+    const lawyer = await User.findById(lawyerId);
+    if (!lawyer || lawyer.role !== "lawyer") {
+      return res.status(403).json({ error: "Assigned user must be a lawyer." });
+    }
+
+    const targetCaseId = caseId || (isValidObjectId(applicationId)
+      ? (await Application.findById(applicationId))?.caseId
+      : null);
+    const caseData = await updateCaseStatus(targetCaseId, "assigned", {
+      assignedLawyerId: lawyerId,
+      assignedAt: new Date()
+    });
+
+    await Application.updateMany({ caseId: caseData._id }, { status: "rejected" });
+    await Application.findOneAndUpdate(
+      { caseId: caseData._id, lawyerId },
+      { status: "accepted" },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    res.json(serializeCase(caseData));
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message || "Failed to assign lawyer." });
+  }
+});
+
+app.post("/approve-case", async (req, res) => {
+  try {
+    const { caseId, lawyerId, lawyerNotes = "", reviewedDocument = "" } = req.body || {};
+    const caseData = await Case.findById(caseId);
+    if (!caseData) return res.status(404).json({ error: "Case not found." });
+    if (lawyerId && String(caseData.assignedLawyerId || "") !== String(lawyerId)) {
+      return res.status(403).json({ error: "Only the assigned lawyer can approve this case." });
+    }
+
+    caseData.status = "approved";
+    caseData.approvedAt = new Date();
+    caseData.lawyerNotes = String(lawyerNotes || "").trim();
+    caseData.reviewedDocument = String(reviewedDocument || "").trim();
+    await caseData.save();
+
+    res.json(serializeCase(caseData));
+  } catch (err) {
+    res.status(500).json({ error: "Failed to approve case." });
+  }
+});
+
+app.post("/complete-payment", async (req, res) => {
+  try {
+    const { caseId, amount = 999, currency = "INR", reference = "" } = req.body || {};
+    const caseData = await updateCaseStatus(caseId, "paid", {
+      paidAt: new Date(),
+      payment: { amount: Number(amount) || 999, currency, reference }
+    });
+    res.json(serializeCase(caseData));
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message || "Failed to complete payment." });
+  }
+});
+
+app.post("/final-delivery", async (req, res) => {
+  try {
+    const { caseId, finalDocument = "" } = req.body || {};
+    const caseData = await updateCaseStatus(caseId, "completed", {
+      completedAt: new Date(),
+      finalDocument: String(finalDocument || "Your lawyer-approved document is ready for delivery.").trim()
+    });
+    res.json(serializeCase(caseData));
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message || "Failed to complete final delivery." });
   }
 });
 
@@ -375,10 +593,19 @@ app.post("/apply-case", async (req, res) => {
     if (!caseId || !lawyerId) {
       return res.status(400).json({ error: "Missing caseId or lawyerId." });
     }
+    if (!isValidObjectId(caseId) || !isValidObjectId(lawyerId)) {
+      return res.status(400).json({ error: "Invalid caseId or lawyerId." });
+    }
+
+    const caseData = await Case.findById(caseId);
+    if (!caseData) return res.status(404).json({ error: "Case not found." });
+    if (!["open", "pending_review"].includes(caseData.status)) {
+      return res.status(400).json({ error: "This case is no longer accepting applications." });
+    }
 
     const alreadyApplied = await Application.findOne({ caseId, lawyerId });
     if (alreadyApplied) {
-      return res.status(400).json({ error: "You have already applied for this case." });
+      return res.status(409).json({ error: "You have already applied for this case." });
     }
 
     const newApp = await Application.create({
@@ -387,7 +614,13 @@ app.post("/apply-case", async (req, res) => {
       status: "pending"
     });
 
-    res.status(201).json(newApp);
+    res.status(201).json({
+      id: newApp.id,
+      caseId: newApp.caseId,
+      lawyerId: newApp.lawyerId,
+      status: newApp.status,
+      createdAt: newApp.createdAt
+    });
   } catch (err) {
     res.status(500).json({ error: "Failed to submit application." });
   }
@@ -398,7 +631,7 @@ app.get("/my-applications/:lawyerId", async (req, res) => {
     const apps = await Application.find({ lawyerId: req.params.lawyerId })
       .populate({
         path: 'caseId',
-        select: 'problemType summary status createdAt' // Anonymized case data
+        select: 'problemType summary location language status createdAt'
       })
       .sort({ createdAt: -1 });
 
@@ -409,7 +642,7 @@ app.get("/my-applications/:lawyerId", async (req, res) => {
       lawyerId: app.lawyerId,
       status: app.status,
       createdAt: app.createdAt,
-      case: app.caseId // Populated object
+      case: serializeCase(app.caseId)
     }));
 
     res.json(enrichedApps);
@@ -442,7 +675,7 @@ app.get("/case-details/:caseId", async (req, res) => {
       return res.status(403).json({ error: "You are not assigned to this case. User identity is hidden until case is assigned." });
     }
 
-    res.json(caseData);
+    res.json(serializeCase(caseData));
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch case details." });
   }
@@ -470,7 +703,7 @@ app.get("/match-lawyers/:caseId", async (req, res) => {
     const lawyerPool = mapped.length ? mapped : getFallbackLawyers();
     const matched = matchLawyersForCase(lawyerPool, caseData);
 
-    res.json({ case: caseData, lawyers: matched.slice(0, 3) });
+    res.json({ case: serializeCase(caseData), lawyers: matched.slice(0, 3) });
   } catch (err) {
     res.status(500).json({ error: "Failed to match lawyers." });
   }
