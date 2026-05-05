@@ -19,7 +19,7 @@ function toggleTheme() {
   if (btn) btn.textContent = isDark ? '☽' : '☀';
 }
 
-const API_BASE_URL = "https://nyaysetu-a5vj.onrender.com";
+const API_BASE_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ? "http://localhost:5000" : "https://nyaysetu-a5vj.onrender.com";
 
 // ── TOAST ──
 function showToast(msg, icon = '✓') {

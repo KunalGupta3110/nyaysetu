@@ -9,7 +9,7 @@
 html,body{height:100%}
 body{display:flex;align-items:center;justify-content:center;padding:20px;min-height:100vh}
 
-.auth-wrap{display:grid;grid-template-columns:0.8fr 1.2fr;max-width:1000px;width:100%;background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadowlg)}
+.auth-wrap{display:grid;grid-template-columns:0.8fr 1.2fr;max-width:1000px;width:100%;max-height:90vh;background:var(--bg1);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadowlg)}
 
 /* Left panel */
 .auth-left{background:linear-gradient(135deg,rgba(201,169,110,.07) 0%,transparent 60%);border-right:1px solid var(--border);padding:48px 44px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
@@ -26,7 +26,7 @@ body{display:flex;align-items:center;justify-content:center;padding:20px;min-hei
 .auth-bottom{position:relative;z-index:2;font-size:11px;color:var(--tm);line-height:1.6}
 
 /* Right panel */
-.auth-right{padding:48px 52px;display:flex;flex-direction:column;justify-content:center}
+.auth-right{padding:48px 52px;display:flex;flex-direction:column;justify-content:center;overflow-y:auto}
 .auth-tabs{display:flex;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:28px}
 .auth-tab{flex:1;padding:9px;font-size:13px;font-weight:500;background:transparent;border:none;color:var(--ts);transition:all var(--t) var(--ease)}
 .auth-tab.active{background:var(--adim);color:var(--accent)}
@@ -458,7 +458,7 @@ window.signUp = async () => {
   setAuthLoading('signup', true);
   
   try {
-    const res = await fetch('/signup', {
+    const res = await fetch(typeof API_BASE_URL !== 'undefined' ? API_BASE_URL + '/signup' : '/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userPayload)
@@ -495,7 +495,7 @@ window.signIn = async () => {
   setAuthLoading('signin', true);
   
   try {
-    const res = await fetch('/login', {
+    const res = await fetch(typeof API_BASE_URL !== 'undefined' ? API_BASE_URL + '/login' : '/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
